@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 2,
+  "id": "servo",
+  "kind": "sfx",
+  "generator": "servo",
+  "params": {
+    "freq": 170
+  },
+  "durationSec": 0.7,
+  "seed": 1,
+  "license": {
+    "id": "procedural-original",
+    "source": "Series Forge procedural synthesis",
+    "commercialUse": "allowed"
+  }
+}

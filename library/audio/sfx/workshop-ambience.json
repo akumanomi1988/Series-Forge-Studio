@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 2,
+  "id": "workshop-ambience",
+  "kind": "ambience",
+  "generator": "workshop-hum",
+  "params": {
+    "hum": 0.7
+  },
+  "durationSec": 24,
+  "seed": 5,
+  "license": {
+    "id": "procedural-original",
+    "source": "Series Forge procedural synthesis",
+    "commercialUse": "allowed"
+  }
+}

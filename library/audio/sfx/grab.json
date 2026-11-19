@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 2,
+  "id": "grab",
+  "kind": "sfx",
+  "generator": "click",
+  "params": {
+    "peak": 0.35
+  },
+  "durationSec": 0.06,
+  "seed": 1,
+  "license": {
+    "id": "procedural-original",
+    "source": "Series Forge procedural synthesis",
+    "commercialUse": "allowed"
+  }
+}

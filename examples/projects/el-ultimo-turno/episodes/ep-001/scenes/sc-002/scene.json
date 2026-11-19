@@ -1,0 +1,473 @@
+{
+  "schemaVersion": 2,
+  "id": "sc-002",
+  "name": "La pieza defectuosa",
+  "environmentId": "taller",
+  "durationSec": "auto",
+  "tailSec": 2.2,
+  "autoLook": true,
+  "synopsis": "Lara descubre la gravedad de la avería; discuten; el fusible cae; Lara lo recoge.",
+  "actors": [
+    {
+      "id": "bruno",
+      "characterId": "bruno",
+      "position": [
+        -0.55,
+        0,
+        -0.5
+      ],
+      "yawDeg": -57,
+      "expression": "nervous",
+      "idle": "idle"
+    },
+    {
+      "id": "lara",
+      "characterId": "lara",
+      "position": [
+        -2.15,
+        0,
+        0.45
+      ],
+      "yawDeg": 123,
+      "expression": "neutral",
+      "idle": "idle"
+    }
+  ],
+  "props": [
+    {
+      "id": "robot",
+      "propId": "robot-r7",
+      "position": [
+        0.25,
+        0,
+        -0.85
+      ],
+      "yawDeg": -35
+    },
+    {
+      "id": "fusible",
+      "propId": "fusible-nucleo",
+      "heldBy": {
+        "actor": "bruno",
+        "hand": "right"
+      }
+    }
+  ],
+  "actions": [
+    {
+      "id": "panel",
+      "type": "propJoint",
+      "prop": "robot",
+      "joint": "panel",
+      "at": 0,
+      "fromDeg": 95,
+      "toDeg": 95,
+      "durationSec": 0.05
+    },
+    {
+      "id": "cabeza",
+      "type": "propJoint",
+      "prop": "robot",
+      "joint": "head",
+      "at": 0,
+      "fromDeg": 12,
+      "toDeg": 12,
+      "durationSec": 0.05
+    },
+    {
+      "id": "oculta",
+      "type": "hold",
+      "actor": "bruno",
+      "at": 0,
+      "hand": "right",
+      "pose": "behind",
+      "durationSec": 0.05
+    },
+    {
+      "id": "lara-al-robot",
+      "type": "walk",
+      "actor": "lara",
+      "at": 0.5,
+      "to": [
+        0.95,
+        0,
+        -0.05
+      ],
+      "faceTo": {
+        "prop": "robot",
+        "anchor": "panel"
+      }
+    },
+    {
+      "id": "lara-mira-panel",
+      "type": "lookAt",
+      "actor": "lara",
+      "with": "lara-al-robot",
+      "offset": 0.8,
+      "target": {
+        "prop": "robot",
+        "anchor": "panel"
+      },
+      "durationSec": 2.2
+    },
+    {
+      "id": "lara-enfado",
+      "type": "expression",
+      "actor": "lara",
+      "after": "lara-al-robot",
+      "expression": "angry",
+      "intensity": 0.8
+    },
+    {
+      "id": "lara-encara",
+      "type": "turn",
+      "actor": "lara",
+      "after": "lara-al-robot",
+      "offset": 0.6,
+      "towards": "bruno"
+    },
+    {
+      "id": "bruno-gira-35",
+      "type": "turn",
+      "actor": "bruno",
+      "after": "l3",
+      "offset": 0.15,
+      "by": -35,
+      "durationSec": 0.9
+    },
+    {
+      "id": "bruno-triste",
+      "type": "expression",
+      "actor": "bruno",
+      "after": "l3",
+      "expression": "sad"
+    },
+    {
+      "id": "cae",
+      "type": "drop",
+      "actor": "bruno",
+      "after": "b5",
+      "offset": 0.45,
+      "prop": "fusible"
+    },
+    {
+      "id": "bruno-susto",
+      "type": "expression",
+      "actor": "bruno",
+      "with": "cae",
+      "offset": 0.25,
+      "expression": "fear",
+      "durationSec": 1.8
+    },
+    {
+      "id": "bruno-mira-pieza",
+      "type": "lookAt",
+      "actor": "bruno",
+      "with": "cae",
+      "offset": 0.2,
+      "target": "fusible",
+      "durationSec": 1.6
+    },
+    {
+      "id": "lara-mira-pieza",
+      "type": "lookAt",
+      "actor": "lara",
+      "with": "cae",
+      "offset": 0.15,
+      "target": "fusible",
+      "durationSec": 2.6
+    },
+    {
+      "id": "lara-va",
+      "type": "walk",
+      "actor": "lara",
+      "after": "cae",
+      "offset": 0.7,
+      "to": {
+        "prop": "fusible",
+        "distance": 0.42
+      }
+    },
+    {
+      "id": "lara-recoge",
+      "type": "pickUp",
+      "actor": "lara",
+      "after": "lara-va",
+      "prop": "fusible",
+      "hand": "right",
+      "durationSec": 1.7
+    },
+    {
+      "id": "lara-ensena",
+      "type": "hold",
+      "actor": "lara",
+      "after": "lara-recoge",
+      "hand": "right",
+      "pose": "show",
+      "durationSec": 0.7
+    },
+    {
+      "id": "lara-mira-mano",
+      "type": "lookAt",
+      "actor": "lara",
+      "after": "lara-recoge",
+      "target": "fusible",
+      "mode": "head",
+      "durationSec": 0.9
+    },
+    {
+      "id": "lara-ironia",
+      "type": "expression",
+      "actor": "lara",
+      "after": "lara-recoge",
+      "offset": 0.3,
+      "expression": "smirk"
+    },
+    {
+      "id": "lara-a-bruno",
+      "type": "turn",
+      "actor": "lara",
+      "after": "lara-recoge",
+      "offset": 0.3,
+      "towards": "bruno"
+    },
+    {
+      "id": "bruno-vuelve",
+      "type": "turn",
+      "actor": "bruno",
+      "with": "l4",
+      "offset": 0.4,
+      "towards": "lara"
+    },
+    {
+      "id": "bruno-nervioso",
+      "type": "expression",
+      "actor": "bruno",
+      "with": "b6",
+      "expression": "nervous"
+    }
+  ],
+  "dialogue": [
+    {
+      "id": "l2",
+      "actor": "lara",
+      "text": "¿Nada grave? Tiene el núcleo quemado y medio circuito fundido.",
+      "to": "bruno",
+      "emotion": "angry",
+      "intensity": 0.8,
+      "after": "lara-encara",
+      "offset": -0.3
+    },
+    {
+      "id": "b4",
+      "actor": "bruno",
+      "text": "Puedo arreglarlo. Solo necesito un poco más de tiempo.",
+      "to": "lara",
+      "emotion": "determined",
+      "gesture": "present",
+      "pauseAfter": 0.3
+    },
+    {
+      "id": "l3",
+      "actor": "lara",
+      "text": "¡Siempre dices lo mismo! Si falla en la inspección, nos cierran el taller.",
+      "to": "bruno",
+      "emotion": "angry",
+      "intensity": 1.1,
+      "gesture": "angry-gesture",
+      "pauseAfter": 1.3
+    },
+    {
+      "id": "b5",
+      "actor": "bruno",
+      "text": "Lo sé. Lo sé.",
+      "emotion": "sad",
+      "after": "bruno-gira-35",
+      "offset": 0.2
+    },
+    {
+      "id": "l4",
+      "actor": "lara",
+      "text": "Vaya, vaya. ¿Y esto qué es, señor nada grave?",
+      "to": "bruno",
+      "emotion": "smirk",
+      "after": "lara-ensena",
+      "offset": 0.2,
+      "pauseAfter": 0.4
+    },
+    {
+      "id": "b6",
+      "actor": "bruno",
+      "text": "Eso... es una historia muy larga.",
+      "to": "lara",
+      "emotion": "nervous",
+      "gesture": "shrug",
+      "pauseAfter": 0.5
+    },
+    {
+      "id": "l5",
+      "actor": "lara",
+      "text": "Tengo toda la noche. Empieza a explicar.",
+      "to": "bruno",
+      "emotion": "smirk",
+      "gesture": "hands-on-hips"
+    }
+  ],
+  "shots": [
+    {
+      "id": "sh-01",
+      "at": 0,
+      "camera": {
+        "framing": "two-shot",
+        "subjects": [
+          "lara",
+          "bruno"
+        ],
+        "fov": 34,
+        "track": true,
+        "elevationDeg": 6
+      },
+      "transitionIn": {
+        "type": "fade",
+        "durationSec": 0.6
+      }
+    },
+    {
+      "id": "sh-02",
+      "with": "l2",
+      "offset": -0.2,
+      "camera": {
+        "framing": "close",
+        "subject": "lara",
+        "azimuthDeg": 18,
+        "fov": 30
+      }
+    },
+    {
+      "id": "sh-03",
+      "with": "b4",
+      "offset": -0.15,
+      "camera": {
+        "framing": "over-shoulder",
+        "over": "lara",
+        "subject": "bruno",
+        "side": "right",
+        "fov": 32
+      }
+    },
+    {
+      "id": "sh-04",
+      "with": "l3",
+      "offset": -0.15,
+      "camera": {
+        "framing": "medium-close",
+        "subject": "lara",
+        "azimuthDeg": -15,
+        "fov": 32,
+        "handheld": 0.5
+      }
+    },
+    {
+      "id": "sh-05",
+      "with": "bruno-gira-35",
+      "offset": -0.3,
+      "camera": {
+        "framing": "medium",
+        "subject": "bruno",
+        "azimuthDeg": 0,
+        "fov": 32,
+        "move": {
+          "type": "push-in",
+          "amount": 0.12
+        }
+      }
+    },
+    {
+      "id": "sh-06",
+      "with": "cae",
+      "offset": -0.25,
+      "camera": {
+        "type": "static",
+        "position": [
+          0.9,
+          0.55,
+          1.6
+        ],
+        "target": [
+          -0.6,
+          0.35,
+          -0.3
+        ],
+        "fov": 42
+      },
+      "notes": "Plano bajo: la pieza cae."
+    },
+    {
+      "id": "sh-07",
+      "with": "lara-va",
+      "offset": 0.2,
+      "camera": {
+        "framing": "full",
+        "subject": "lara",
+        "azimuthDeg": 30,
+        "fov": 34,
+        "track": true
+      }
+    },
+    {
+      "id": "sh-08",
+      "with": "l4",
+      "offset": -0.2,
+      "camera": {
+        "framing": "medium-close",
+        "subject": "lara",
+        "azimuthDeg": 20,
+        "fov": 32
+      }
+    },
+    {
+      "id": "sh-09",
+      "with": "b6",
+      "offset": -0.15,
+      "camera": {
+        "framing": "close",
+        "subject": "bruno",
+        "azimuthDeg": -10,
+        "fov": 30,
+        "handheld": 0.3
+      }
+    },
+    {
+      "id": "sh-10",
+      "with": "l5",
+      "offset": -0.15,
+      "camera": {
+        "framing": "two-shot",
+        "subjects": [
+          "lara",
+          "bruno"
+        ],
+        "fov": 34,
+        "move": {
+          "type": "pull-out",
+          "amount": 0.25
+        }
+      }
+    }
+  ],
+  "sound": [
+    {
+      "id": "ambiente",
+      "kind": "ambience",
+      "sound": "workshop-ambience",
+      "at": 0,
+      "gainDb": -23,
+      "fadeIn": 1,
+      "fadeOut": 0.5
+    }
+  ],
+  "transitionOut": {
+    "type": "fade",
+    "durationSec": 1.6
+  }
+}

@@ -1,0 +1,33 @@
+{
+  "schemaVersion": 2,
+  "id": "ultimo-turno-tema",
+  "kind": "music",
+  "generator": "procedural",
+  "seed": 7,
+  "durationSec": 60,
+  "license": {
+    "id": "procedural-original",
+    "source": "Series Forge procedural composer",
+    "commercialUse": "allowed"
+  },
+  "tempo": 84,
+  "key": "D",
+  "mode": "dorian",
+  "progression": [
+    "i",
+    "VII",
+    "iv",
+    "i",
+    "VI",
+    "VII",
+    "i",
+    "v"
+  ],
+  "instruments": [
+    "pad",
+    "bass",
+    "arp",
+    "bell"
+  ],
+  "mood": "melancólico, cálido, taller al anochecer"
+}

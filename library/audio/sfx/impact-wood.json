@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 2,
+  "id": "impact-wood",
+  "kind": "sfx",
+  "generator": "thud",
+  "params": {
+    "freq": 140,
+    "variants": 2
+  },
+  "durationSec": 0.4,
+  "seed": 1,
+  "license": {
+    "id": "procedural-original",
+    "source": "Series Forge procedural synthesis",
+    "commercialUse": "allowed"
+  }
+}

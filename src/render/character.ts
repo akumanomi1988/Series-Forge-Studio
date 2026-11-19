@@ -356,6 +356,12 @@ export class CharacterVisual {
     const ow = 0.007 * s;
     const add = (m: THREE.Mesh, outline = true) => { H.add(outline ? withOutline(m, ow) : m); return m; };
     const cap = (theta: number, k = 1.07, tilt = -0.48, color = hc) => { const m = new THREE.Mesh(new THREE.SphereGeometry(1, 32, 18, 0, Math.PI * 2, 0, theta), toon(color)); m.scale.set(rx * k * (1 + 0.04 * (v - 1)), ry * k * (1 + 0.08 * (v - 1)), rz * k * (1 + 0.05 * (v - 1))); m.rotation.x = tilt; m.position.y = ry * 0.02; return add(m); };
+    // nape: covers the back of the skull below the tilted cap for every style with hair
+    if (!['bald', 'mohawk'].includes(g.hair.style)) {
+      const nape = new THREE.Mesh(new THREE.SphereGeometry(1, 28, 14, Math.PI * 0.05, Math.PI * 0.9, Math.PI * 0.18, Math.PI * 0.52), toon(g.hair.style === 'buzz' ? mix(hc, g.body.skinColor, 0.35) : hc));
+      nape.rotation.y = Math.PI; nape.scale.set(rx * 1.05, ry * 1.05, rz * 1.06); nape.position.y = ry * 0.02;
+      H.add(withOutline(nape, ow));
+    }
     switch (g.hair.style) {
       case 'bald': break;
       case 'buzz': cap(Math.PI * 0.42, 1.015, -0.48, mix(hc, g.body.skinColor, 0.35)); break;

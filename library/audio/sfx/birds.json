@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 2,
+  "id": "birds",
+  "kind": "ambience",
+  "generator": "birds",
+  "params": {},
+  "durationSec": 20,
+  "seed": 8,
+  "license": {
+    "id": "procedural-original",
+    "source": "Series Forge procedural synthesis",
+    "commercialUse": "allowed"
+  }
+}

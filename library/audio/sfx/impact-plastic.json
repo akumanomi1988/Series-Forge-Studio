@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 2,
+  "id": "impact-plastic",
+  "kind": "sfx",
+  "generator": "thud",
+  "params": {
+    "freq": 260,
+    "variants": 2
+  },
+  "durationSec": 0.3,
+  "seed": 1,
+  "license": {
+    "id": "procedural-original",
+    "source": "Series Forge procedural synthesis",
+    "commercialUse": "allowed"
+  }
+}

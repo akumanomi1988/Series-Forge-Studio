@@ -20,11 +20,29 @@ function subjectPoint(ev: SceneEvaluator, id: string, t: number, framing: string
   if (p) { const v = new THREE.Vector3().setFromMatrixPosition(p.matrix); v.y += 0.1; return v; }
   return new THREE.Vector3(0, 1.2, 0);
 }
+/** Direction the face points (head bone forward, including look-at), evaluated deterministically at t. */
 function facingOf(ev: SceneEvaluator, id: string, t: number): number {
   const a = ev.scene.actors.find(x => x.id === id);
   if (!a) return 0;
-  let seg = a.root[0]; for (const s of a.root) if (s.start <= t) seg = s;
-  return seg.kind === 'turn' ? seg.yawTo : seg.yawFrom;
+  const f = ev.faceForward(id, t);
+  return Math.atan2(f.x, f.z) / DEG;
+}
+/** Rotate the camera around the subject until no other actor blocks the view (vertical capsules r=0.32 m). */
+function unoccluded(ev: SceneEvaluator, subjects: string[], t: number, target: THREE.Vector3, position: THREE.Vector3): THREE.Vector3 {
+  const blockers = ev.scene.actors.filter(a => !subjects.includes(a.id)).map(a => ev.headWorld(a.id, t));
+  const blocked = (cam: THREE.Vector3) => blockers.some(h => {
+    const seg = target.clone().sub(cam); const L = seg.length(); seg.normalize();
+    for (let k = 0.05; k < 0.97; k += 0.03) { const p = cam.clone().addScaledVector(seg, L * k); if (p.y > h.y + 0.25 || p.y < 0) continue; if (Math.hypot(p.x - h.x, p.z - h.z) < 0.34) return true; }
+    return false;
+  });
+  if (!blocked(position)) return position;
+  const rel = position.clone().sub(target);
+  for (let k = 1; k <= 12; k++) {
+    const ang = (k % 2 ? 1 : -1) * Math.ceil(k / 2) * 15 * DEG;
+    const cand = target.clone().add(rel.clone().applyAxisAngle(new THREE.Vector3(0, 1, 0), ang));
+    if (!blocked(cand)) return cand;
+  }
+  return position;
 }
 
 export function shotCamera(ev: SceneEvaluator, shot: ResolvedShot, t: number, aspect: number): CameraState {
@@ -48,11 +66,12 @@ export function shotCamera(ev: SceneEvaluator, shot: ResolvedShot, t: number, as
     if ((c.side === 'right') !== (facing < 0)) normal.multiplyScalar(-1);
     const az = (c.azimuthDeg ?? 0) * DEG;
     const dir = normal.clone().applyAxisAngle(new THREE.Vector3(0, 1, 0), az);
-    const extent = Math.max(EXTENT[c.framing ?? 'two-shot'] ?? 1.5, span * 0.85 + 0.6);
-    const d = dist(extent * 0.75);
+    const extent = Math.max(EXTENT[c.framing ?? 'two-shot'] ?? 1.5, span * 1.15 + 0.9);
+    const d = dist(extent);
     const el = (c.elevationDeg ?? 4) * DEG;
     position = mid.clone().addScaledVector(dir, d * Math.cos(el)).add(new THREE.Vector3(0, d * Math.sin(el), 0));
-    target = mid.clone().add(new THREE.Vector3(0, -0.12, 0));
+    target = mid.clone().add(new THREE.Vector3(0, -0.22, 0));
+    position = unoccluded(ev, ids, tt, target, position);
   } else if (c.framing === 'over-shoulder' && c.over && c.subject) {
     const over = subjectPoint(ev, c.over, tt, 'close'), subj = subjectPoint(ev, c.subject, tt, 'close');
     const axis = subj.clone().sub(over).setY(0).normalize();
@@ -68,6 +87,7 @@ export function shotCamera(ev: SceneEvaluator, shot: ResolvedShot, t: number, as
     const dir = new THREE.Vector3(Math.sin(yaw * DEG) * Math.cos(el), Math.sin(el), Math.cos(yaw * DEG) * Math.cos(el));
     position = p.clone().addScaledVector(dir, d);
     target = p.clone();
+    position = unoccluded(ev, [id], tt, target, position);
   }
   // camera moves
   if (c.move && c.move.type !== 'none') {

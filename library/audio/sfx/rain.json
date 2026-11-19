@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 2,
+  "id": "rain",
+  "kind": "ambience",
+  "generator": "rain",
+  "params": {},
+  "durationSec": 20,
+  "seed": 6,
+  "license": {
+    "id": "procedural-original",
+    "source": "Series Forge procedural synthesis",
+    "commercialUse": "allowed"
+  }
+}

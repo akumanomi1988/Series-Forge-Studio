@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 2,
+  "id": "whoosh",
+  "kind": "sfx",
+  "generator": "whoosh",
+  "params": {},
+  "durationSec": 0.7,
+  "seed": 1,
+  "license": {
+    "id": "procedural-original",
+    "source": "Series Forge procedural synthesis",
+    "commercialUse": "allowed"
+  }
+}

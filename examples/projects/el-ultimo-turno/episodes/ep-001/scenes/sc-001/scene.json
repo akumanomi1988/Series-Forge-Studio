@@ -1,0 +1,415 @@
+{
+  "schemaVersion": 2,
+  "id": "sc-001",
+  "name": "El robot averiado",
+  "environmentId": "taller",
+  "durationSec": "auto",
+  "tailSec": 1.2,
+  "autoLook": true,
+  "synopsis": "Bruno intenta reparar el R-7; Lara llega al final de su turno.",
+  "actors": [
+    {
+      "id": "bruno",
+      "characterId": "bruno",
+      "position": [
+        -0.55,
+        0,
+        -0.5
+      ],
+      "yawDeg": 72,
+      "expression": "worried",
+      "idle": "idle"
+    },
+    {
+      "id": "lara",
+      "characterId": "lara",
+      "position": [
+        -5.4,
+        0,
+        0.62
+      ],
+      "yawDeg": 90,
+      "expression": "neutral",
+      "idle": "idle"
+    }
+  ],
+  "props": [
+    {
+      "id": "robot",
+      "propId": "robot-r7",
+      "position": [
+        0.25,
+        0,
+        -0.85
+      ],
+      "yawDeg": -35
+    },
+    {
+      "id": "fusible",
+      "propId": "fusible-nucleo",
+      "heldBy": {
+        "actor": "bruno",
+        "hand": "right"
+      }
+    }
+  ],
+  "actions": [
+    {
+      "id": "panel",
+      "type": "propJoint",
+      "prop": "robot",
+      "joint": "panel",
+      "at": 0,
+      "fromDeg": 95,
+      "toDeg": 95,
+      "durationSec": 0.05
+    },
+    {
+      "id": "sujeta",
+      "type": "hold",
+      "actor": "bruno",
+      "at": 0,
+      "hand": "right",
+      "pose": "side",
+      "durationSec": 0.05
+    },
+    {
+      "id": "mira-robot",
+      "type": "lookAt",
+      "actor": "bruno",
+      "at": 0,
+      "target": {
+        "prop": "robot",
+        "anchor": "panel"
+      },
+      "durationSec": 3.4
+    },
+    {
+      "id": "chispas",
+      "type": "effect",
+      "effect": "sparks",
+      "prop": "robot",
+      "part": "cavity",
+      "after": "b1",
+      "offset": 0.25,
+      "durationSec": 1,
+      "intensity": 1.4,
+      "sound": "sparks"
+    },
+    {
+      "id": "ojo",
+      "type": "effect",
+      "effect": "flicker",
+      "prop": "robot",
+      "part": "eyeL",
+      "with": "chispas",
+      "durationSec": 2.2
+    },
+    {
+      "id": "susto",
+      "type": "expression",
+      "actor": "bruno",
+      "with": "chispas",
+      "offset": 0.05,
+      "expression": "fear",
+      "durationSec": 1.3
+    },
+    {
+      "id": "retrocede",
+      "type": "play",
+      "actor": "bruno",
+      "with": "chispas",
+      "offset": 0.05,
+      "clip": "shrug",
+      "speed": 1.4
+    },
+    {
+      "id": "cabeza-robot",
+      "type": "propJoint",
+      "prop": "robot",
+      "joint": "head",
+      "after": "chispas",
+      "offset": 0.1,
+      "toDeg": -28,
+      "durationSec": 0.6,
+      "sound": "servo"
+    },
+    {
+      "id": "pitido",
+      "type": "effect",
+      "effect": "glow",
+      "prop": "robot",
+      "part": "antennaTip",
+      "with": "cabeza-robot",
+      "offset": 0.4,
+      "durationSec": 0.9,
+      "intensity": 2
+    },
+    {
+      "id": "cabeza-robot-2",
+      "type": "propJoint",
+      "prop": "robot",
+      "joint": "head",
+      "after": "cabeza-robot",
+      "offset": 0.5,
+      "toDeg": 12,
+      "durationSec": 0.7,
+      "sound": "servo"
+    },
+    {
+      "id": "mira-robot-2",
+      "type": "lookAt",
+      "actor": "bruno",
+      "with": "b2",
+      "target": {
+        "prop": "robot",
+        "anchor": "eye"
+      },
+      "durationSec": 2
+    },
+    {
+      "id": "puerta-abre",
+      "type": "propJoint",
+      "prop": "puerta",
+      "joint": "leaf",
+      "after": "b2",
+      "offset": 0.4,
+      "toDeg": -100,
+      "durationSec": 1.2,
+      "sound": "door-creak"
+    },
+    {
+      "id": "lara-entra",
+      "type": "walk",
+      "actor": "lara",
+      "with": "puerta-abre",
+      "offset": 0.5,
+      "to": [
+        -2.15,
+        0,
+        0.45
+      ],
+      "gait": "walk-brisk",
+      "faceTo": "bruno"
+    },
+    {
+      "id": "bruno-gira",
+      "type": "turn",
+      "actor": "bruno",
+      "with": "lara-entra",
+      "offset": 0.9,
+      "towards": "lara"
+    },
+    {
+      "id": "esconde",
+      "type": "hold",
+      "actor": "bruno",
+      "with": "lara-entra",
+      "offset": 1.1,
+      "hand": "right",
+      "pose": "behind",
+      "durationSec": 0.7
+    },
+    {
+      "id": "nervios",
+      "type": "expression",
+      "actor": "bruno",
+      "with": "esconde",
+      "expression": "nervous"
+    },
+    {
+      "id": "puerta-cierra",
+      "type": "propJoint",
+      "prop": "puerta",
+      "joint": "leaf",
+      "after": "lara-entra",
+      "offset": -0.4,
+      "toDeg": 0,
+      "durationSec": 1,
+      "sound": "click"
+    }
+  ],
+  "dialogue": [
+    {
+      "id": "b1",
+      "actor": "bruno",
+      "text": "Vamos, pequeño. No me hagas esto ahora.",
+      "emotion": "nervous",
+      "intensity": 0.8,
+      "pauseAfter": 2.6
+    },
+    {
+      "id": "b2",
+      "actor": "bruno",
+      "text": "Solo es un fusible... creo.",
+      "emotion": "worried",
+      "direction": "en voz baja, para sí mismo",
+      "pauseAfter": 0.4
+    },
+    {
+      "id": "l1",
+      "actor": "lara",
+      "text": "¿Todavía aquí, Bruno? El turno acabó hace una hora.",
+      "to": "bruno",
+      "emotion": "surprise",
+      "intensity": 0.7,
+      "after": "lara-entra",
+      "offset": 0.2
+    },
+    {
+      "id": "b3",
+      "actor": "bruno",
+      "text": "Sí, sí. Estaba ajustando unos tornillos. Nada grave.",
+      "to": "lara",
+      "emotion": "nervous",
+      "gesture": "present",
+      "pauseAfter": 0.5
+    }
+  ],
+  "shots": [
+    {
+      "id": "sh-01",
+      "at": 0,
+      "camera": {
+        "type": "static",
+        "position": [
+          1.6,
+          2.2,
+          5.6
+        ],
+        "target": [
+          -0.6,
+          1,
+          -1.1
+        ],
+        "fov": 38,
+        "move": {
+          "type": "push-in",
+          "amount": 0.12
+        }
+      },
+      "transitionIn": {
+        "type": "fade",
+        "durationSec": 1.2
+      },
+      "notes": "Plano general de establecimiento."
+    },
+    {
+      "id": "sh-02",
+      "with": "b1",
+      "offset": -0.3,
+      "camera": {
+        "framing": "medium-close",
+        "subject": "bruno",
+        "azimuthDeg": -25,
+        "fov": 32
+      }
+    },
+    {
+      "id": "sh-03",
+      "with": "chispas",
+      "offset": -0.15,
+      "camera": {
+        "type": "static",
+        "position": [
+          1.15,
+          1.05,
+          0.55
+        ],
+        "target": [
+          0.2,
+          0.62,
+          -0.85
+        ],
+        "fov": 40,
+        "handheld": 0.6
+      },
+      "notes": "Inserto del panel con chispas."
+    },
+    {
+      "id": "sh-04",
+      "with": "b2",
+      "offset": -0.2,
+      "camera": {
+        "framing": "close",
+        "subject": "bruno",
+        "azimuthDeg": -15,
+        "fov": 30,
+        "move": {
+          "type": "push-in",
+          "amount": 0.1
+        }
+      }
+    },
+    {
+      "id": "sh-05",
+      "with": "puerta-abre",
+      "offset": -0.2,
+      "camera": {
+        "type": "static",
+        "position": [
+          2.6,
+          1.75,
+          3.4
+        ],
+        "target": [
+          -2.4,
+          1.15,
+          0.2
+        ],
+        "fov": 40
+      },
+      "transitionIn": {
+        "type": "dissolve",
+        "durationSec": 0.7
+      },
+      "notes": "Transición encadenada: Lara entra."
+    },
+    {
+      "id": "sh-06",
+      "with": "l1",
+      "offset": -0.2,
+      "camera": {
+        "framing": "over-shoulder",
+        "over": "bruno",
+        "subject": "lara",
+        "side": "right",
+        "fov": 32
+      }
+    },
+    {
+      "id": "sh-07",
+      "with": "b3",
+      "offset": -0.1,
+      "camera": {
+        "framing": "medium-close",
+        "subject": "bruno",
+        "azimuthDeg": 10,
+        "fov": 32,
+        "handheld": 0.35
+      }
+    }
+  ],
+  "sound": [
+    {
+      "id": "ambiente",
+      "kind": "ambience",
+      "sound": "workshop-ambience",
+      "at": 0,
+      "gainDb": -23,
+      "fadeIn": 1,
+      "fadeOut": 0.5
+    },
+    {
+      "id": "pitido-triste",
+      "kind": "sfx",
+      "sound": "robot-sad",
+      "with": "pitido",
+      "gainDb": -6
+    }
+  ],
+  "transitionOut": {
+    "type": "fade",
+    "durationSec": 0.6
+  }
+}

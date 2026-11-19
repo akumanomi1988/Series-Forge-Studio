@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 2,
+  "id": "wind",
+  "kind": "ambience",
+  "generator": "wind",
+  "params": {},
+  "durationSec": 20,
+  "seed": 4,
+  "license": {
+    "id": "procedural-original",
+    "source": "Series Forge procedural synthesis",
+    "commercialUse": "allowed"
+  }
+}

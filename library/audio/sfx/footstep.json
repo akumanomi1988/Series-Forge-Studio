@@ -1,0 +1,18 @@
+{
+  "schemaVersion": 2,
+  "id": "footstep",
+  "kind": "sfx",
+  "generator": "footstep",
+  "params": {
+    "surface": "concrete",
+    "variants": 4,
+    "peak": 0.7
+  },
+  "durationSec": 0.18,
+  "seed": 1,
+  "license": {
+    "id": "procedural-original",
+    "source": "Series Forge procedural synthesis",
+    "commercialUse": "allowed"
+  }
+}

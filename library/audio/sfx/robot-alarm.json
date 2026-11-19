@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 2,
+  "id": "robot-alarm",
+  "kind": "sfx",
+  "generator": "robot-beep",
+  "params": {
+    "notes": "1600,1200,1600,1200"
+  },
+  "durationSec": 0.8,
+  "seed": 1,
+  "license": {
+    "id": "procedural-original",
+    "source": "Series Forge procedural synthesis",
+    "commercialUse": "allowed"
+  }
+}

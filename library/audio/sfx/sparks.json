@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 2,
+  "id": "sparks",
+  "kind": "sfx",
+  "generator": "sparks",
+  "params": {},
+  "durationSec": 1.1,
+  "seed": 1,
+  "license": {
+    "id": "procedural-original",
+    "source": "Series Forge procedural synthesis",
+    "commercialUse": "allowed"
+  }
+}

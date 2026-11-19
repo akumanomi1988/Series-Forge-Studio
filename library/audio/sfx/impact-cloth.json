@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 2,
+  "id": "impact-cloth",
+  "kind": "sfx",
+  "generator": "thud",
+  "params": {
+    "freq": 80
+  },
+  "durationSec": 0.25,
+  "seed": 1,
+  "license": {
+    "id": "procedural-original",
+    "source": "Series Forge procedural synthesis",
+    "commercialUse": "allowed"
+  }
+}

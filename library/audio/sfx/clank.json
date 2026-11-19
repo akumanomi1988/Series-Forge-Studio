@@ -1,0 +1,18 @@
+{
+  "schemaVersion": 2,
+  "id": "clank",
+  "kind": "sfx",
+  "generator": "metal-impact",
+  "params": {
+    "freq": 620,
+    "decay": 0.4,
+    "brightness": 0.9
+  },
+  "durationSec": 1,
+  "seed": 1,
+  "license": {
+    "id": "procedural-original",
+    "source": "Series Forge procedural synthesis",
+    "commercialUse": "allowed"
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "schemaVersion": 2,
+  "id": "impact-glass",
+  "kind": "sfx",
+  "generator": "metal-impact",
+  "params": {
+    "freq": 2600,
+    "decay": 0.2,
+    "brightness": 1.4
+  },
+  "durationSec": 0.8,
+  "seed": 1,
+  "license": {
+    "id": "procedural-original",
+    "source": "Series Forge procedural synthesis",
+    "commercialUse": "allowed"
+  }
+}

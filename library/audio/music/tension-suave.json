@@ -1,0 +1,29 @@
+{
+  "schemaVersion": 2,
+  "id": "tension-suave",
+  "kind": "music",
+  "generator": "procedural",
+  "seed": 7,
+  "durationSec": 60,
+  "license": {
+    "id": "procedural-original",
+    "source": "Series Forge procedural composer",
+    "commercialUse": "allowed"
+  },
+  "tempo": 96,
+  "key": "A",
+  "mode": "minor",
+  "progression": [
+    "i",
+    "VI",
+    "III",
+    "VII"
+  ],
+  "instruments": [
+    "pad",
+    "bass",
+    "pluck",
+    "drums"
+  ],
+  "mood": "tensión ligera"
+}

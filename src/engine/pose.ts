@@ -389,12 +389,30 @@ export class SceneEvaluator {
   }
   assetsFor(actorId: string): CharacterAssets { const a = this.scene.actors.find(x => x.id === actorId)!; const c = this.lib.characters[a.characterId]; return { geometry: c.geometry, clips: c.clips, locomotion: c.locomotion, expressions: c.expressions }; }
   /** Evaluate every actor at time t (props are derived on demand). */
+  private evaluatedAt = new Map<string, number>();
+  private evaluating = new Map<string, RigInstance>();
   evaluate(t: number): void {
     this.time = t;
-    for (const a of this.scene.actors) this.poses.set(a.id, evaluateActor(this.rigs.get(a.id)!, a, this.assetsFor(a.id), t, this.ctx(t)));
+    this.evaluatedAt.clear();
+    for (const a of this.scene.actors) {
+      const rig = this.rigs.get(a.id)!;
+      this.evaluating.set(a.id, rig);
+      try { this.poses.set(a.id, evaluateActor(rig, a, this.assetsFor(a.id), t, this.ctx(t))); } finally { this.evaluating.delete(a.id); }
+      this.evaluatedAt.set(a.id, t);
+    }
   }
   private ctx(_t: number): SceneContext {
     return { targetWorld: (target, t, self) => this.targetWorld(target, t, self), cameraPos: this.cameraPos };
+  }
+  /** World forward vector of the actor's face at time t (probe evaluation, does not disturb the visible rig). */
+  faceForward(actorId: string, t: number): THREE.Vector3 {
+    const a = this.scene.actors.find(x => x.id === actorId)!;
+    const rig = this.probes.get(actorId)!;
+    if (this.evaluating.has(actorId)) { const r = rootAt(a, t); return new THREE.Vector3(Math.sin(r.yaw * DEG), 0, Math.cos(r.yaw * DEG)); }
+    this.evaluating.set(actorId, rig);
+    try { evaluateActor(rig, a, this.assetsFor(actorId), t, this.ctx(t)); } finally { this.evaluating.delete(actorId); }
+    const f = new THREE.Vector3(0, 0, 1).applyQuaternion(rig.bone('head').getWorldQuaternion(new THREE.Quaternion()));
+    f.y = 0; return f.lengthSq() > 1e-6 ? f.normalize() : new THREE.Vector3(0, 0, 1);
   }
   /** Approximate head position of an actor without evaluating its full pose (avoids evaluation cycles). */
   headWorld(actorId: string, t: number): THREE.Vector3 {
@@ -427,7 +445,13 @@ export class SceneEvaluator {
   /** Hand-held prop transform at time t for actor (uses already-evaluated pose when t is current time). */
   private heldMatrix(actor: string, hand: 'left' | 'right', propId: string, t: number, useProbe: boolean): THREE.Matrix4 {
     let rig = this.rigs.get(actor)!;
-    if (useProbe) { rig = this.probes.get(actor)!; const a = this.scene.actors.find(x => x.id === actor)!; evaluateActor(rig, a, this.assetsFor(actor), t, this.ctx(t)); }
+    const inProgress = this.evaluating.get(actor);
+    if (inProgress) rig = inProgress; // the actor's own (partially posed) rig: no recursion
+    else if (useProbe) {
+      rig = this.probes.get(actor)!; const a = this.scene.actors.find(x => x.id === actor)!;
+      this.evaluating.set(actor, rig);
+      try { evaluateActor(rig, a, this.assetsFor(actor), t, this.ctx(t)); } finally { this.evaluating.delete(actor); }
+    }
     const handBone = rig.bone(`${hand}Hand`);
     const geo = this.lib.props[this.scene.props.find(p => p.id === propId)?.propId ?? ''];
     const grip = geo?.anchors.grip ?? { position: [0, 0, 0] as Vec3, rotationDeg: [0, 0, 0] as Vec3 };
@@ -452,7 +476,7 @@ export class SceneEvaluator {
       return { matrix: (parent?.matrix.clone() ?? new THREE.Matrix4()).multiply(local), joints };
     }
     if (seg.kind === 'held') {
-      const current = Math.abs(t - this.time) < 1e-9 && this.poses.has(seg.actor);
+      const current = this.evaluatedAt.get(seg.actor) === t;
       return { matrix: this.heldMatrix(seg.actor, seg.hand, propId, t, !current).scale(scale), joints };
     }
     // fall: analytic ballistic motion with bounces, then rest

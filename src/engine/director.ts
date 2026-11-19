@@ -138,6 +138,40 @@ export function compileScene(scene: SceneV2, lib: AssetLibrary, opts: DirectorOp
     }
     return end;
   }
+  /** Other actors' ground positions at time t (planning view). */
+  function othersAt(self: string, t: number): Vec3[] { return actors.filter(a => a.id !== self).map(a => { let seg = a.root[0]; for (const s of a.root) if (s.start <= t) seg = s; return seg.kind === 'walk' ? seg.to : seg.from; }); }
+  const PERSONAL = 0.62;
+  /** Point at distance r from target, as close as possible to the straight approach, away from other actors. */
+  function approachPoint(self: string, from: Vec3, target: Vec3, r: number, t: number): Vec3 {
+    const others = othersAt(self, t);
+    const base = Math.atan2(from[0] - target[0], from[2] - target[2]);
+    for (let k = 0; k <= 12; k++) {
+      const a = base + (k % 2 ? 1 : -1) * Math.ceil(k / 2) * (Math.PI / 12);
+      const p: Vec3 = [target[0] + Math.sin(a) * r, 0, target[2] + Math.cos(a) * r];
+      if (others.every(o => dist2D(o, p) >= PERSONAL)) return p;
+    }
+    return [target[0] + Math.sin(base) * r, 0, target[2] + Math.cos(base) * r];
+  }
+  function clearDest(self: string, dest: Vec3, t: number): Vec3 {
+    let p: Vec3 = [...dest] as Vec3;
+    for (let iter = 0; iter < 4; iter++) for (const o of othersAt(self, t)) {
+      const d0 = dist2D(o, p);
+      if (d0 < PERSONAL) { const k = d0 > 1e-3 ? PERSONAL / d0 : 1; p = d0 > 1e-3 ? [o[0] + (p[0] - o[0]) * k, 0, o[2] + (p[2] - o[2]) * k] : [o[0] + PERSONAL, 0, o[2]]; warnings.push('Destino de ' + self + ' desplazado para no atravesar a otro personaje'); }
+    }
+    return p;
+  }
+  /** Straight walk, or two legs around the first actor blocking the path. */
+  function walkAround(id: string, start: number, dest: Vec3, gait?: string, speed?: number): number {
+    const from = rootState(id).from;
+    const dx = dest[0] - from[0], dz = dest[2] - from[2], L2 = dx * dx + dz * dz || 1, L = Math.sqrt(L2);
+    const block = othersAt(id, start).map(o => { const u = clamp(((o[0] - from[0]) * dx + (o[2] - from[2]) * dz) / L2, 0, 1); const px = from[0] + dx * u, pz = from[2] + dz * u; return { o, d: Math.hypot(o[0] - px, o[2] - pz), u, side: Math.sign((o[0] - from[0]) * dz - (o[2] - from[2]) * dx) || 1 }; })
+      .filter(b => b.d < 0.55 && b.u > 0.05 && b.u < 0.95).sort((a, b) => a.u - b.u)[0];
+    if (!block) return planWalk(id, start, dest, gait, speed);
+    const nx = -dz / L * block.side, nz = dx / L * block.side;
+    const wp: Vec3 = [block.o[0] - nx * 0.8, 0, block.o[2] - nz * 0.8];
+    const mid = planWalk(id, start, wp, gait, speed);
+    return planWalk(id, mid, dest, gait, speed);
+  }
   function holdPose(pose: string, hand: 'left' | 'right'): TargetRef {
     const s = hand === 'left' ? 1 : -1;
     switch (pose) {
@@ -237,10 +271,10 @@ export function compileScene(scene: SceneV2, lib: AssetLibrary, opts: DirectorOp
       case 'walk': {
         let dest: Vec3;
         const r = rootState(a.actor);
-        if (Array.isArray(a.to)) dest = a.to as Vec3;
-        else if ('prop' in a.to) { const p = pointOf({ kind: 'prop', prop: a.to.prop, anchor: a.to.anchor ?? 'grip' }, s); const D = dist2D(r.from, p); const k = D > 1e-3 ? Math.max(0, D - a.to.distance) / D : 0; dest = [lerp(r.from[0], p[0], k), 0, lerp(r.from[2], p[2], k)]; }
-        else { const other = rootState(a.to.actor).from; const D = dist2D(r.from, other); const k = D > 1e-3 ? Math.max(0, D - a.to.distance) / D : 0; dest = [lerp(r.from[0], other[0], k), 0, lerp(r.from[2], other[2], k)]; }
-        let end = planWalk(a.actor, s, dest, a.gait, a.speed);
+        if (Array.isArray(a.to)) dest = clearDest(a.actor, a.to as Vec3, s);
+        else if ('prop' in a.to) dest = approachPoint(a.actor, r.from, pointOf({ kind: 'prop', prop: a.to.prop, anchor: a.to.anchor ?? 'grip' }, s), a.to.distance, s);
+        else dest = approachPoint(a.actor, r.from, rootState(a.to.actor).from, a.to.distance, s);
+        let end = walkAround(a.actor, s, dest, a.gait, a.speed);
         if (a.faceTo !== undefined) { const p = pointOf(targetRef(a.faceTo), end); end = planTurn(a.actor, end, yawTowards(rootState(a.actor).from, p)); }
         else if (typeof a.to === 'object' && !Array.isArray(a.to)) { const p = 'prop' in a.to ? pointOf({ kind: 'prop', prop: a.to.prop, anchor: a.to.anchor ?? 'grip' }, end) : rootState(a.to.actor).from; end = planTurn(a.actor, end, yawTowards(rootState(a.actor).from, p)); }
         return end;
@@ -290,7 +324,7 @@ export function compileScene(scene: SceneV2, lib: AssetLibrary, opts: DirectorOp
       }
       case 'hold': {
         const from = currentHoldTarget(a.actor, a.hand) ?? holdPose('side', a.hand);
-        const propId = a.prop ?? handState.get(`${a.actor}:${a.hand}`)?.prop;
+        const propId = a.prop ?? handState.get(`${a.actor}:${a.hand}`)?.prop ?? props.find(p => { const s = p.segments[p.segments.length - 1]; return s.kind === 'held' && s.actor === a.actor && s.hand === a.hand; })?.id;
         startHold(a.actor, a.hand, s, { kind: 'blend', from, to: holdPose(a.pose, a.hand), start: s, end: s + a.durationSec, ease: 'easeInOut' }, propId, handState.has(`${a.actor}:${a.hand}`) ? 0 : 0.3);
         const st = handState.get(`${a.actor}:${a.hand}`)!; st.inst.end = s + a.durationSec;
         startHold(a.actor, a.hand, s + a.durationSec, holdPose(a.pose, a.hand), propId);

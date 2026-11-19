@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 2,
+  "id": "alegre",
+  "kind": "music",
+  "generator": "procedural",
+  "seed": 7,
+  "durationSec": 60,
+  "license": {
+    "id": "procedural-original",
+    "source": "Series Forge procedural composer",
+    "commercialUse": "allowed"
+  },
+  "tempo": 112,
+  "key": "G",
+  "mode": "major",
+  "progression": [
+    "I",
+    "V",
+    "vi",
+    "IV"
+  ],
+  "instruments": [
+    "pad",
+    "bass",
+    "pluck",
+    "drums",
+    "bell"
+  ],
+  "mood": "comedia ligera"
+}
