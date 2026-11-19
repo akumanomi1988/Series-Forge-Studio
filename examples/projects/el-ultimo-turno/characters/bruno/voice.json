@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 2,
+  "provider": "windows-onecore",
+  "voice": "Microsoft Pablo",
+  "language": "es-ES",
+  "rate": 0.96,
+  "pitchSemitones": -2.5,
+  "formantPreserve": true,
+  "gainDb": 0,
+  "eq": {
+    "lowDb": 2.5,
+    "midDb": 0,
+    "highDb": -1.5
+  },
+  "emotionProsody": true,
+  "license": {
+    "id": "windows-onecore-voices",
+    "commercialUse": "unknown",
+    "notes": "Voz del sistema Windows. Revisar los términos de licencia de Windows antes de distribuir comercialmente; alternativa: proveedor piper con un modelo de licencia verificada."
+  }
+}

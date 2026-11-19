@@ -1,0 +1,72 @@
+{
+  "schemaVersion": 2,
+  "generator": "humanoid-toon",
+  "body": {
+    "height": 1.74,
+    "headScale": 1.06,
+    "headWidth": 1.05,
+    "jaw": 0.85,
+    "shoulderWidth": 0.5,
+    "hipWidth": 0.34,
+    "armThickness": 0.064,
+    "legThickness": 0.084,
+    "chestDepth": 0.27,
+    "belly": 0.55,
+    "chest": 0.4,
+    "neckLength": 0.055,
+    "handSize": 1.1,
+    "footSize": 1.05,
+    "skinColor": "#d9a27a"
+  },
+  "face": {
+    "eyeSize": 0.92,
+    "eyeSpacing": 1.02,
+    "irisColor": "#6b4a2e",
+    "eyeShape": "round",
+    "browThickness": 1.7,
+    "noseShape": "round",
+    "noseSize": 1.3,
+    "mouthWidth": 1.05,
+    "lipColor": "#7a2f3a",
+    "earSize": 1.1
+  },
+  "hair": {
+    "style": "short",
+    "color": "#3a2a20",
+    "volume": 0.95
+  },
+  "beard": {
+    "style": "full",
+    "color": "#3a2a20"
+  },
+  "outfit": {
+    "top": {
+      "type": "overalls",
+      "color": "#3f6e9e",
+      "secondaryColor": "#e7e1d3"
+    },
+    "bottom": {
+      "type": "pants",
+      "color": "#3f6e9e"
+    },
+    "shoes": {
+      "type": "boots",
+      "color": "#5a3b26"
+    }
+  },
+  "accessories": [
+    {
+      "type": "goggles",
+      "color": "#5c4b36",
+      "secondaryColor": "#e8a33d",
+      "position": "forehead"
+    },
+    {
+      "type": "toolbelt",
+      "color": "#6b4a2f",
+      "secondaryColor": "#8a6542"
+    }
+  ],
+  "parts": [],
+  "outlineWidth": 0.012
+}

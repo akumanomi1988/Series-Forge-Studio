@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 2,
+  "relations": [
+    {
+      "characterId": "lara",
+      "type": "compañeros de taller",
+      "feeling": "aprecio y miedo a decepcionarla",
+      "trust": 0.7,
+      "history": [
+        "Fundaron juntos el Taller 7 hace seis años."
+      ]
+    }
+  ]
+}

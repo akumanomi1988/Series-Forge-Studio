@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 2,
+  "generator": "workbench",
+  "params": {
+    "width": 1.8,
+    "depth": 0.8,
+    "height": 0.92,
+    "topColor": "#9b7552",
+    "legColor": "#3e4a56"
+  },
+  "material": "wood"
+}

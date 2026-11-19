@@ -1,0 +1,10 @@
+{
+  "schemaVersion": 2,
+  "generator": "console",
+  "params": {
+    "height": 1.1,
+    "color": "#3a4552",
+    "screenColor": "#3fd2ff"
+  },
+  "material": "metal"
+}

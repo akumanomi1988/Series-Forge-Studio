@@ -1,0 +1,11 @@
+{
+  "schemaVersion": 2,
+  "generator": "shelf",
+  "params": {
+    "width": 1.3,
+    "height": 2,
+    "depth": 0.42,
+    "color": "#6d5640"
+  },
+  "material": "wood"
+}

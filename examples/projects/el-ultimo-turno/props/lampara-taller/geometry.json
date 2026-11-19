@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 2,
+  "generator": "lamp",
+  "params": {
+    "height": 2.55,
+    "color": "#2f3b46",
+    "lightColor": "#ffcf8a",
+    "intensity": 3.2,
+    "distance": 6
+  },
+  "material": "metal"
+}

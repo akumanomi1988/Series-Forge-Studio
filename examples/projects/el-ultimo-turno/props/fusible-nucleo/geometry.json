@@ -1,0 +1,13 @@
+{
+  "schemaVersion": 2,
+  "generator": "component",
+  "params": {
+    "radius": 0.032,
+    "length": 0.13,
+    "color": "#cfd6dc",
+    "glow": "#ff5a3c",
+    "lying": true
+  },
+  "material": "metal",
+  "restHeight": 0.032
+}

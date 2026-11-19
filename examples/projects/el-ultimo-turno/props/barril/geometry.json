@@ -1,0 +1,9 @@
+{
+  "schemaVersion": 2,
+  "generator": "barrel",
+  "params": {
+    "height": 0.9,
+    "color": "#2e6e8e"
+  },
+  "material": "metal"
+}

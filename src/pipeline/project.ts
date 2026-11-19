@@ -11,6 +11,7 @@ import {
 } from '../engine/schema.ts';
 import type { CharacterGeometry, ClipV2, Locomotion, ExpressionV2, PropGeometry, EnvironmentV2, SceneV2, Episode, VoiceProfile, SfxDef, MusicDef } from '../engine/schema.ts';
 import type { AssetLibrary } from '../engine/timeline.ts';
+import { withDefaults } from '../engine/props.ts';
 import type { Vec3 } from '../engine/math.ts';
 
 export const REPO_ROOT = resolve(import.meta.dirname, '..', '..');
@@ -163,7 +164,7 @@ export async function loadProject(project: string): Promise<LoadedProject> {
     let geometry: PropGeometry | null;
     if (raw.schemaVersion === 1) { geometry = r.parse(`${base}/geometry.json`, { schemaVersion: 2, generator: 'parts', parts: raw.parts ?? [] }, PropGeometrySchema); r.warn(`${base}/geometry.json`, 'Objeto v1 migrado en memoria'); }
     else geometry = r.parse(`${base}/geometry.json`, raw, PropGeometrySchema);
-    if (geometry) out.props[id] = { id, name: String(manifest.name ?? id), geometry };
+    if (geometry) out.props[id] = { id, name: String(manifest.name ?? id), geometry: withDefaults(geometry) };
   }
   // environments
   for (const id of await dirs(join(root, 'environments'))) {

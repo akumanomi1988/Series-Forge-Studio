@@ -5,4 +5,5 @@ data/*.lock
 data/*.tmp
 data/previews/
 *.log
-.DS_Store
+.DS_Storepublic/build/
+scripts/debug-*.ts

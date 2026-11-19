@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 2,
+  "id": "lara",
+  "type": "character",
+  "name": "Lara Ibarra",
+  "rigType": "humanoid",
+  "age": 33,
+  "tags": [
+    "protagonista",
+    "ingeniera"
+  ]
+}

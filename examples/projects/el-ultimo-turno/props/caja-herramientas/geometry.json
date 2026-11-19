@@ -1,0 +1,9 @@
+{
+  "schemaVersion": 2,
+  "generator": "toolbox",
+  "params": {
+    "height": 0.22,
+    "color": "#c0392b"
+  },
+  "material": "metal"
+}

@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 2,
+  "id": "bruno",
+  "type": "character",
+  "name": "Bruno Castell",
+  "rigType": "humanoid",
+  "age": 46,
+  "tags": [
+    "protagonista",
+    "mecánico"
+  ]
+}

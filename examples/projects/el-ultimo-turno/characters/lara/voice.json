@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 2,
+  "provider": "windows-onecore",
+  "voice": "Microsoft Laura",
+  "language": "es-ES",
+  "rate": 1.04,
+  "pitchSemitones": 0.5,
+  "formantPreserve": true,
+  "gainDb": 0,
+  "eq": {
+    "lowDb": 0,
+    "midDb": 1,
+    "highDb": 1
+  },
+  "emotionProsody": true,
+  "license": {
+    "id": "windows-onecore-voices",
+    "commercialUse": "unknown",
+    "notes": "Voz del sistema Windows. Revisar términos antes de distribución comercial."
+  }
+}

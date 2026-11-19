@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 2,
+  "generator": "door",
+  "params": {
+    "width": 1,
+    "height": 2.15,
+    "color": "#56708a",
+    "frameColor": "#2b3947",
+    "accent": "#e8a33d"
+  },
+  "material": "metal"
+}

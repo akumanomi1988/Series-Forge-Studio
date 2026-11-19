@@ -1,0 +1,76 @@
+{
+  "schemaVersion": 2,
+  "generator": "humanoid-toon",
+  "body": {
+    "height": 1.69,
+    "headScale": 1,
+    "headWidth": 0.95,
+    "jaw": 0.3,
+    "shoulderWidth": 0.4,
+    "hipWidth": 0.33,
+    "armThickness": 0.048,
+    "legThickness": 0.068,
+    "chestDepth": 0.22,
+    "belly": 0,
+    "chest": 0.45,
+    "neckLength": 0.075,
+    "handSize": 0.95,
+    "footSize": 0.92,
+    "skinColor": "#b97a55"
+  },
+  "face": {
+    "eyeSize": 1.12,
+    "eyeSpacing": 1,
+    "eyeHeight": 0.05,
+    "irisColor": "#2f7d5b",
+    "eyeShape": "almond",
+    "browThickness": 1,
+    "browColor": "#1d1a24",
+    "noseShape": "button",
+    "noseSize": 0.85,
+    "mouthWidth": 0.95,
+    "lipColor": "#a33a4a",
+    "earSize": 0.9,
+    "blush": 0.25
+  },
+  "hair": {
+    "style": "ponytail",
+    "color": "#1d1a24",
+    "volume": 1.1
+  },
+  "beard": {
+    "style": "none"
+  },
+  "outfit": {
+    "top": {
+      "type": "jacket",
+      "color": "#c0392b",
+      "secondaryColor": "#2c3e50"
+    },
+    "bottom": {
+      "type": "pants",
+      "color": "#2c3e50"
+    },
+    "shoes": {
+      "type": "sneakers",
+      "color": "#ecf0f1",
+      "soleColor": "#c0392b"
+    }
+  },
+  "accessories": [
+    {
+      "type": "badge",
+      "color": "#f1c40f"
+    },
+    {
+      "type": "watch",
+      "color": "#2d2d2d"
+    },
+    {
+      "type": "earrings",
+      "color": "#f1c40f"
+    }
+  ],
+  "parts": [],
+  "outlineWidth": 0.011
+}

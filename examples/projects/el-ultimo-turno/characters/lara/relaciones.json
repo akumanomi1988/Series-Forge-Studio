@@ -1,0 +1,15 @@
+{
+  "schemaVersion": 2,
+  "relations": [
+    {
+      "characterId": "bruno",
+      "type": "compañeros de taller",
+      "feeling": "cariño exasperado",
+      "trust": 0.6,
+      "history": [
+        "Fundaron juntos el Taller 7 hace seis años.",
+        "Bruno le ocultó una deuda el año pasado."
+      ]
+    }
+  ]
+}

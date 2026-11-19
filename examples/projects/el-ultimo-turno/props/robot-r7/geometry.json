@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 2,
+  "generator": "robot",
+  "params": {
+    "height": 1.1,
+    "color": "#c8ccd2",
+    "accent": "#e8a33d",
+    "eyeColor": "#5ff0ff",
+    "damaged": true
+  },
+  "material": "metal"
+}
