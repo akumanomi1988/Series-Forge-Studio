@@ -1,0 +1,27 @@
+{
+  "title": "Los últimos mecánicos",
+  "synopsis": "Vera, una mecánica impulsiva, y Nox, un robot cauteloso, deben encontrar una llave para escapar de un laboratorio averiado. Se quieren como hermanos, pero no confían en las decisiones del otro.",
+  "genre": "ciencia ficción y comedia",
+  "characters": [
+    {"ref":"vera","name":"Vera","prompt":"Crea una mujer con pelo largo negro, gafas y chaqueta roja","personality":"Impulsiva, sarcástica y valiente","goal":"Sacar a los dos del laboratorio","voice":{"voice.locale":"es-ES","voice.pitch":1.12}},
+    {"ref":"nox","name":"Nox","prompt":"Crea un robot con camisa azul y ojos verdes","personality":"Cauteloso y metódico","goal":"Evitar daños durante la huida","voice":{"voice.locale":"es-ES","voice.pitch":0.82}}
+  ],
+  "environments": [
+    {"ref":"lab","name":"Laboratorio oscuro","prompt":"Crea un laboratorio nocturno con paredes azules"}
+  ],
+  "objects": [
+    {"ref":"key","name":"Llave maestra","prompt":"Crea una llave dorada"},
+    {"ref":"door","name":"Puerta blindada","prompt":"Crea una puerta gris de metal"}
+  ],
+  "relationships": [
+    {"fromRef":"vera","toRef":"nox","relation":"hermandad no biológica","feeling":"afecto, con impaciencia"},
+    {"fromRef":"nox","toRef":"vera","relation":"hermandad no biológica","feeling":"lealtad y preocupación"}
+  ],
+  "scenes": [
+    {"ref":"scene_a","name":"La alarma","environmentRef":"lab","durationSeconds":16,"description":"Suena la alarma. Vera busca la llave. Nox comprueba la salida.","actors":[{"ref":"vera","x":235,"y":465,"expression":"enfadado","pose":"señalar"},{"ref":"nox","x":640,"y":465,"expression":"asustado","pose":"idle"}],"props":[{"ref":"key","x":485,"y":466},{"ref":"door","x":820,"y":465}],"dialogues":[{"characterRef":"vera","text":"¿Dónde está la llave maestra? Nos quedan segundos."},{"characterRef":"nox","text":"La he localizado. Pero alguien la ha dejado junto a esa puerta."}]},
+    {"ref":"scene_b","name":"El hallazgo","environmentRef":"lab","durationSeconds":18,"description":"Vera ve la llave y deja de discutir con Nox.","actors":[{"ref":"vera","x":440,"y":465,"expression":"feliz","pose":"señalar"},{"ref":"nox","x":690,"y":465,"expression":"sorprendido","pose":"idle"}],"props":[{"ref":"key","x":490,"y":467}],"dialogues":[{"characterRef":"vera","text":"¡La tengo! Nox, abre esa puerta."},{"characterRef":"nox","text":"De acuerdo. Y por favor, esta vez sin explosiones."}]}
+  ],
+  "events": [
+    {"characterRef":"vera","summary":"Vera halló la llave maestra en el laboratorio y prometió confiar más en Nox.","emotion":"feliz"}
+  ]
+}

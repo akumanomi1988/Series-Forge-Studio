@@ -1,0 +1,29 @@
+<!doctype html><html lang="es"><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/><meta name="theme-color" content="#0a0f1b"/><title>Series Forge Studio</title><link rel="stylesheet" href="/style.css"/></head>
+<body>
+<div id="app">
+ <aside class="sidebar">
+  <header class="brand"><div class="brand-mark">SF</div><div><strong>SERIES FORGE</strong><span>PROCEDURAL STUDIO</span></div><span class="brand-version">v0.1</span></header>
+  <div class="side-kicker">BIBLIOTECA DE PRODUCCIÓN</div>
+  <nav class="categories" id="categories"></nav>
+  <div class="side-filter"><input type="search" id="search" placeholder="Buscar assets..." aria-label="Buscar assets"></div>
+  <div class="library" id="library"></div>
+  <footer class="sidebar-footer"><button id="demo" class="outline full">Cargar universo de ejemplo</button><button id="export" class="ghost full">↓ Exportar biblioteca JSON</button><span id="storage-indicator">◉ Datos locales persistentes</span></footer>
+ </aside>
+ <main class="workspace">
+  <div class="topbar"><div class="crumb"><span>WORKSPACE</span><span class="slash">/</span><b id="workspace-title">Estudio</b></div><div class="top-actions"><span id="model-status" class="chip">Chat local</span><span class="chip ok">● Local</span></div></div>
+  <section class="stage-panel">
+   <div class="panel-header"><div><span class="eyebrow">PREVISUALIZACIÓN PROCEDURAL</span><h1 id="asset-title">Tu estudio de creación</h1></div><div class="buttons"><span id="revision" class="revision"></span><button class="primary small hidden" id="play-scene">▶ Escuchar escena</button><button class="outline small" id="download-svg">Exportar SVG</button></div></div>
+   <div id="stage" class="stage"><div class="empty-state"><div class="empty-symbol">✦</div><h2>Un universo desde cero</h2><p>Crea un personaje, escenario u objeto por chat y observa cómo cambia al instante.</p><div class="prompt-tags"><button class="suggest">Crea un hombre llamado Alex</button><button class="suggest">Crea un laboratorio futurista</button><button class="suggest">Crea una llave dorada</button></div></div></div>
+   <div id="stage-footer" class="stage-footer"><span><span class="live-dot"></span> SVG procedural editable</span><span id="stage-info">Sin asset seleccionado</span></div>
+  </section>
+  <section class="production-panel"><div class="section-head"><div><span class="eyebrow">CONTINUIDAD Y NARRATIVA</span><h2>Universo de producción</h2></div><button id="new-scene" class="outline small">+ Nueva escena</button></div><div class="overview" id="overview"></div><div class="scene-list" id="scene-list"></div></section>
+ </main>
+ <aside class="assistant-pane"><div class="right-tabs"><button id="tab-chat" class="right-tab active" data-tab="chat">Asistente</button><button id="tab-inspector" class="right-tab" data-tab="inspector">Inspector</button><button id="tab-story" class="right-tab" data-tab="story">Narrativa</button></div>
+  <div id="chat-panel" class="right-content"><div class="assistant-head"><div class="agent-avatar">✧</div><div><strong>Director creativo</strong><small>Edición conversacional de assets</small></div><span class="status-pulse"></span></div><div id="chat-messages" class="messages"><div class="bubble assistant">Puedes pedirme que cree personajes y escenarios, y después modificarlos sin perder identidad. Por ejemplo: <b>«Crea un hombre llamado Bruno, con chaqueta roja y pelo negro»</b>.</div></div><div class="examples" id="examples"><button class="suggest">Ponle gafas y hazlo más alto</button><button class="suggest">Haz que esté enfadado</button><button class="suggest">Cámbiale la camisa a verde</button></div><form id="chat-form" class="composer"><textarea id="chat-input" rows="3" placeholder="Describe qué quieres crear o modificar..."></textarea><div class="composer-footer"><span>Ctrl + Intro para enviar</span><button type="submit" id="send" class="primary">Enviar ↗</button></div></form><p class="fine-print">Modo local: comandos naturales limitados. Admite un LLM opcional para instrucciones abiertas.</p></div>
+  <div id="inspector-panel" class="right-content hidden"><div id="inspector"><div class="empty-inspector">Selecciona un asset para editar sus propiedades visuales y narrativas.</div></div></div>
+  <div id="story-panel" class="right-content hidden"><div class="story-head"><h3>Memoria narrativa</h3><p>Relaciones, eventos, biografía e historia persistentes entre escenas.</p></div><div id="story-content"></div></div>
+ </aside>
+</div>
+<div id="toast" role="status" aria-live="polite"></div>
+<script type="module" src="/app.js"></script>
+</body></html>
