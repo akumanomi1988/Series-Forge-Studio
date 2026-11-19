@@ -1,6 +1,6 @@
 /** File-first Series Forge editor. All AI interaction happens outside the application. */
 import { createServer } from 'node:http';
-import { readFile } from 'node:fs/promises';
+import { readFile, readdir } from 'node:fs/promises';
 import { join, resolve, extname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { FileWorkspace } from './workspace.mjs';
@@ -24,7 +24,13 @@ function json(res,status,value){res.writeHead(status,{'Content-Type':'applicatio
 async function requestBody(req){if(!String(req.headers['content-type']||'').startsWith('application/json'))throw new Error('Se requiere application/json');const chunks=[];let size=0;for await(const chunk of req){size+=chunk.length;if(size>750_000)throw new Error('Petición demasiado grande');chunks.push(chunk);}return JSON.parse(Buffer.concat(chunks).toString('utf8')||'{}');}
 async function bundle(project,kind,id){
  const base=`${kind}/${id}/`,list=kind==='characters'?['manifest.json','geometry.json','rig.json','voice.json','animations/idle.json','animations/walk.json','expressions/neutral.json','expressions/surprised.json','aspecto.md','personalidad.md','biografia.md','gustos.md','relaciones.json']:kind==='environments'?['manifest.json','environment.json','descripcion.md']:kind==='props'?['manifest.json','geometry.json','descripcion.md']:['manifest.json','sinopsis.md','guion.md'];
- const result={kind,id,files:{},errors:[]};for(const file of list){try{const obj=await workspace.read(project,base+file);result.files[file]={...obj,parsed:file.endsWith('.json')?JSON.parse(obj.content):null};}catch(e){result.errors.push({file,error:e.message});}}return result;
+ const dynamic=new Set(list);const root=await workspace.securePath(project,base);
+ for(const entry of await readdir(root,{withFileTypes:true}))if(entry.isFile()&&/^[a-z0-9][a-z0-9_-]*\.md$/.test(entry.name))dynamic.add(entry.name);
+ if(kind==='characters')for(const category of ['animations','expressions']){
+  try{const dir=await workspace.securePath(project,base+category),entries=await readdir(dir,{withFileTypes:true});if(entries.length>200)throw new Error('Demasiados recursos en '+category);
+   for(const entry of entries)if(entry.isFile()&&/^[a-z0-9][a-z0-9_-]*\.json$/.test(entry.name))dynamic.add(category+'/'+entry.name);
+  }catch(e){if(e.code!=='ENOENT')throw e;}}
+ const result={kind,id,files:{},errors:[]};for(const file of [...dynamic].sort()){try{const obj=await workspace.read(project,base+file);result.files[file]={...obj,parsed:file.endsWith('.json')?JSON.parse(obj.content):null};}catch(e){if(e.code!=='ENOENT')result.errors.push({file,error:e.message});}}return result;
 }
 async function handler(req,res){
  res.setHeader('X-Content-Type-Options','nosniff');res.setHeader('X-Frame-Options','DENY');res.setHeader('Referrer-Policy','no-referrer');
