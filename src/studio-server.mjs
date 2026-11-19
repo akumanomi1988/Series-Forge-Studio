@@ -4,11 +4,21 @@ import { readFile } from 'node:fs/promises';
 import { join, resolve, extname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { FileWorkspace } from './workspace.mjs';
+import { exportEpisode } from './export-episode.mjs';
+import { createReadStream } from 'node:fs';
+import { randomUUID } from 'node:crypto';
 
 const cwd=resolve(fileURLToPath(new URL('../',import.meta.url)));
 const workspace=await new FileWorkspace().init();
 const host='127.0.0.1',port=Number(process.env.PORT||4317);
 const MIME={'.html':'text/html; charset=utf-8','.js':'text/javascript; charset=utf-8','.css':'text/css; charset=utf-8','.svg':'image/svg+xml; charset=utf-8'};
+const renderJobs=new Map();
+function startRender(options){
+ if([...renderJobs.values()].some(j=>j.state==='running'))throw new Error('Ya hay un render en proceso');
+ const id=randomUUID(),job={id,state:'running',progress:{status:'queued'},result:null,error:null,createdAt:Date.now()};renderJobs.set(id,job);
+ for(const [key,item] of renderJobs)if(Date.now()-item.createdAt>24*3600_000)renderJobs.delete(key);
+ exportEpisode({...options,workspace,progress:x=>{job.progress=x;}}).then(result=>{job.state='done';job.result=result;}).catch(e=>{job.state='error';job.error=e.message;});return {id,state:job.state};
+}
 const files=new Map([['/','studio.html'],['/studio.html','studio.html'],['/studio.js','studio.js'],['/studio.css','studio.css'],['/viewport.js','viewport.js']]);
 function json(res,status,value){res.writeHead(status,{'Content-Type':'application/json; charset=utf-8','Cache-Control':'no-store'});res.end(JSON.stringify(value));}
 async function requestBody(req){if(!String(req.headers['content-type']||'').startsWith('application/json'))throw new Error('Se requiere application/json');const chunks=[];let size=0;for await(const chunk of req){size+=chunk.length;if(size>750_000)throw new Error('Petición demasiado grande');chunks.push(chunk);}return JSON.parse(Buffer.concat(chunks).toString('utf8')||'{}');}
@@ -27,6 +37,7 @@ async function handler(req,res){
    if(req.headers.origin&&!['http://127.0.0.1:'+port,'http://localhost:'+port].includes(req.headers.origin))return json(res,403,{error:'Origen no permitido'});
    const body=await requestBody(req);
    if(path==='/api/projects')return json(res,201,await workspace.createProject(body.name));
+   if(path==='/api/render')return json(res,202,startRender({project:body.project,episode:body.episode,width:body.full?1920:640,height:body.full?1080:360,fps:body.full?24:12,maxSeconds:body.full?null:8,speech:body.speech==='sapi'?'sapi':'none'}));
    if(path==='/api/assets')return json(res,201,await workspace.createAsset(body.project,body.kind,body.name));
    if(path==='/api/scenes')return json(res,201,await workspace.createScene(body.project,body.episode,body.name));
    if(path==='/api/file')return json(res,200,await workspace.put(body.project,body.path,body.content,body.expectedHash??null));
@@ -35,6 +46,8 @@ async function handler(req,res){
   }
   if(req.method!=='GET'&&req.method!=='HEAD')return json(res,405,{error:'Método no permitido'});
   if(path==='/api/projects')return json(res,200,await workspace.projects());
+  if(path==='/api/render-status'){const job=renderJobs.get(url.searchParams.get('id'));return job?json(res,200,{id:job.id,state:job.state,progress:job.progress,error:job.error,result:job.result}):json(res,404,{error:'Render no encontrado'});}
+  if(path==='/api/render-file'){const job=renderJobs.get(url.searchParams.get('id'));if(!job||job.state!=='done')return json(res,404,{error:'Render no disponible'});const type=url.searchParams.get('type'),file=type==='video'?job.result.video:type==='subtitles'?job.result.srt:null;if(!file)return json(res,400,{error:'Tipo no permitido'});res.writeHead(200,{'Content-Type':type==='video'?'video/mp4':'text/plain; charset=utf-8','Content-Disposition':`attachment; filename="${type==='video'?'episodio.mp4':'subtitulos.srt'}"`,'Cache-Control':'no-store'});return createReadStream(file).pipe(res);}
   if(path==='/api/catalog')return json(res,200,await workspace.catalog(project));
   if(path==='/api/asset')return json(res,200,await bundle(project,url.searchParams.get('kind'),url.searchParams.get('id')));
   if(path==='/api/file')return json(res,200,await workspace.read(project,url.searchParams.get('path')));
