@@ -41,9 +41,9 @@ async function handler(req,res){
   if(path==='/api/scenes')return json(res,200,await workspace.listScenes(project,url.searchParams.get('episode')));
   if(path==='/api/changes'){
    res.writeHead(200,{'Content-Type':'text/event-stream','Cache-Control':'no-cache, no-transform','Connection':'keep-alive','X-Accel-Buffering':'no'});res.write(': connected\n\n');
-   let last=0;const stop=await workspace.watch(project,ev=>{if(Date.now()-last<100)return;last=Date.now();if(!res.destroyed)res.write(`event: change\ndata: ${JSON.stringify(ev)}\n\n`);});
+   let pending=null;const stop=await workspace.watch(project,ev=>{clearTimeout(pending);pending=setTimeout(()=>{if(!res.destroyed)res.write(`event: change\ndata: ${JSON.stringify(ev)}\n\n`);},180);});
    const timer=setInterval(()=>{if(!res.destroyed)res.write(': keepalive\n\n');},20000);
-   res.on('close',()=>{clearInterval(timer);stop();});return;
+   res.on('close',()=>{clearInterval(timer);clearTimeout(pending);stop();});return;
   }
   if(path==='/vendor/three.module.js'){
    try{const data=await readFile(join(cwd,'node_modules','three','build','three.module.js'));res.writeHead(200,{'Content-Type':'text/javascript','Cache-Control':'public, max-age=3600'});res.end(data);}catch{json(res,404,{error:'Three.js no instalado. Ejecuta npm install.'});}return;

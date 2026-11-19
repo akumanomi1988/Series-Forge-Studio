@@ -39,7 +39,7 @@ export class Viewport {
  }
  setYaw(deg){this.defaultYaw=deg;for(const a of this.actors)a.body.rotation.y=deg*RAD;}
  setPerformance(animation,expression){for(const a of this.actors){if(animation)a.animation=animation;if(expression)a.expression=expression;}}
- setTime(t){this.elapsed=Math.max(0,Number(t)||0);this.draw();}
+ setTime(t){this.elapsed=Math.max(0,Number(t)||0);this.onFrame?.(this.elapsed);this.draw();}
  loadCharacter(bundle){this.clear();this.mode='character';this.buildActor(bundle,[0,0,0],this.defaultYaw);this.camera.position.set(3.2,2.6,6.3);this.camera.lookAt(0,1,0);this.draw();}
  loadProp(bundle){this.clear();this.mode='prop';const parts=bundle.files?.['geometry.json']?.parsed?.parts||[];const g=new THREE.Group();this.root.add(g);for(const p of parts)g.add(mesher(p));this.camera.position.set(3,2.4,5);this.camera.lookAt(0,.65,0);this.draw();}
  addEnvironment(bundle){const env=bundle.files?.['environment.json']?.parsed||{};const [w,h,d]=vec(env.size,[12,8,9]);const mat=new THREE.MeshToonMaterial({color:validHex(env.backdropColor)});const rear=new THREE.Mesh(new THREE.BoxGeometry(w,h,.1),mat);rear.position.set(0,h/2,-d/2);this.root.add(rear);const l=new THREE.Mesh(new THREE.BoxGeometry(.1,h,d),mat);l.position.set(-w/2,h/2,0);this.root.add(l);this.draw();}
@@ -47,6 +47,6 @@ export class Viewport {
  async loadScene(scene,getBundle){this.clear();this.mode='scene';for(const a of scene.actors){try{const data=await getBundle('characters',a.characterId);this.buildActor(data,a.position,a.yawDeg,a.headYawDeg,a.animation,a.expression);}catch(e){console.warn('Actor inválido',a.characterId,e);}}for(const p of scene.props||[]){try{const b=await getBundle('props',p.propId);const g=new THREE.Group();g.position.fromArray(vec(p.position));g.rotation.y=(p.yawDeg||0)*RAD;this.root.add(g);for(const part of b.files?.['geometry.json']?.parsed?.parts||[])g.add(mesher(part));}catch(e){console.warn('Prop inválido',e);}}
   this.camera.position.fromArray(vec(scene.camera?.position,[0,2.4,8]));this.camera.lookAt(...vec(scene.camera?.target,[0,1,0]));this.draw();}
  draw(){for(const a of this.actors)this.applyActor(a,this.elapsed);this.renderer.render(this.scene,this.camera);}
- frame(now){const dt=Math.min(.1,(now-this.last)/1000);this.last=now;if(this.playing)this.elapsed+=dt;this.draw();this.req=requestAnimationFrame(this.frame);}
+ frame(now){const dt=Math.min(.1,(now-this.last)/1000);this.last=now;if(this.playing){this.elapsed+=dt;this.onFrame?.(this.elapsed);}this.draw();this.req=requestAnimationFrame(this.frame);}
  dispose(){cancelAnimationFrame(this.req);this.resizeObserver.disconnect();this.clear();this.renderer.dispose();this.host.replaceChildren();}
 }
