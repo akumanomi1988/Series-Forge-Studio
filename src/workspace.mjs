@@ -72,22 +72,11 @@ export function validateScene(s){
  for(const b of s.beats){if(!Number.isFinite(b.startSec)||!Number.isFinite(b.endSec)||b.startSec<0||b.endSec<b.startSec||b.endSec>s.durationSec||!['dialogue','action','camera','effect'].includes(b.type))throw new Error('Beat inválido');}
  return s;
 }
-export function evaluateScene(scene,timeSec){
- validateScene(scene);const t=Math.min(scene.durationSec,Math.max(0,Number(timeSec)||0));
- const actors=scene.actors.map(a=>({...a,position:[...a.position],headYawDeg:a.headYawDeg||0,expression:a.expression||'neutral',animation:a.animation||'idle'}));
- const camera=structuredClone(scene.camera);
- for(const b of scene.beats.filter(b=>b.startSec<=t).sort((a,b)=>a.startSec-b.startSec)){
-  const alpha=b.endSec===b.startSec?1:Math.min(1,(t-b.startSec)/(b.endSec-b.startSec));
-  if(b.type==='action'){
-   const actor=actors.find(a=>a.characterId===b.actorId);if(!actor)continue;
-   if(b.toPosition&&Array.isArray(b.fromPosition)&&b.fromPosition.length===3){actor.position=b.fromPosition.map((x,i)=>x+(b.toPosition[i]-x)*alpha);}
-   if(Number.isFinite(b.yawDeg))actor.yawDeg=(b.fromYawDeg??actor.yawDeg)+(b.yawDeg-(b.fromYawDeg??actor.yawDeg))*alpha;
-   if(b.animation)actor.animation=b.animation;
-   if(b.expression)actor.expression=b.expression;
-  }
-  if(b.type==='camera'&&b.position&&Array.isArray(b.fromPosition))camera.position=b.fromPosition.map((x,i)=>x+(b.position[i]-x)*alpha);
- }
- return {timeSec:t,actors,camera,activeDialogues:scene.beats.filter(b=>b.type==='dialogue'&&b.startSec<=t&&b.endSec>=t)};
+export { evaluateSceneFrame } from '../public/scene-runtime.js';
+import { evaluateSceneFrame } from '../public/scene-runtime.js';
+export function evaluateScene(scene, timeSec) {
+ validateScene(scene);
+ return evaluateSceneFrame(scene, timeSec);
 }
 
 export class FileWorkspace {
