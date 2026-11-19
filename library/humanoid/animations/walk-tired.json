@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 2,
+  "id": "walk-tired",
+  "kind": "locomotion",
+  "rigType": "humanoid",
+  "description": "Caminar cansado/pesado.",
+  "gait": "walk",
+  "speed": 0.85,
+  "strideScale": 0.8,
+  "stepHeight": 0.06,
+  "bob": 0.035,
+  "sway": 0.03,
+  "hipYawDeg": 6,
+  "armSwingDeg": 12,
+  "elbowBendDeg": 18,
+  "leanDeg": 8,
+  "crouch": 0,
+  "flight": 0
+}

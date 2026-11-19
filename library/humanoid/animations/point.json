@@ -1,0 +1,123 @@
+{
+  "schemaVersion": 2,
+  "id": "point",
+  "rigType": "humanoid",
+  "kind": "keyframes",
+  "description": "Señala con el brazo derecho; apunta a target si la acción lo define.",
+  "duration": 1.8,
+  "loop": false,
+  "layer": "arms",
+  "tracks": [
+    {
+      "bone": "rightUpperArm",
+      "property": "rotation",
+      "keys": [
+        {
+          "t": 0,
+          "v": [
+            0,
+            0,
+            -6
+          ]
+        },
+        {
+          "t": 0.35,
+          "v": [
+            -82,
+            0,
+            -14
+          ]
+        },
+        {
+          "t": 1.4,
+          "v": [
+            -82,
+            0,
+            -14
+          ]
+        },
+        {
+          "t": 1.8,
+          "v": [
+            0,
+            0,
+            -6
+          ]
+        }
+      ]
+    },
+    {
+      "bone": "rightLowerArm",
+      "property": "rotation",
+      "keys": [
+        {
+          "t": 0,
+          "v": [
+            -10,
+            0,
+            0
+          ]
+        },
+        {
+          "t": 0.35,
+          "v": [
+            -6,
+            0,
+            0
+          ]
+        },
+        {
+          "t": 1.4,
+          "v": [
+            -6,
+            0,
+            0
+          ]
+        },
+        {
+          "t": 1.8,
+          "v": [
+            -10,
+            0,
+            0
+          ]
+        }
+      ]
+    }
+  ],
+  "face": [],
+  "ik": [
+    {
+      "chain": "rightArm",
+      "target": {
+        "offset": [
+          0,
+          0,
+          0
+        ],
+        "space": "actor"
+      },
+      "weight": [
+        [
+          0,
+          0
+        ],
+        [
+          0.35,
+          1
+        ],
+        [
+          1.4,
+          1
+        ],
+        [
+          1.8,
+          0
+        ]
+      ]
+    }
+  ],
+  "grip": {
+    "right": 0.35
+  }
+}

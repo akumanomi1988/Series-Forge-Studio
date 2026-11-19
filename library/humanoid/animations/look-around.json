@@ -1,0 +1,98 @@
+{
+  "schemaVersion": 2,
+  "id": "look-around",
+  "rigType": "humanoid",
+  "kind": "keyframes",
+  "description": "Mira alrededor (cabeza y pecho).",
+  "duration": 3,
+  "loop": false,
+  "layer": "head",
+  "tracks": [
+    {
+      "bone": "neck",
+      "property": "rotation",
+      "keys": [
+        {
+          "t": 0,
+          "v": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "t": 0.8,
+          "v": [
+            0,
+            35,
+            0
+          ]
+        },
+        {
+          "t": 1.6,
+          "v": [
+            5,
+            -30,
+            0
+          ]
+        },
+        {
+          "t": 2.4,
+          "v": [
+            0,
+            10,
+            0
+          ]
+        },
+        {
+          "t": 3,
+          "v": [
+            0,
+            0,
+            0
+          ]
+        }
+      ]
+    },
+    {
+      "bone": "head",
+      "property": "rotation",
+      "keys": [
+        {
+          "t": 0,
+          "v": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "t": 0.8,
+          "v": [
+            -5,
+            20,
+            0
+          ]
+        },
+        {
+          "t": 1.6,
+          "v": [
+            0,
+            -25,
+            0
+          ]
+        },
+        {
+          "t": 3,
+          "v": [
+            0,
+            0,
+            0
+          ]
+        }
+      ]
+    }
+  ],
+  "face": [],
+  "ik": []
+}

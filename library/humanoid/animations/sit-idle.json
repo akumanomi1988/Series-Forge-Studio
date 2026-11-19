@@ -1,0 +1,44 @@
+{
+  "schemaVersion": 2,
+  "id": "sit-idle",
+  "rigType": "humanoid",
+  "kind": "keyframes",
+  "description": "Sentado: respiración con manos en los muslos.",
+  "duration": 4,
+  "loop": true,
+  "layer": "upper",
+  "tracks": [
+    {
+      "bone": "chest",
+      "property": "rotation",
+      "keys": [
+        {
+          "t": 0,
+          "v": [
+            1,
+            0,
+            0
+          ]
+        },
+        {
+          "t": 2,
+          "v": [
+            -1,
+            0,
+            0
+          ]
+        },
+        {
+          "t": 4,
+          "v": [
+            1,
+            0,
+            0
+          ]
+        }
+      ]
+    }
+  ],
+  "face": [],
+  "ik": []
+}

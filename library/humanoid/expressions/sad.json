@@ -1,0 +1,34 @@
+{
+  "schemaVersion": 2,
+  "id": "sad",
+  "description": "Tristeza.",
+  "face": {
+    "browRaiseL": 0.1,
+    "browRaiseR": 0.1,
+    "browAngleL": 0.85,
+    "browAngleR": 0.85,
+    "lidUpperL": 0.38,
+    "lidUpperR": 0.38,
+    "mouthSmile": -0.65,
+    "mouthPress": 0.2,
+    "headNodDeg": 9
+  },
+  "posture": {
+    "chest": [
+      6,
+      0,
+      0
+    ],
+    "leftShoulder": [
+      0,
+      0,
+      -5
+    ],
+    "rightShoulder": [
+      0,
+      0,
+      5
+    ]
+  },
+  "blinkRate": 0.7
+}

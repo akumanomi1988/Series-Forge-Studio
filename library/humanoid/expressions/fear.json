@@ -1,0 +1,38 @@
+{
+  "schemaVersion": 2,
+  "id": "fear",
+  "description": "Miedo.",
+  "face": {
+    "browRaiseL": 0.85,
+    "browRaiseR": 0.85,
+    "browAngleL": 0.75,
+    "browAngleR": 0.75,
+    "lidUpperL": 0,
+    "lidUpperR": 0,
+    "eyeScale": 1.2,
+    "pupilScale": 0.65,
+    "mouthOpen": 0.35,
+    "mouthWide": 0.45,
+    "mouthSmile": -0.45,
+    "teethShow": 0.6,
+    "headNodDeg": -4
+  },
+  "posture": {
+    "leftShoulder": [
+      0,
+      0,
+      9
+    ],
+    "rightShoulder": [
+      0,
+      0,
+      -9
+    ],
+    "chest": [
+      -3,
+      0,
+      0
+    ]
+  },
+  "blinkRate": 1.8
+}

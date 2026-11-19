@@ -1,0 +1,62 @@
+{
+  "schemaVersion": 2,
+  "id": "hands-on-hips",
+  "rigType": "humanoid",
+  "kind": "keyframes",
+  "description": "Manos en la cintura.",
+  "duration": 1,
+  "loop": false,
+  "layer": "arms",
+  "tracks": [],
+  "face": [],
+  "ik": [
+    {
+      "chain": "leftArm",
+      "target": {
+        "bone": "hips",
+        "offset": [
+          0.19,
+          0.08,
+          0
+        ],
+        "space": "bone"
+      },
+      "weight": [
+        [
+          0,
+          0
+        ],
+        [
+          0.45,
+          1
+        ]
+      ]
+    },
+    {
+      "chain": "rightArm",
+      "target": {
+        "bone": "hips",
+        "offset": [
+          -0.19,
+          0.08,
+          0
+        ],
+        "space": "bone"
+      },
+      "weight": [
+        [
+          0,
+          0
+        ],
+        [
+          0.45,
+          1
+        ]
+      ]
+    }
+  ],
+  "grip": {
+    "left": 0.7,
+    "right": 0.7
+  }
+}

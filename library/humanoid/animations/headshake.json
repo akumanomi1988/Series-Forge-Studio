@@ -1,0 +1,60 @@
+{
+  "schemaVersion": 2,
+  "id": "headshake",
+  "rigType": "humanoid",
+  "kind": "keyframes",
+  "description": "Niega con la cabeza (aditivo).",
+  "duration": 1,
+  "loop": false,
+  "layer": "additive",
+  "tracks": [
+    {
+      "bone": "head",
+      "property": "rotation",
+      "keys": [
+        {
+          "t": 0,
+          "v": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "t": 0.2,
+          "v": [
+            0,
+            18,
+            0
+          ]
+        },
+        {
+          "t": 0.45,
+          "v": [
+            0,
+            -18,
+            0
+          ]
+        },
+        {
+          "t": 0.7,
+          "v": [
+            0,
+            14,
+            0
+          ]
+        },
+        {
+          "t": 1,
+          "v": [
+            0,
+            0,
+            0
+          ]
+        }
+      ]
+    }
+  ],
+  "face": [],
+  "ik": []
+}

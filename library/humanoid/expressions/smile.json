@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 2,
+  "id": "smile",
+  "description": "Sonrisa suave.",
+  "face": {
+    "browRaiseL": 0.1,
+    "browRaiseR": 0.1,
+    "lidLowerL": 0.18,
+    "lidLowerR": 0.18,
+    "mouthSmile": 0.6,
+    "cheekRaise": 0.3
+  },
+  "posture": {}
+}

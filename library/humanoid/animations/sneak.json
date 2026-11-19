@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 2,
+  "id": "sneak",
+  "kind": "locomotion",
+  "rigType": "humanoid",
+  "description": "Andar sigiloso agachado.",
+  "gait": "sneak",
+  "speed": 0.6,
+  "strideScale": 0.75,
+  "stepHeight": 0.08,
+  "bob": 0.01,
+  "sway": 0.02,
+  "hipYawDeg": 6,
+  "armSwingDeg": 10,
+  "elbowBendDeg": 40,
+  "leanDeg": 16,
+  "crouch": 0.12,
+  "flight": 0
+}

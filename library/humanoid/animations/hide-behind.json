@@ -1,0 +1,36 @@
+{
+  "schemaVersion": 2,
+  "id": "hide-behind",
+  "rigType": "humanoid",
+  "kind": "keyframes",
+  "description": "Esconde la mano derecha tras la espalda.",
+  "duration": 0.8,
+  "loop": false,
+  "layer": "arms",
+  "tracks": [],
+  "face": [],
+  "ik": [
+    {
+      "chain": "rightArm",
+      "target": {
+        "bone": "hips",
+        "offset": [
+          -0.08,
+          0.1,
+          -0.24
+        ],
+        "space": "bone"
+      },
+      "weight": [
+        [
+          0,
+          0
+        ],
+        [
+          0.8,
+          1
+        ]
+      ]
+    }
+  ]
+}

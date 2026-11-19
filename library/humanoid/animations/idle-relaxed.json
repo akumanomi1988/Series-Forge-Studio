@@ -1,0 +1,184 @@
+{
+  "schemaVersion": 2,
+  "id": "idle-relaxed",
+  "rigType": "humanoid",
+  "kind": "keyframes",
+  "description": "Reposo con peso en una pierna y brazos sueltos.",
+  "duration": 5,
+  "loop": true,
+  "layer": "full",
+  "tracks": [
+    {
+      "bone": "hips",
+      "property": "position",
+      "keys": [
+        {
+          "t": 0,
+          "v": [
+            0.02,
+            -0.01,
+            0
+          ]
+        },
+        {
+          "t": 2.5,
+          "v": [
+            0.025,
+            -0.012,
+            0
+          ]
+        },
+        {
+          "t": 5,
+          "v": [
+            0.02,
+            -0.01,
+            0
+          ]
+        }
+      ]
+    },
+    {
+      "bone": "hips",
+      "property": "rotation",
+      "keys": [
+        {
+          "t": 0,
+          "v": [
+            0,
+            0,
+            3
+          ]
+        },
+        {
+          "t": 5,
+          "v": [
+            0,
+            0,
+            3
+          ]
+        }
+      ]
+    },
+    {
+      "bone": "chest",
+      "property": "rotation",
+      "keys": [
+        {
+          "t": 0,
+          "v": [
+            1,
+            0,
+            -3
+          ]
+        },
+        {
+          "t": 2.5,
+          "v": [
+            -1,
+            0,
+            -3.5
+          ]
+        },
+        {
+          "t": 5,
+          "v": [
+            1,
+            0,
+            -3
+          ]
+        }
+      ]
+    },
+    {
+      "bone": "leftUpperArm",
+      "property": "rotation",
+      "keys": [
+        {
+          "t": 0,
+          "v": [
+            0,
+            0,
+            5
+          ]
+        },
+        {
+          "t": 5,
+          "v": [
+            0,
+            0,
+            5
+          ]
+        }
+      ]
+    },
+    {
+      "bone": "rightUpperArm",
+      "property": "rotation",
+      "keys": [
+        {
+          "t": 0,
+          "v": [
+            3,
+            0,
+            -8
+          ]
+        },
+        {
+          "t": 5,
+          "v": [
+            3,
+            0,
+            -8
+          ]
+        }
+      ]
+    },
+    {
+      "bone": "leftLowerArm",
+      "property": "rotation",
+      "keys": [
+        {
+          "t": 0,
+          "v": [
+            -6,
+            0,
+            0
+          ]
+        },
+        {
+          "t": 5,
+          "v": [
+            -6,
+            0,
+            0
+          ]
+        }
+      ]
+    },
+    {
+      "bone": "rightLowerArm",
+      "property": "rotation",
+      "keys": [
+        {
+          "t": 0,
+          "v": [
+            -14,
+            0,
+            0
+          ]
+        },
+        {
+          "t": 5,
+          "v": [
+            -14,
+            0,
+            0
+          ]
+        }
+      ]
+    }
+  ],
+  "face": [],
+  "ik": []
+}

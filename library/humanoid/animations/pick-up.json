@@ -1,0 +1,128 @@
+{
+  "schemaVersion": 2,
+  "id": "pick-up",
+  "rigType": "humanoid",
+  "kind": "keyframes",
+  "description": "Postura corporal de recoger del suelo (la mano usa IK desde la acción pickUp).",
+  "duration": 1.2,
+  "loop": false,
+  "layer": "full",
+  "tracks": [
+    {
+      "bone": "hips",
+      "property": "position",
+      "keys": [
+        {
+          "t": 0,
+          "v": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "t": 0.5,
+          "v": [
+            0,
+            -0.38,
+            0.08
+          ]
+        },
+        {
+          "t": 0.7,
+          "v": [
+            0,
+            -0.38,
+            0.08
+          ]
+        },
+        {
+          "t": 1.2,
+          "v": [
+            0,
+            0,
+            0
+          ]
+        }
+      ]
+    },
+    {
+      "bone": "spine",
+      "property": "rotation",
+      "keys": [
+        {
+          "t": 0,
+          "v": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "t": 0.5,
+          "v": [
+            30,
+            0,
+            0
+          ]
+        },
+        {
+          "t": 0.7,
+          "v": [
+            30,
+            0,
+            0
+          ]
+        },
+        {
+          "t": 1.2,
+          "v": [
+            0,
+            0,
+            0
+          ]
+        }
+      ]
+    },
+    {
+      "bone": "chest",
+      "property": "rotation",
+      "keys": [
+        {
+          "t": 0,
+          "v": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "t": 0.5,
+          "v": [
+            18,
+            0,
+            0
+          ]
+        },
+        {
+          "t": 0.7,
+          "v": [
+            18,
+            0,
+            0
+          ]
+        },
+        {
+          "t": 1.2,
+          "v": [
+            0,
+            0,
+            0
+          ]
+        }
+      ]
+    }
+  ],
+  "face": [],
+  "ik": []
+}

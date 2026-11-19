@@ -1,0 +1,62 @@
+{
+  "schemaVersion": 2,
+  "id": "hold-object",
+  "rigType": "humanoid",
+  "kind": "keyframes",
+  "description": "Sujeta un objeto con ambas manos delante del pecho.",
+  "duration": 0.6,
+  "loop": false,
+  "layer": "arms",
+  "tracks": [],
+  "face": [],
+  "ik": [
+    {
+      "chain": "leftArm",
+      "target": {
+        "bone": "chest",
+        "offset": [
+          0.1,
+          -0.12,
+          0.3
+        ],
+        "space": "bone"
+      },
+      "weight": [
+        [
+          0,
+          0
+        ],
+        [
+          0.6,
+          1
+        ]
+      ]
+    },
+    {
+      "chain": "rightArm",
+      "target": {
+        "bone": "chest",
+        "offset": [
+          -0.1,
+          -0.12,
+          0.3
+        ],
+        "space": "bone"
+      },
+      "weight": [
+        [
+          0,
+          0
+        ],
+        [
+          0.6,
+          1
+        ]
+      ]
+    }
+  ],
+  "grip": {
+    "left": 0.8,
+    "right": 0.8
+  }
+}

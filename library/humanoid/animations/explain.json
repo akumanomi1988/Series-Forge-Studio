@@ -1,0 +1,170 @@
+{
+  "schemaVersion": 2,
+  "id": "explain",
+  "rigType": "humanoid",
+  "kind": "keyframes",
+  "description": "Gesticula al hablar con ambas manos abiertas.",
+  "duration": 2.4,
+  "loop": true,
+  "layer": "arms",
+  "tracks": [
+    {
+      "bone": "leftUpperArm",
+      "property": "rotation",
+      "keys": [
+        {
+          "t": 0,
+          "v": [
+            -18,
+            0,
+            12
+          ]
+        },
+        {
+          "t": 0.6,
+          "v": [
+            -26,
+            0,
+            16
+          ]
+        },
+        {
+          "t": 1.2,
+          "v": [
+            -16,
+            0,
+            12
+          ]
+        },
+        {
+          "t": 1.8,
+          "v": [
+            -24,
+            0,
+            15
+          ]
+        },
+        {
+          "t": 2.4,
+          "v": [
+            -18,
+            0,
+            12
+          ]
+        }
+      ]
+    },
+    {
+      "bone": "rightUpperArm",
+      "property": "rotation",
+      "keys": [
+        {
+          "t": 0,
+          "v": [
+            -22,
+            0,
+            -14
+          ]
+        },
+        {
+          "t": 0.6,
+          "v": [
+            -14,
+            0,
+            -12
+          ]
+        },
+        {
+          "t": 1.2,
+          "v": [
+            -28,
+            0,
+            -16
+          ]
+        },
+        {
+          "t": 1.8,
+          "v": [
+            -16,
+            0,
+            -12
+          ]
+        },
+        {
+          "t": 2.4,
+          "v": [
+            -22,
+            0,
+            -14
+          ]
+        }
+      ]
+    },
+    {
+      "bone": "leftLowerArm",
+      "property": "rotation",
+      "keys": [
+        {
+          "t": 0,
+          "v": [
+            -62,
+            -25,
+            0
+          ]
+        },
+        {
+          "t": 1.2,
+          "v": [
+            -70,
+            -35,
+            0
+          ]
+        },
+        {
+          "t": 2.4,
+          "v": [
+            -62,
+            -25,
+            0
+          ]
+        }
+      ]
+    },
+    {
+      "bone": "rightLowerArm",
+      "property": "rotation",
+      "keys": [
+        {
+          "t": 0,
+          "v": [
+            -68,
+            30,
+            0
+          ]
+        },
+        {
+          "t": 1.2,
+          "v": [
+            -58,
+            22,
+            0
+          ]
+        },
+        {
+          "t": 2.4,
+          "v": [
+            -68,
+            30,
+            0
+          ]
+        }
+      ]
+    }
+  ],
+  "face": [],
+  "ik": [],
+  "grip": {
+    "left": 0.1,
+    "right": 0.1
+  }
+}

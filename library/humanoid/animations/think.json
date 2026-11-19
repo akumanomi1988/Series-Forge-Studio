@@ -1,0 +1,93 @@
+{
+  "schemaVersion": 2,
+  "id": "think",
+  "rigType": "humanoid",
+  "kind": "keyframes",
+  "description": "Mano a la barbilla, pensativo.",
+  "duration": 1.2,
+  "loop": false,
+  "layer": "upper",
+  "tracks": [
+    {
+      "bone": "head",
+      "property": "rotation",
+      "keys": [
+        {
+          "t": 0,
+          "v": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "t": 0.6,
+          "v": [
+            6,
+            0,
+            7
+          ]
+        },
+        {
+          "t": 1.2,
+          "v": [
+            6,
+            0,
+            7
+          ]
+        }
+      ]
+    }
+  ],
+  "face": [],
+  "ik": [
+    {
+      "chain": "rightArm",
+      "target": {
+        "bone": "head",
+        "offset": [
+          0,
+          0.02,
+          0.16
+        ],
+        "space": "bone"
+      },
+      "weight": [
+        [
+          0,
+          0
+        ],
+        [
+          0.55,
+          1
+        ]
+      ]
+    },
+    {
+      "chain": "leftArm",
+      "target": {
+        "bone": "chest",
+        "offset": [
+          -0.02,
+          -0.16,
+          0.2
+        ],
+        "space": "bone"
+      },
+      "weight": [
+        [
+          0,
+          0
+        ],
+        [
+          0.6,
+          1
+        ]
+      ]
+    }
+  ],
+  "grip": {
+    "left": 0.5,
+    "right": 0.7
+  }
+}

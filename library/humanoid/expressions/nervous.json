@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 2,
+  "id": "nervous",
+  "description": "Nerviosismo: sonrisa forzada y parpadeo rápido.",
+  "face": {
+    "browRaiseL": 0.3,
+    "browRaiseR": 0.3,
+    "browAngleL": 0.5,
+    "browAngleR": 0.5,
+    "lidUpperL": 0.12,
+    "lidUpperR": 0.12,
+    "mouthWide": 0.3,
+    "mouthSmile": 0.2,
+    "mouthAsym": 0.45,
+    "mouthPress": 0.45
+  },
+  "posture": {
+    "leftShoulder": [
+      0,
+      0,
+      6
+    ],
+    "rightShoulder": [
+      0,
+      0,
+      -6
+    ]
+  },
+  "blinkRate": 2.4
+}

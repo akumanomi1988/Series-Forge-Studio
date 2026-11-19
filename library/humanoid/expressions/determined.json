@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 2,
+  "id": "determined",
+  "description": "Decidido.",
+  "face": {
+    "browRaiseL": -0.15,
+    "browRaiseR": -0.15,
+    "browAngleL": -0.45,
+    "browAngleR": -0.45,
+    "lidUpperL": 0.22,
+    "lidUpperR": 0.22,
+    "mouthSmile": 0.05,
+    "mouthPress": 0.4
+  },
+  "posture": {}
+}

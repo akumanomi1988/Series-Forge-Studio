@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 2,
+  "id": "surprise",
+  "description": "Sorpresa.",
+  "face": {
+    "browRaiseL": 1,
+    "browRaiseR": 1,
+    "lidUpperL": 0,
+    "lidUpperR": 0,
+    "eyeScale": 1.25,
+    "pupilScale": 0.85,
+    "mouthOpen": 0.6,
+    "mouthRound": 0.6,
+    "headNodDeg": -6
+  },
+  "posture": {
+    "chest": [
+      -4,
+      0,
+      0
+    ]
+  },
+  "blinkRate": 0.4
+}

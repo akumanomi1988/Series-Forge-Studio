@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 2,
+  "id": "worried",
+  "description": "Preocupación.",
+  "face": {
+    "browRaiseL": 0.2,
+    "browRaiseR": 0.2,
+    "browAngleL": 0.65,
+    "browAngleR": 0.65,
+    "lidUpperL": 0.18,
+    "lidUpperR": 0.18,
+    "mouthSmile": -0.3,
+    "mouthPress": 0.35
+  },
+  "posture": {},
+  "blinkRate": 1.5
+}

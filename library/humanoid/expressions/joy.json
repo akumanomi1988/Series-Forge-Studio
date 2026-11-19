@@ -1,0 +1,18 @@
+{
+  "schemaVersion": 2,
+  "id": "joy",
+  "description": "Alegría abierta.",
+  "face": {
+    "browRaiseL": 0.35,
+    "browRaiseR": 0.35,
+    "lidUpperL": 0.05,
+    "lidUpperR": 0.05,
+    "lidLowerL": 0.3,
+    "lidLowerR": 0.3,
+    "mouthOpen": 0.28,
+    "mouthSmile": 0.85,
+    "teethShow": 0.7,
+    "cheekRaise": 0.6
+  },
+  "posture": {}
+}

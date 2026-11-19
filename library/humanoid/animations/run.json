@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 2,
+  "id": "run",
+  "kind": "locomotion",
+  "rigType": "humanoid",
+  "description": "Correr: zancada larga, inclinación y brazos flexionados.",
+  "gait": "run",
+  "speed": 3.2,
+  "strideScale": 1.65,
+  "stepHeight": 0.22,
+  "bob": 0.045,
+  "sway": 0.01,
+  "hipYawDeg": 9,
+  "armSwingDeg": 48,
+  "elbowBendDeg": 85,
+  "leanDeg": 12,
+  "crouch": 0,
+  "flight": 0.3
+}

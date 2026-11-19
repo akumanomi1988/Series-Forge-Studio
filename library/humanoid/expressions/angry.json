@@ -1,0 +1,38 @@
+{
+  "schemaVersion": 2,
+  "id": "angry",
+  "description": "Enfado.",
+  "face": {
+    "browRaiseL": -0.45,
+    "browRaiseR": -0.45,
+    "browAngleL": -0.95,
+    "browAngleR": -0.95,
+    "lidUpperL": 0.3,
+    "lidUpperR": 0.3,
+    "lidLowerL": 0.3,
+    "lidLowerR": 0.3,
+    "pupilScale": 0.85,
+    "mouthOpen": 0.06,
+    "mouthWide": 0.35,
+    "mouthSmile": -0.55,
+    "teethShow": 0.5,
+    "headNodDeg": 6
+  },
+  "posture": {
+    "chest": [
+      3,
+      0,
+      0
+    ],
+    "leftShoulder": [
+      0,
+      0,
+      4
+    ],
+    "rightShoulder": [
+      0,
+      0,
+      -4
+    ]
+  }
+}

@@ -1,0 +1,86 @@
+{
+  "schemaVersion": 2,
+  "id": "facepalm",
+  "rigType": "humanoid",
+  "kind": "keyframes",
+  "description": "Se lleva la mano a la cara.",
+  "duration": 1.6,
+  "loop": false,
+  "layer": "upper",
+  "tracks": [
+    {
+      "bone": "head",
+      "property": "rotation",
+      "keys": [
+        {
+          "t": 0,
+          "v": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "t": 0.5,
+          "v": [
+            16,
+            0,
+            0
+          ]
+        },
+        {
+          "t": 1.3,
+          "v": [
+            16,
+            0,
+            0
+          ]
+        },
+        {
+          "t": 1.6,
+          "v": [
+            0,
+            0,
+            0
+          ]
+        }
+      ]
+    }
+  ],
+  "face": [],
+  "ik": [
+    {
+      "chain": "rightArm",
+      "target": {
+        "bone": "head",
+        "offset": [
+          0,
+          0.14,
+          0.16
+        ],
+        "space": "bone"
+      },
+      "weight": [
+        [
+          0,
+          0
+        ],
+        [
+          0.45,
+          1
+        ],
+        [
+          1.3,
+          1
+        ],
+        [
+          1.6,
+          0
+        ]
+      ]
+    }
+  ],
+  "grip": {
+    "right": 0.1
+  }
+}

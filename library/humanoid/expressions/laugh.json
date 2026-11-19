@@ -1,0 +1,20 @@
+{
+  "schemaVersion": 2,
+  "id": "laugh",
+  "description": "Carcajada (con sacudidas de cuerpo).",
+  "face": {
+    "browRaiseL": 0.4,
+    "browRaiseR": 0.4,
+    "lidUpperL": 0.45,
+    "lidUpperR": 0.45,
+    "lidLowerL": 0.6,
+    "lidLowerR": 0.6,
+    "mouthOpen": 0.8,
+    "mouthSmile": 1,
+    "teethShow": 1,
+    "cheekRaise": 1,
+    "headNodDeg": -10
+  },
+  "posture": {},
+  "clip": "laugh-body"
+}

@@ -1,0 +1,15 @@
+{
+  "schemaVersion": 2,
+  "id": "smirk",
+  "description": "Sonrisa irónica.",
+  "face": {
+    "browRaiseL": 0.5,
+    "browRaiseR": -0.1,
+    "lidUpperL": 0.3,
+    "lidUpperR": 0.36,
+    "mouthSmile": 0.42,
+    "mouthAsym": 0.75,
+    "headTiltDeg": -6
+  },
+  "posture": {}
+}

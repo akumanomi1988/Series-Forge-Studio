@@ -1,0 +1,62 @@
+{
+  "schemaVersion": 2,
+  "id": "cross-arms",
+  "rigType": "humanoid",
+  "kind": "keyframes",
+  "description": "Brazos cruzados (IK hacia el pecho).",
+  "duration": 1.2,
+  "loop": false,
+  "layer": "arms",
+  "tracks": [],
+  "face": [],
+  "ik": [
+    {
+      "chain": "leftArm",
+      "target": {
+        "bone": "chest",
+        "offset": [
+          -0.1,
+          -0.06,
+          0.2
+        ],
+        "space": "bone"
+      },
+      "weight": [
+        [
+          0,
+          0
+        ],
+        [
+          0.5,
+          1
+        ]
+      ]
+    },
+    {
+      "chain": "rightArm",
+      "target": {
+        "bone": "chest",
+        "offset": [
+          0.1,
+          -0.02,
+          0.22
+        ],
+        "space": "bone"
+      },
+      "weight": [
+        [
+          0,
+          0
+        ],
+        [
+          0.55,
+          1
+        ]
+      ]
+    }
+  ],
+  "grip": {
+    "left": 0.6,
+    "right": 0.6
+  }
+}

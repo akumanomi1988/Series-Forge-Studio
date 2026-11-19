@@ -1,0 +1,137 @@
+{
+  "schemaVersion": 2,
+  "id": "nervous",
+  "rigType": "humanoid",
+  "kind": "keyframes",
+  "description": "Inquieto: frota las manos, hombros tensos. Bucle.",
+  "duration": 1.6,
+  "loop": true,
+  "layer": "upper",
+  "tracks": [
+    {
+      "bone": "leftShoulder",
+      "property": "rotation",
+      "keys": [
+        {
+          "t": 0,
+          "v": [
+            0,
+            0,
+            6
+          ]
+        },
+        {
+          "t": 1.6,
+          "v": [
+            0,
+            0,
+            6
+          ]
+        }
+      ]
+    },
+    {
+      "bone": "rightShoulder",
+      "property": "rotation",
+      "keys": [
+        {
+          "t": 0,
+          "v": [
+            0,
+            0,
+            -6
+          ]
+        },
+        {
+          "t": 1.6,
+          "v": [
+            0,
+            0,
+            -6
+          ]
+        }
+      ]
+    },
+    {
+      "bone": "head",
+      "property": "rotation",
+      "keys": [
+        {
+          "t": 0,
+          "v": [
+            3,
+            -6,
+            0
+          ]
+        },
+        {
+          "t": 0.8,
+          "v": [
+            3,
+            6,
+            0
+          ]
+        },
+        {
+          "t": 1.6,
+          "v": [
+            3,
+            -6,
+            0
+          ]
+        }
+      ]
+    }
+  ],
+  "face": [],
+  "ik": [
+    {
+      "chain": "leftArm",
+      "target": {
+        "bone": "hips",
+        "offset": [
+          0.03,
+          0.2,
+          0.24
+        ],
+        "space": "bone"
+      },
+      "weight": [
+        [
+          0,
+          1
+        ],
+        [
+          1.6,
+          1
+        ]
+      ]
+    },
+    {
+      "chain": "rightArm",
+      "target": {
+        "bone": "hips",
+        "offset": [
+          -0.03,
+          0.22,
+          0.25
+        ],
+        "space": "bone"
+      },
+      "weight": [
+        [
+          0,
+          1
+        ],
+        [
+          1.6,
+          1
+        ]
+      ]
+    }
+  ],
+  "grip": {
+    "left": 0.5,
+    "right": 0.5
+  }
+}

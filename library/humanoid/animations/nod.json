@@ -1,0 +1,60 @@
+{
+  "schemaVersion": 2,
+  "id": "nod",
+  "rigType": "humanoid",
+  "kind": "keyframes",
+  "description": "Asiente con la cabeza (aditivo).",
+  "duration": 0.9,
+  "loop": false,
+  "layer": "additive",
+  "tracks": [
+    {
+      "bone": "head",
+      "property": "rotation",
+      "keys": [
+        {
+          "t": 0,
+          "v": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "t": 0.22,
+          "v": [
+            14,
+            0,
+            0
+          ]
+        },
+        {
+          "t": 0.45,
+          "v": [
+            -3,
+            0,
+            0
+          ]
+        },
+        {
+          "t": 0.65,
+          "v": [
+            10,
+            0,
+            0
+          ]
+        },
+        {
+          "t": 0.9,
+          "v": [
+            0,
+            0,
+            0
+          ]
+        }
+      ]
+    }
+  ],
+  "face": [],
+  "ik": []
+}

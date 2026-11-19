@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 2,
+  "id": "walk-brisk",
+  "kind": "locomotion",
+  "rigType": "humanoid",
+  "description": "Caminar decidido y rápido.",
+  "gait": "walk",
+  "speed": 1.6,
+  "strideScale": 1.15,
+  "stepHeight": 0.12,
+  "bob": 0.03,
+  "sway": 0.02,
+  "hipYawDeg": 6,
+  "armSwingDeg": 30,
+  "elbowBendDeg": 25,
+  "leanDeg": 5,
+  "crouch": 0,
+  "flight": 0
+}

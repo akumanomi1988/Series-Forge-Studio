@@ -1,0 +1,15 @@
+{
+  "schemaVersion": 2,
+  "id": "disgust",
+  "description": "Asco/desdén.",
+  "face": {
+    "browAngleL": -0.4,
+    "browAngleR": -0.4,
+    "lidLowerL": 0.5,
+    "lidLowerR": 0.5,
+    "mouthSmile": -0.45,
+    "mouthAsym": -0.55,
+    "headNodDeg": -3
+  },
+  "posture": {}
+}

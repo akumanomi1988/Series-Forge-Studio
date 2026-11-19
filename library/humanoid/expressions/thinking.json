@@ -1,0 +1,18 @@
+{
+  "schemaVersion": 2,
+  "id": "thinking",
+  "description": "Pensativo.",
+  "face": {
+    "browRaiseL": 0.45,
+    "browRaiseR": -0.2,
+    "browAngleR": -0.2,
+    "lidUpperL": 0.25,
+    "lidUpperR": 0.32,
+    "mouthSmile": -0.1,
+    "mouthAsym": 0.5,
+    "mouthPress": 0.5,
+    "headTiltDeg": 8
+  },
+  "posture": {},
+  "blinkRate": 0.6
+}
