@@ -1,3 +1,7 @@
+# CONTINUIDAD v0.3 (leer primero)
+
+La base file-first sigue siendo el contrato principal. La versión v0.3 incorpora exportación **animatic SVG → FFmpeg MP4**, SRT, audio AAC (silencio predeterminado, SAPI opcional solo Windows), caché y trabajos web; NO es aún el renderer cinematográfico final. Lee `docs/VIDEO_EXPORT_V03.md` antes de modificar el exportador. Mantén la API en loopback, el uso de agentes CLI externos y evita Docker/GitHub Actions. No afirmes calidad profesional, voces verificadas en Windows, lip-sync fonético o 20 minutos validados.
+
 # AGENTS.md — SERIES FORGE STUDIO (dirección v0.2 file-first)
 
 ## Misión
