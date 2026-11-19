@@ -1,66 +1,55 @@
-> **Novedad v0.4:** el editor y el renderizador Three.js comparten `public/viewport.js` y `public/scene-runtime.js`. El comando `npm run render` usa por defecto `--renderer three` con Chromium/Edge/Chrome local; `--renderer svg` conserva el animatic anterior. Lee `docs/THREE_RENDER_PIPELINE_V04.md` para requisitos, limitaciones y pruebas pendientes.
+# Series Forge Studio
 
-# Series Forge Studio v0.3 — 19 de noviembre de 2026
+Estudio audiovisual **local y basado en archivos** para producir series de animación 2D/2.5D (3D con sombreado *toon*) desde agentes de programación como Claude Code, Codex u OpenCode. No integra ningún LLM: los agentes escriben JSON/Markdown y el motor produce el episodio.
 
-**Novedad:** exportación de animatic MP4/SRT por FFmpeg, caché por escena, seguimiento desde la web y descubrimiento de clips creados por agentes. Consulta [docs/VIDEO_EXPORT_V03.md](docs/VIDEO_EXPORT_V03.md). El renderizador final 3D toon, IK avanzado, lip-sync fonético y episodios de 20 minutos comerciales aún están pendientes.
+**Estado (v0.5):** el piloto «El último turno» (64 s, 1920×1080, 24 fps) se genera de extremo a extremo con un comando y supera la validación automática. Detalle verificado, limitaciones y pendientes en [`docs/IMPLEMENTATION_STATUS.md`](docs/IMPLEMENTATION_STATUS.md).
 
-# Series Forge Studio v0.2 — Estudio de animación file-first
+## Qué hace
 
-Aplicación **local para Windows** que muestra assets de personajes 3D-toon, escenarios y escenas generados por **Claude Code, Codex u OpenCode mediante archivos**, sin configurar modelos en el editor. El objetivo es producir series 2D/2.5D y capítulos de 20 minutos; esa capacidad final **aún no está implementada**.
+- **Personajes procedurales** con esqueleto humanoide, skinning, ropa, pelo, barba, accesorios y rig facial (ojos con párpados y mirada, cejas, boca dinámica). Giro libre de cuerpo y cabeza en 3D.
+- **Motor de animación determinista**: keyframes con curvas, capas y máscaras, aditivos, locomoción paramétrica con pasos planificados y pies apoyados (IK), IK de brazos, mirada repartida en columna/cuello/cabeza/ojos, coger/soltar/dar/sentarse, objetos que caen con física balística. `pose(t)` es pura.
+- **Escenarios y objetos** generados (taller, robot, puertas que se abren, mobiliario, exteriores) con anclajes y articulaciones.
+- **Dirección**: acciones y diálogos con tiempos relativos, cámaras por encuadre (plano general, medio, primer plano, plano/contraplano, dos personajes…), movimientos, transiciones (fundido, encadenado, iris, cortinilla), miradas automáticas.
+- **Audio**: voces offline en español por personaje (Windows OneCore/SAPI o Piper), caché, prosodia por emoción, alineación fonética → visemas (lip-sync), foley automático, ambientes y música procedurales, mezcla con ducking, −16 LUFS.
+- **Producción**: render por fragmentos de plano en GPU (Chrome/Edge headless) → FFmpeg, caché por huella de estado (solo se re-renderiza lo que cambia), reanudación tras fallo, MP4 H.264/AAC con subtítulos, WAV maestro, SRT, metadata, storyboard y **informe de QA** (ffprobe, negros, sonoridad, sincronía de diálogo, desfase de lip-sync, paridad editor/exportación).
+- **Historia**: canon, conocimiento por personaje, relaciones y cronología con propuestas por episodio y confirmación explícita.
+- **Editor web** (React): explorador, visor 3D, inspector paramétrico, timeline multipista, guion con escucha de voz, historia y render. Se actualiza solo cuando un agente cambia archivos.
 
-## Ejecutar
+## Empezar
 
 ```powershell
-git clone https://github.com/akumanomi1988/Series-Forge-Studio.git
-cd Series-Forge-Studio
 npm install
-npm run demo
-npm start
+npm run build
+npm run studio -- init pilot
+npm run studio -- produce el-ultimo-turno ep-001     # ≈ 2–4 min en una GPU modesta
+npm start                                            # http://127.0.0.1:4317
 ```
 
-Abrir **http://127.0.0.1:4317**. Se requiere **Node.js 22+** y navegador moderno con WebGL. Sin Docker, sin servidor LLM ni claves API. `npm install` descarga la dependencia **Three.js** para el visor 3D local; **no usa una CDN**.
+Requisitos: Windows 10/11, Node.js ≥ 24, FFmpeg (libx264) en el PATH, Chrome o Edge, voces españolas de Windows. Ver [`docs/GUIDE.md`](docs/GUIDE.md).
 
-Alternativamente usar `iniciar-estudio.cmd`. `npm test` ejecuta la suite de regresión. `npm run plan -- demo-de-produccion piloto` imprime el plan de producción del episodio, con hashes e invalidaciones futuras por escena.
-
-## Flujo: agente externo + web
-
-1. Abre la carpeta del repo con tu CLI habitual: `claude`, `codex` u `opencode`.
-2. Pide «En `workspace/demo-de-produccion`, crea tres personajes, sus biografías y relaciones. Añade `animations/gesticular.json` y una escena con dos personajes girados 35°. Respeta `docs/FILE_FIRST_STUDIO.md`. No cambies el motor salvo necesidad real».
-3. La web muestra los cambios automáticamente mediante eventos de filesystem y **Server-Sent Events**. No necesita conexión al agente.
-4. Desde el inspector puedes seleccionar el archivo JSON/Markdown, editar y guardar; el guardado rechaza conflictos por hash.
-5. Para personajes, el visor permite rotar cuerpo y cabeza por separado y probar las animaciones/expresiones que existan. Para capítulos, abrir una escena, añadir personajes y texto a la timeline.
-
-**Archivos**: `workspace/<universo>/characters/<id>/{manifest.json,geometry.json,rig.json,animations/*.json,expressions/*.json,aspecto.md,personalidad.md,biografia.md,gustos.md,relaciones.json,voice.json}`. También existen `environments/`, `props/` y `episodes/` con sus escenas. Consulta `docs/FILE_FIRST_STUDIO.md` para el contrato completo.
-
-Los universos en `workspace/` están ignorados en Git para no publicar por error tus guiones/personajes privados. Los propios archivos del ejemplo se crean ejecutando `npm run demo`.
-
-## Funcionalidades implementadas
-
-- Gestor de universos file-first, creación de recursos (personajes/entornos/props/capítulos), explorador, edición JSON/Markdown, revisión por hash.
-- Geometría procedural simple con Three.js local, apariencia toon, huesos jerárquicos, orientación libre yaw, giro de cabeza, animaciones `idle/walk`, expresiones básicas.
-- Escenas declarativas con actores/props/transformaciones, beats con tiempo de inicio/fin, diálogos como texto y previsualización temporal.
-- Detección de cambios externos con SSE (si el navegador reconecta, los datos se recargan), validaciones básicas, protección frente a traversal y symlinks de recursos, importación parcial del prototipo anterior.
-- `src/production.mjs`: recopilación de dependencias y hashes deterministas para render incremental posterior, sin crear aún vídeo final.
-
-## No implementado todavía
-
-- Editor completo de geometría/IK/rigging y vestuario, labios por fonemas, TTS exportable, mezcla de sonido, efectos avanzados, animación física, cámara multi-plano, guionizador automático ni exportación MP4 de episodios de 20 minutos.
-- Exportación GLB, presets de animación compartidos, anclajes de objetos y animación avanzada de personajes. Los personajes actuales son primitivas estilizadas, no calidad televisiva.
-- La herramienta de importación conserva personajes y otras entidades legadas, pero la migración de escenas antiguas exige revisión manual.
-
-## Modo v0.1 conservado
-
-En otra terminal Windows:
+## Comandos
 
 ```powershell
-$env:PORT=4318
-npm run legacy
+npm run studio -- help
+npm run studio -- validate <proyecto>
+npm run studio -- list characters <proyecto>
+npm run studio -- preview character <proyecto> <id>
+npm run studio -- compile episode <proyecto> <ep>
+npm run studio -- render episode <proyecto> <ep> [--draft] [--max-seconds 10] [--scenes sc-001]
+npm run studio -- validate episode <proyecto> <ep>
+npm run studio -- produce <proyecto> <ep>
+npm run studio -- story status|confirm|amend|revert <proyecto> …
+npm test            # 50 pruebas (unitarias, integración con render real, navegador, TTS)
+npm run typecheck
 ```
 
-El editor original queda en http://127.0.0.1:4318, con datos almacenados en `data/studio.json`. Su chat local y MCP funcionan como antes; **no forman parte del nuevo flujo CLI file-first**. No se elimina la base anterior.
+## Documentación
 
-## Calidad y seguridad
+- [`AGENTS.md`](AGENTS.md) — instrucciones para agentes.
+- [`docs/GUIDE.md`](docs/GUIDE.md) — instalación, editor, flujo de producción, añadir personajes y animaciones, pruebas.
+- [`docs/FORMATS.md`](docs/FORMATS.md) — formatos de datos.
+- [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) — arquitectura, determinismo, caché, seguridad.
+- [`docs/IMPLEMENTATION_STATUS.md`](docs/IMPLEMENTATION_STATUS.md) — estado verificado y limitaciones.
+- `docs/history/` — documentos de versiones anteriores (v0.1–v0.4).
 
-El servidor escucha **solo en 127.0.0.1**. No exponer el puerto a Internet. Los agentes deben generar **JSON/Markdown declarativo**, no JS ejecutable. Hay protección de rutas permitidas y hash para conflictos en el editor, pero el sistema requiere endurecimiento adicional antes de uso multiusuario o distribuirlo como SaaS. Los cambios externos del CLI tienen que seguir las validaciones y convenciones documentadas.
-
-**Documentación canónica:** `AGENTS.md`, `docs/FILE_FIRST_STUDIO.md` y `docs/IMPLEMENTATION_STATUS.md`. `docs/MASTER_IMPLEMENTATION_SPEC.md` se conserva solo como visión histórica anterior.
+Las versiones anteriores siguen disponibles: `npm run legacy` (editor SVG v0.1 + MCP), `npm run legacy-v04` y `npm run render:legacy`.

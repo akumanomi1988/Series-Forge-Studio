@@ -9,13 +9,16 @@ export function FileEditor({ project, path, version }: { project: string; path: 
   const [text, setText] = useState('');
   const [msg, setMsg] = useState('');
   const dirty = doc !== null && text !== doc.content;
+  const [versions, setVersions] = useState<{ id: string; at: string; source: string }[]>([]);
+  const loadVersions = () => api<{ id: string; at: string; source: string }[]>(`/api/project/${project}/history?path=${encodeURIComponent(path)}`).then(setVersions).catch(() => setVersions([]));
   useEffect(() => { let alive = true; getFile(project, path).then(d => { if (!alive) return; setDoc(prev => { if (prev && text !== prev.content && prev.path === path) { setMsg('El archivo cambió fuera del editor; tus cambios locales se conservan (guardar dará conflicto).'); return { ...d, content: prev.content, hash: prev.hash }; } setText(d.content); return d; }); }).catch(e => setMsg(e.message)); return () => { alive = false; }; }, [project, path, version]);
   const save = async () => {
     try { if (path.endsWith('.json')) JSON.parse(text); const r = await putFile(project, path, text, doc?.hash ?? null); setDoc({ path, content: text, hash: r.hash }); setMsg('Guardado ✓'); }
     catch (e) { setMsg((e as Error).message); }
   };
   return <div className="file-editor">
-    <div className="row"><code>{path}</code><span className="grow" /><button disabled={!dirty} onClick={save}>Guardar</button><button disabled={!dirty} onClick={() => doc && setText(doc.content)}>Descartar</button></div>
+    <div className="row"><code>{path}</code><span className="grow" /><button disabled={!dirty} onClick={save}>Guardar</button><button disabled={!dirty} onClick={() => doc && setText(doc.content)}>Descartar</button>
+      <select value="" onFocus={loadVersions} onChange={async e => { const id = e.target.value; if (!id) return; try { await api(`/api/project/${project}/revert`, { method: 'POST', body: JSON.stringify({ path, id }) }); setMsg('Versión restaurada ✓'); } catch (err) { setMsg((err as Error).message); } }}><option value="">Historial…</option>{versions.map(v => <option key={v.id} value={v.id}>{v.at.slice(0, 19).replace('T', ' ')} · {v.source}</option>)}</select></div>
     <textarea spellCheck={false} value={text} onChange={e => setText(e.target.value)} onKeyDown={e => { if ((e.ctrlKey || e.metaKey) && e.key === 's') { e.preventDefault(); save(); } }} />
     {msg && <div className="msg">{msg}</div>}
   </div>;

@@ -1,0 +1,163 @@
+{
+  "schemaVersion": 2,
+  "id": "sc-001",
+  "name": "Acciones",
+  "environmentId": "taller",
+  "durationSec": "auto",
+  "tailSec": 1,
+  "autoLook": true,
+  "actors": [
+    {
+      "id": "bruno",
+      "characterId": "bruno",
+      "position": [
+        1,
+        0,
+        0.6
+      ],
+      "yawDeg": -90,
+      "expression": "smile"
+    },
+    {
+      "id": "lara",
+      "characterId": "lara",
+      "position": [
+        -2.4,
+        0,
+        1.2
+      ],
+      "yawDeg": 90,
+      "expression": "neutral"
+    }
+  ],
+  "props": [
+    {
+      "id": "taza",
+      "propId": "taza",
+      "heldBy": {
+        "actor": "bruno",
+        "hand": "right"
+      }
+    }
+  ],
+  "actions": [
+    {
+      "id": "ofrece",
+      "type": "hold",
+      "actor": "bruno",
+      "at": 0,
+      "hand": "right",
+      "pose": "front",
+      "durationSec": 0.5
+    },
+    {
+      "id": "saluda",
+      "type": "play",
+      "actor": "lara",
+      "at": 0.3,
+      "clip": "wave"
+    },
+    {
+      "id": "corre",
+      "type": "walk",
+      "actor": "lara",
+      "after": "saluda",
+      "to": [
+        -0.2,
+        0,
+        1
+      ],
+      "gait": "run"
+    },
+    {
+      "id": "da",
+      "type": "give",
+      "actor": "bruno",
+      "after": "corre",
+      "offset": 0.2,
+      "prop": "taza",
+      "to": "lara"
+    },
+    {
+      "id": "salta",
+      "type": "play",
+      "actor": "bruno",
+      "after": "da",
+      "offset": 0.2,
+      "clip": "jump"
+    },
+    {
+      "id": "senala",
+      "type": "play",
+      "actor": "lara",
+      "after": "da",
+      "offset": 0.4,
+      "clip": "point",
+      "target": "consola",
+      "durationSec": 1.8
+    },
+    {
+      "id": "va-taburete",
+      "type": "walk",
+      "actor": "bruno",
+      "after": "salta",
+      "to": [
+        2.6,
+        0,
+        -1.25
+      ]
+    },
+    {
+      "id": "sienta",
+      "type": "sit",
+      "actor": "bruno",
+      "after": "va-taburete",
+      "prop": "taburete"
+    },
+    {
+      "id": "piensa",
+      "type": "play",
+      "actor": "lara",
+      "after": "senala",
+      "clip": "think",
+      "durationSec": 2
+    },
+    {
+      "id": "levanta",
+      "type": "stand",
+      "actor": "bruno",
+      "after": "sienta",
+      "offset": 1.5
+    }
+  ],
+  "dialogue": [],
+  "shots": [
+    {
+      "id": "sh-01",
+      "at": 0,
+      "camera": {
+        "type": "static",
+        "position": [
+          0.6,
+          2.4,
+          6.2
+        ],
+        "target": [
+          0.2,
+          0.9,
+          -0.2
+        ],
+        "fov": 46
+      }
+    }
+  ],
+  "sound": [
+    {
+      "id": "amb",
+      "kind": "ambience",
+      "sound": "workshop-ambience",
+      "at": 0,
+      "gainDb": -24
+    }
+  ]
+}

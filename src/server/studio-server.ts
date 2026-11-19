@@ -21,6 +21,7 @@ import { resolveEmotion } from '../engine/director.ts';
 import { estimateSpeech } from '../audio/phonetics-es.ts';
 import { buildBrowser } from '../../scripts/build.ts';
 import { scaffold } from '../pipeline/scaffold.ts';
+import { recordVersion, listVersions, revertTo } from '../pipeline/history.ts';
 import {
   CharacterGeometrySchema, RigSchema, VoiceSchema, ClipSchemaV2, LocomotionSchema, ExpressionSchemaV2, PropGeometrySchema, EnvironmentSchemaV2, SceneSchemaV2, EpisodeSchema, SfxSchema, MusicSchema, ManifestSchema, formatZodError
 } from '../engine/schema.ts';
@@ -88,7 +89,7 @@ function ensureWatcher(project: string) {
       const paths = [...entry.pending]; entry.pending.clear(); entry.timer = null;
       const invalid: { path: string; error: string }[] = [];
       for (const p of paths) if (p.endsWith('.json') && editablePath(p)) {
-        try { const s = (await readFile(join(root, p), 'utf8')).replace(/^﻿/, ''); const sc = schemaFor(p); const obj = JSON.parse(s); sc?.parse(obj); } catch (e) { if ((e as NodeJS.ErrnoException).code !== 'ENOENT') invalid.push({ path: p, error: formatZodError(e) }); }
+        try { const s = (await readFile(join(root, p), 'utf8')).replace(/^﻿/, ''); const sc = schemaFor(p); const obj = JSON.parse(s); sc?.parse(obj); await recordVersion(project, p, s, 'disk'); } catch (e) { if ((e as NodeJS.ErrnoException).code !== 'ENOENT') invalid.push({ path: p, error: formatZodError(e) }); }
       }
       broadcast(project, 'change', { paths, invalid, at: Date.now() });
     }, 180);
@@ -188,9 +189,13 @@ const server = createServer(async (req, res) => {
         if (expectedHash !== undefined && expectedHash !== null && sha(prev ?? '') !== expectedHash) return json(res, 409, { error: 'Conflicto: el archivo cambió (otro agente o pestaña). Recarga antes de guardar.', current: prev, hash: sha(prev ?? '') });
         await mkdir(join(abs, '..'), { recursive: true });
         const tmp = `${abs}.${randomUUID()}.tmp`;
+        if (prev !== null) await recordVersion(project, rel, prev, 'disk');
         try { await writeFile(tmp, content, { flag: 'wx' }); await rename(tmp, abs); } finally { await rm(tmp, { force: true }); }
+        await recordVersion(project, rel, content, 'editor');
         return json(res, 200, { path: rel, hash: sha(content) });
       }
+      if (req.method === 'GET' && sub === '/history') { const rel = url.searchParams.get('path') ?? ''; if (!editablePath(rel)) return json(res, 400, { error: 'Ruta no permitida' }); return json(res, 200, await listVersions(project, rel)); }
+      if (req.method === 'POST' && sub === '/revert') { const { path: rel, id } = JSON.parse(await body(req)) as { path: string; id: string }; if (!editablePath(rel)) return json(res, 400, { error: 'Ruta no permitida' }); if (rel.endsWith('.json')) { try { schemaFor(rel)?.parse(JSON.parse(await readFile(join(projectDir(project), 'generated', 'history', ...rel.split('/'), id), 'utf8'))); } catch (e) { return json(res, 422, { error: formatZodError(e) }); } } const content = await revertTo(project, rel, id); return json(res, 200, { path: rel, hash: sha(content) }); }
       if (req.method === 'POST' && sub === '/new') { const { kind, args, from } = JSON.parse(await body(req)) as { kind: string; args: string[]; from?: string }; return json(res, 200, { message: await scaffold(kind, [project, ...args], from) }); }
       if (req.method === 'GET' && sub === '/scene') {
         const episode = url.searchParams.get('episode') ?? '', sceneId = url.searchParams.get('scene') ?? '';

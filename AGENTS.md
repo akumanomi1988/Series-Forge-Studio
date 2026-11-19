@@ -1,42 +1,46 @@
-> **ACTUALIZACIÓN v0.4 (19/11/2026):** antes de trabajar, lee `docs/THREE_RENDER_PIPELINE_V04.md`. El visor web y la exportación Three comparten ahora el mismo motor y evaluador temporal. La captura WebGL **no ha sido validada visualmente** en este entorno por falta de `three` y bloqueo corporativo de Chromium a localhost. En Windows, ejecutar `npm install`, probar `--renderer three` y revisar el MP4. Mantener `--renderer svg` como fallback. Priorizar test visual real, IK, expresiones, voz y lip-sync; no afirmar producción de capítulos de 20 minutos hasta verificarlos de extremo a extremo.
+# AGENTS — Series Forge Studio (v0.5)
 
-# CONTINUIDAD v0.3 (leer primero)
+Punto de entrada para Claude Code, Codex, OpenCode y cualquier agente que trabaje en este repositorio.
 
-La base file-first sigue siendo el contrato principal. La versión v0.3 incorpora exportación **animatic SVG → FFmpeg MP4**, SRT, audio AAC (silencio predeterminado, SAPI opcional solo Windows), caché y trabajos web; NO es aún el renderer cinematográfico final. Lee `docs/VIDEO_EXPORT_V03.md` antes de modificar el exportador. Mantén la API en loopback, el uso de agentes CLI externos y evita Docker/GitHub Actions. No afirmes calidad profesional, voces verificadas en Windows, lip-sync fonético o 20 minutos validados.
+Series Forge Studio es un **estudio audiovisual local, file-first, sin LLM integrado**. Tú (el agente) escribes **datos** (JSON/Markdown) en `workspace/<proyecto>/`; el motor los convierte en un episodio con imagen 3D toon, voces en español, lip-sync, efectos, música y subtítulos, y la web local (`npm start`) muestra los cambios en vivo.
 
-# AGENTS.md — SERIES FORGE STUDIO (dirección v0.2 file-first)
+Lee, en este orden: `docs/GUIDE.md` (uso y flujo de agente), `docs/FORMATS.md` (formatos exactos), `docs/ARCHITECTURE.md` (motor) y `docs/IMPLEMENTATION_STATUS.md` (qué está verificado y qué no). `docs/history/` contiene especificaciones antiguas: son contexto, no el estado actual.
 
-## Misión
+## Si te piden producir algo desde una sinopsis
 
-Desarrolla un estudio local de producción de series animadas 2D/2.5D, con personajes/entornos/objetos **procedurales y reutilizables**, guion, continuidad, escenas, cámaras, voces, música, lip-sync y exportación de episodios de hasta 20 minutos.
+1. Consulta lo existente: `npm run studio -- list characters|props|environments|episodes|animations|expressions|sounds|music <proyecto>` y `npm run studio -- story status <proyecto>`. **Reutiliza** personajes, escenarios, objetos y animaciones; no dupliques identidades.
+2. Crea solo lo necesario con `npm run studio -- new …` y edita sus archivos (proporciones, ropa, voz, fichas). Proyecto nuevo: `npm run studio -- new project <id> "<Nombre>"`.
+3. Escribe `episodes/<ep>/sinopsis.md`, `guion.md`, `story.json` y una `scene.json` por escena. Encadena el tiempo con `after`/`with` sobre los ids de diálogo: las duraciones reales salen del TTS.
+4. `npm run studio -- validate <proyecto>` hasta 0 errores (esquemas, referencias, continuidad: un personaje no puede usar información que aún no conoce).
+5. Revisa imágenes: `npm run studio -- preview character <proyecto> <id>` y `preview scene <proyecto> <ep> <sc>` (PNG en `generated/preview/`). Míralas.
+6. Produce: `npm run studio -- produce <proyecto> <ep> [--draft]`. Lee `output/validation-report.json` y los fotogramas de `output/storyboard/`. Corrige y repite.
+7. Tras aprobación humana: `npm run studio -- story confirm <proyecto> <ep>`. Nunca edites a mano hechos confirmados del canon (usa `story amend` con motivo).
 
-**Cambio de arquitectura obligatorio:** el usuario trabaja desde **Claude Code, Codex u OpenCode ya instalados en su PC**. Los agentes **escriben archivos JSON/Markdown en `workspace/<universo>/`**; el editor en `localhost:4317` observa esos archivos y muestra los cambios. No implementar un gestor de modelos, selector de harness ni configuración de endpoints de IA como dependencia principal. El MCP legado es opcional.
+**No** escribas componentes React ni código por escena, ni modifiques el motor para una petición de contenido («ponle barba», «que se siente», «nueva animación»): todo eso son datos.
 
-Lee íntegramente `docs/FILE_FIRST_STUDIO.md`, luego `README.md` y `docs/IMPLEMENTATION_STATUS.md`. `docs/MASTER_IMPLEMENTATION_SPEC.md` es referencia histórica y sus decisiones incompatibles quedan reemplazadas por la presente arquitectura. Ejecuta `npm test` antes y después de tocar código.
+## Si te piden desarrollar el motor
 
-## Implementación existente
+- Código TypeScript en `src/` (Node 24 ejecuta `.ts` directamente; solo sintaxis borrable: nada de `enum`, `namespace` ni propiedades de parámetro). El navegador usa el mismo código vía `npm run build` (esbuild).
+- Antes y después de cambiar código: `npm run typecheck` y `npm test` (las pruebas con GPU/Chrome, FFmpeg y voces OneCore se omiten si faltan).
+- Cualquier cambio que afecte a píxeles debe verificarse **visualmente** (`preview`, storyboard, fotogramas del MP4) y con `validate episode`. No declares una capacidad terminada sin prueba reproducible.
+- Cambios de formato: nueva `schemaVersion` + migración en `src/engine/schema.ts`/`src/pipeline/project.ts`; nunca destruyas archivos del usuario.
+- La evaluación debe seguir siendo pura en el tiempo (`pose(t)` sin estado acumulado). Mantén `tests/engine.test.ts` (determinismo, IK, pies sin deslizar, límites articulares).
 
-- `src/workspace.mjs`: modelo file-first, formatos declarativos, plantillas de humanos, creación de carpetas, validación de animaciones/escenas, lectura/escritura con hash y observación.
-- `src/studio-server.mjs`: API web local, SSE, importador de assets legados y servidor de Three.js local.
-- `public/studio.html`, `studio.js`, `studio.css`: explorador, visor, edición JSON/MD, escenas/diálogos y timeline básica.
-- `public/viewport.js`: Three.js toon procedural; bones articulados, yaw, cabeza independiente, clips `idle/walk`, expresión y escena.
-- `src/production.mjs`: **plan de producción y hashes, NO renderizador de MP4**.
-- `scripts/demo.mjs`: ejemplo Bruno/Lara y escena de 45 s.
-- `src/server.mjs`, `src/core.mjs`, `public/index.html`: editor v0.1 legado, sin borrar.
+## Restricciones del proyecto
 
-## Regla de desarrollo
+Windows local; sin Docker; sin GitHub Actions ni CI remota; sin servicios cloud ni claves obligatorias; dependencias instaladas en el proyecto; assets visuales 100 % procedurales; voces/música/SFX con licencia declarada (`license` en cada archivo); servidor solo en 127.0.0.1. No hagas push, PRs ni Actions salvo orden explícita.
 
-1. Modifica el formato de assets solo mediante versionado y migraciones, preservando IDs y proyectos previos.
-2. Crear una animación no debe requerir cambiar el motor de render; usar `animations/<nombre>.json` y `rig.json`.
-3. En el modelo 3D el eje Y es vertical y los ángulos humanos se expresan en grados; el motor transforma a radianes internamente.
-4. Separar fuente editable (JSON/MD), caché compilable (GLB opcional), previsualización y exportación audiovisual.
-5. La calidad artística y biomecánica debe verificarse visualmente, no solo en tests unitarios.
-6. Antes de ampliar a 20 min, completar el piloto de 30 segundos con movimiento, expresiones, diálogos y audio reales.
-7. Evitar Docker, pipelines GitHub Actions, servicios cloud de pago y dependencias innecesarias. Nunca añadir claves al repositorio.
-8. Preferir TypeScript para módulos nuevos amplios; los módulos v0.2 iniciales usan ESM de Node para mantener la migración acotada.
-9. Informar con precisión: hoy **NO** hay IK, TTS real, lip-sync fonético, producción de MP4 ni capítulos terminados.
-10. Entregar código probado, pasos de reproducción, imágenes/vídeo de prueba cuando proceda y documentación del resultado, no solo planes.
+## Mapa rápido
 
-## Tarea recomendada a continuación
-
-Conseguir un piloto renderizable real: humanoides 3D toon de calidad, IK en pies/manos, acciones semánticas (caminar, girar, sentarse, coger objeto), cámara editada, diálogos en español con TTS, alineación de visemas y MP4 de 30 segundos. Usar el código actual y no reconstruir otro proyecto desde cero.
+| Necesito… | Dónde |
+|---|---|
+| Comandos | `npm run studio -- help` |
+| Formatos | `docs/FORMATS.md`, `src/engine/schema.ts` |
+| Biblioteca de animaciones/expresiones/sonidos | `library/` (datos; se regenera con `node scripts/generate-library.ts`) |
+| Piloto de referencia | `examples/projects/el-ultimo-turno` (`npm run studio -- init pilot`) |
+| Motor de pose / director / cámara | `src/engine/` |
+| Render Three.js | `src/render/` |
+| Audio (TTS, alineación, mezcla) | `src/audio/` |
+| Producción, QA, historia, CLI, servidor | `src/pipeline/`, `src/cli/`, `src/server/` |
+| Editor web | `ui/` |
+| Código legado v0.1–v0.4 (conservado) | `src/*.mjs`, `public/*.js` (`npm run legacy`, `npm run legacy-v04`, `npm run render:legacy`) |

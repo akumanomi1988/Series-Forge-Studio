@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 2,
+  "id": "muestrario",
+  "type": "episode",
+  "name": "Muestrario de acciones",
+  "number": 0,
+  "scenes": [
+    "sc-001"
+  ],
+  "music": [],
+  "render": {
+    "width": 1920,
+    "height": 1080,
+    "fps": 24,
+    "sampleRate": 48000,
+    "loudnessLufs": -16
+  },
+  "status": "draft"
+}

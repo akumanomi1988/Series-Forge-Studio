@@ -48,3 +48,18 @@ test('la web refleja automáticamente los cambios de un agente y conserva el úl
     assert.deepEqual(page.consoleErrors, []);
   } finally { await page.close(); await new Promise(ok => server.close(() => ok(null))); server.closeAllConnections?.(); }
 });
+
+test('historial de versiones por archivo y reversión', async () => {
+  const { recordVersion, listVersions, revertTo } = await import('../src/pipeline/history.ts');
+  const rel = 'characters/bruno/gustos.md';
+  const file = join(ws, 'el-ultimo-turno', rel);
+  const v1 = readFileSync(file, 'utf8');
+  await recordVersion('el-ultimo-turno', rel, v1, 'disk');
+  writeFileSync(file, '# cambiado\n'); await recordVersion('el-ultimo-turno', rel, '# cambiado\n', 'disk');
+  assert.equal(await recordVersion('el-ultimo-turno', rel, '# cambiado\n', 'disk'), null, 'sin duplicados');
+  const versions = await listVersions('el-ultimo-turno', rel);
+  assert.equal(versions.length, 2);
+  await revertTo('el-ultimo-turno', rel, versions[1].id);
+  assert.equal(readFileSync(file, 'utf8'), v1);
+  assert.equal((await listVersions('el-ultimo-turno', rel)).length, 3);
+});

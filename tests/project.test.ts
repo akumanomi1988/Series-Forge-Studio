@@ -76,3 +76,24 @@ test('el piloto compila con duración estimada antes de sintetizar voces', async
   assert.ok(r.durationSec > 10 && r.shots.length >= 6 && r.subtitles.length >= 4);
   assert.ok(r.audio.some(a => a.sound === 'door-creak') && r.audio.some(a => a.sound === 'sparks') && r.audio.some(a => a.sound === 'footstep'));
 });
+
+test('studio migrate reescribe un proyecto v0.2–v0.4 a v2 conservando copias .v1.json', async () => {
+  const { FileWorkspace } = await import('../src/workspace.mjs');
+  const fw = await new FileWorkspace(ws).init();
+  const { project } = await fw.createProject('Antiguo Demo');
+  const c = await fw.createAsset(project, 'characters', 'Bruno');
+  const ep = await fw.createAsset(project, 'episodes', 'Piloto');
+  const sc = await fw.createScene(project, ep.id, 'Avería');
+  const path = `episodes/${ep.id}/scenes/${sc.id}/scene.json`;
+  const scene = JSON.parse((await fw.read(project, path)).content);
+  scene.actors = [{ characterId: c.id, position: [0, 0, 0], yawDeg: 0 }];
+  scene.beats = [{ id: 'hola', type: 'dialogue', actorId: c.id, text: 'Hola.', startSec: 1, endSec: 2 }, { id: 'mov', type: 'action', actorId: c.id, startSec: 2, endSec: 4, fromPosition: [0, 0, 0], toPosition: [1, 0, 1], yawDeg: 45 }];
+  await fw.put(project, path, JSON.stringify(scene));
+  const { migrateProject } = await import('../src/pipeline/migrate.ts');
+  const r = await migrateProject(project);
+  assert.ok(r.written.length >= 5);
+  const p = await loadProject(project);
+  assert.deepEqual(p.issues.filter(i => i.level === 'error'), []);
+  assert.equal(p.episodes[ep.id].scenes[sc.id].dialogue[0].text, 'Hola.');
+  assert.ok(readFileSync(join(ws, project, 'characters', c.id, 'geometry.v1.json'), 'utf8').includes('"schemaVersion": 1'));
+});

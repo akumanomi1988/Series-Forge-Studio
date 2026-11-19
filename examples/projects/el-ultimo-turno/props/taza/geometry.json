@@ -1,0 +1,9 @@
+{
+  "schemaVersion": 2,
+  "generator": "mug",
+  "params": {
+    "color": "#e8e3d8"
+  },
+  "material": "glass",
+  "restHeight": 0.05
+}

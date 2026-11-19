@@ -16,6 +16,8 @@ import { listOneCoreVoices, synthesize } from '../audio/tts.ts';
 import { compileScene } from '../engine/director.ts';
 import { assetLibrary } from '../pipeline/project.ts';
 import { scaffold } from '../pipeline/scaffold.ts';
+import { migrateProject } from '../pipeline/migrate.ts';
+import { listVersions, revertTo, recordVersion } from '../pipeline/history.ts';
 
 const HELP = `Series Forge Studio — CLI para agentes y personas (sin LLM integrado).
 
@@ -33,6 +35,9 @@ const HELP = `Series Forge Studio — CLI para agentes y personas (sin LLM integ
   studio validate episode <project> <episode>       QA audiovisual del MP4 exportado (validation-report.json)
   studio produce <project> <episode> [render opts]  validate + render + validate episode (código de salida != 0 si falla)
   studio story status|confirm|amend|revert <project> [<episode>|<fact> --text ".." --reason ".."]
+  studio migrate <project>                          Reescribe assets v1 (v0.2–v0.4) en v2 (copias .v1.json)
+  studio history <project> <ruta>                   Versiones guardadas de un archivo (editor y cambios detectados)
+  studio revert <project> <ruta> <versión>          Restaura una versión (queda registrada como nueva versión)
   studio voices                                     Voces TTS locales disponibles
   studio say <project> <character> "<texto>" [--emotion angry]   Prueba de voz (WAV en generated/)
 `;
@@ -129,6 +134,9 @@ async function main() {
       if (sub === 'revert') return out(await revertStory(a1));
       throw new Error('Uso: studio story status|confirm|amend|revert');
     }
+    case 'migrate': return out(await migrateProject(sub));
+    case 'history': { const p = await loadProject(sub); const f = await readFile(join(p.root, a1), 'utf8').catch(() => null); if (f !== null) await recordVersion(sub, a1, f, 'disk'); return out(await listVersions(sub, a1)); }
+    case 'revert': return out({ reverted: a1, to: a2, bytes: (await revertTo(sub, a1, a2)).length });
     case 'voices': return out(await listOneCoreVoices());
     case 'say': {
       const p = await loadProject(sub); const c = p.characters[a1];
