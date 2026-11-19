@@ -1,3 +1,5 @@
+> **ACTUALIZACIÓN v0.4 (19/11/2026):** antes de trabajar, lee `docs/THREE_RENDER_PIPELINE_V04.md`. El visor web y la exportación Three comparten ahora el mismo motor y evaluador temporal. La captura WebGL **no ha sido validada visualmente** en este entorno por falta de `three` y bloqueo corporativo de Chromium a localhost. En Windows, ejecutar `npm install`, probar `--renderer three` y revisar el MP4. Mantener `--renderer svg` como fallback. Priorizar test visual real, IK, expresiones, voz y lip-sync; no afirmar producción de capítulos de 20 minutos hasta verificarlos de extremo a extremo.
+
 # CONTINUIDAD v0.3 (leer primero)
 
 La base file-first sigue siendo el contrato principal. La versión v0.3 incorpora exportación **animatic SVG → FFmpeg MP4**, SRT, audio AAC (silencio predeterminado, SAPI opcional solo Windows), caché y trabajos web; NO es aún el renderer cinematográfico final. Lee `docs/VIDEO_EXPORT_V03.md` antes de modificar el exportador. Mantén la API en loopback, el uso de agentes CLI externos y evita Docker/GitHub Actions. No afirmes calidad profesional, voces verificadas en Windows, lip-sync fonético o 20 minutos validados.
