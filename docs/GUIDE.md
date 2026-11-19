@@ -58,7 +58,13 @@ Edita `characters/nico/geometry.json` (por ejemplo `"hair": {"style":"curly","co
 
 Copia un clip de `library/humanoid/animations/` a `characters/<id>/animations/` (solo ese personaje), a `<proyecto>/animations/humanoid/` (todo el proyecto) o crea uno nuevo con el formato de `docs/FORMATS.md`. Úsalo con `{ "type": "play", "actor": "nico", "clip": "baile", "after": "l3" }`. Para un modo de andar propio, crea un JSON `kind: "locomotion"` y pásalo como `gait`.
 
-## 7. Pruebas
+## 7. Historial, migración y licencias
+
+- Cada guardado del editor y cada cambio válido de un agente detectado por el servidor se guarda en `generated/history/`. `npm run studio -- history <proyecto> <ruta>` lista versiones y `npm run studio -- revert <proyecto> <ruta> <versión>` restaura (en el editor: desplegable *Historial…* del inspector).
+- Proyectos de v0.2–v0.4: `npm run studio -- migrate <proyecto>` (deja copias `.v1.json`).
+- `output/metadata.json` incluye un informe de licencias (voces, SFX, música). Las voces de Windows quedan marcadas `commercialUse: "unknown"`: revísalo antes de distribuir.
+
+## 8. Pruebas
 
 - `npm test`: todas las suites. Las que necesitan GPU/Chrome, FFmpeg o voces OneCore se omiten (skip) si faltan.
 - `npm run typecheck`: TypeScript estricto.

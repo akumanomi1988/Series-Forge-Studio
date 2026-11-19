@@ -17,6 +17,8 @@ export function Viewport(props: ViewportProps) {
   const gizmoRef = useRef<TransformControls | null>(null);
   const propsRef = useRef(props); propsRef.current = props;
   const [info, setInfo] = useState('');
+  const [shotLabel, setShotLabel] = useState('');
+  useEffect(() => { const id = window.setInterval(() => { const s = stageRef.current?.lastShot; setShotLabel(s ? `plano ${s.shot.id}${s.transition ? ' · ' + s.transition.type : ''}` : ''); }, 250); return () => window.clearInterval(id); }, []);
   useEffect(() => {
     const el = host.current!; const canvas = document.createElement('canvas'); el.appendChild(canvas);
     const w = Math.max(320, el.clientWidth), h = Math.max(180, el.clientHeight);
@@ -58,9 +60,8 @@ export function Viewport(props: ViewportProps) {
     if (props.gizmo && props.selectedActor && stage.actors.get(props.selectedActor) && props.time < 0.05) { gizmo.setMode(props.gizmo); gizmo.showX = props.gizmo === 'translate'; gizmo.showZ = props.gizmo === 'translate'; gizmo.showY = props.gizmo === 'rotate'; gizmo.attach(stage.actors.get(props.selectedActor)!.root); }
     (gizmo as unknown as { camera: THREE.Camera }).camera = stage.camera;
   }, [props.gizmo, props.selectedActor, props.resolved, props.time < 0.05]);
-  const shot = stageRef.current?.lastShot;
   return <div className="viewport">
     <div className="viewport-canvas" ref={host} />
-    <div className="viewport-hud">{props.cameraMode === 'shot' && shot ? `plano ${shot.shot.id}` : 'cámara libre'} · {info}</div>
+    <div className="viewport-hud">{props.cameraMode === 'shot' && shotLabel ? shotLabel : 'cámara libre'} · {info}</div>
   </div>;
 }

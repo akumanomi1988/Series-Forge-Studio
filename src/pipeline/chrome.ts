@@ -132,7 +132,7 @@ export async function openRenderHost(job: unknown, opts: { width: number; height
       async capture(scene, times, format, s, labels) {
         if (exited) throw new Error('El navegador se cerró inesperadamente');
         sink = s;
-        try { return await cdp!.eval<{ frames: number; ms: number }>(`window.__SF_CAPTURE__(${JSON.stringify({ scene, times, format, label: labels })})`, Math.max(120_000, times.length * 4_000)); }
+        try { return await cdp!.eval<{ frames: number; ms: number }>(`window.__SF_CAPTURE__(${JSON.stringify({ scene, times, format, label: labels })})`, Math.max(45_000, times.length * 1_500)); }
         catch (e) { throw new Error(`${(e as Error).message}${consoleErrors.length ? ' | consola: ' + consoleErrors.slice(-3).join(' | ') : ''}`); }
         finally { sink = null; }
       },

@@ -78,6 +78,7 @@ test('el piloto compila con duración estimada antes de sintetizar voces', async
 });
 
 test('studio migrate reescribe un proyecto v0.2–v0.4 a v2 conservando copias .v1.json', async () => {
+  // @ts-expect-error legacy v0.2 JavaScript module without type declarations
   const { FileWorkspace } = await import('../src/workspace.mjs');
   const fw = await new FileWorkspace(ws).init();
   const { project } = await fw.createProject('Antiguo Demo');

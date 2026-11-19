@@ -42,7 +42,7 @@ Tiempo: render completo 1080p del piloto ≈ 2,5 min (≈ 8–11 fps de render e
 | Esqueleto, skinning, IK brazos/piernas, pelvis, apoyos | ✅ | IK analítico de dos huesos con eje de bisagra; solver de pelvis |
 | Giro libre de cuerpo/cabeza/ojos | ✅ | verificado 0/35/90/180/270° en hojas de giro |
 | Expresiones (10 pedidas + sonrisa irónica, preocupación, asco, determinación) combinables con habla | ✅ | |
-| Animaciones genéricas por rig (idle, walk, run, jump, crouch, point, pick-up, hold-object, sit, stand, turn…) heredables | ✅ | `sit`/`give` probadas numéricamente, aún no revisadas visualmente en un plano final |
+| Animaciones genéricas por rig (idle, walk, run, jump, crouch, point, pick-up, hold-object, sit, stand, turn…) heredables | ✅ | muestrario `episodes/muestrario` revisado fotograma a fotograma: saludar, correr, dar un objeto, saltar (pies y sombra separados del suelo), caminar, sentarse en el taburete y levantarse |
 | Motor de animación declarativo: keyframes, curvas, capas, aditivos, IK en clips, contactos, root motion paramétrico, determinismo | ✅ | |
 | Objetos con anclajes, articulaciones, agarres, caída física simplificada | ✅ | sin física de colisiones generales (no se pretende) |
 | Escenarios procedurales (habitaciones con aberturas, luces, decoración; exteriores básicos) | ✅ 🟡 | exteriores menos trabajados que interiores |

@@ -167,7 +167,7 @@ function ffmpegSink(out: string, w: number, h: number, fps: number, crf: number,
   return {
     write: (buf: Buffer) => new Promise<void>((ok, fail) => { p.stdin.write(buf, e => (e ? fail(e) : ok())); }),
     end: async () => { p.stdin.end(); await done; },
-    kill: () => { try { p.kill('SIGKILL'); } catch { /* */ } }
+    kill: async () => { try { p.kill('SIGKILL'); } catch { /* */ } await Promise.race([done.catch(() => {}), new Promise(ok => setTimeout(ok, 5000))]); }
   };
 }
 
@@ -179,13 +179,18 @@ export async function renderEpisode(project: string, episode: string, settings: 
   const ep = p.episodes[episode];
   const outDir = join(p.root, ep.dir, 'output');
   const cacheDir = join(p.root, 'generated', 'cache', 'shots');
-  await mkdir(outDir, { recursive: true }); await mkdir(cacheDir, { recursive: true }); await rm(join(outDir, 'storyboard'), { recursive: true, force: true }); await mkdir(join(outDir, 'storyboard'), { recursive: true });
+  await mkdir(outDir, { recursive: true }); await mkdir(cacheDir, { recursive: true }); await rm(join(outDir, 'storyboard'), { recursive: true, force: true });
+  // partial chunks left by an interrupted run are discarded (complete chunks are kept and reused)
+  for (const f of await readdir(cacheDir)) if (f.includes('.part.')) await rm(join(cacheDir, f), { force: true }).catch(() => {}); await mkdir(join(outDir, 'storyboard'), { recursive: true });
   const { width, height, fps } = settings;
   const crf = settings.crf ?? 18, preset = settings.preset ?? 'medium';
   // ------------------------------------------------ video chunks
   let host: RenderHost | null = null;
-  const openHost = async () => { host = await openRenderHost({ width, height, scenes: resolved.map(r => ({ resolved: r })), lib }, { width, height, timeoutMs: 120_000 }); progress({ stage: 'gpu', renderer: host.info.renderer, webgl2: host.info.webgl2 }); return host; };
-  let rendered = 0, reused = 0, renderMs = 0, retries = 0;
+  const openHost = async () => { host = await openRenderHost({ width, height, scenes: resolved.map(r => ({ resolved: r })), lib }, { width, height, timeoutMs: 120_000 }); framesOnHost = 0; progress({ stage: 'gpu', renderer: host.info.renderer, webgl2: host.info.webgl2 }); return host; };
+  let rendered = 0, reused = 0, renderMs = 0, retries = 0, recycles = 0;
+  // Chromium degrades after long runs of large raw-frame transfers: recycle the host every N frames (scaled by resolution)
+  const RECYCLE = Math.min(6000, Math.round(720 * (1920 * 1080) / (width * height)));
+  let framesOnHost = 0;
   const chunkFiles: string[] = [];
   const memPeak = { rss: 0 };
   try {
@@ -195,6 +200,7 @@ export async function renderEpisode(project: string, episode: string, settings: 
       if (existsSync(file)) { reused++; progress({ stage: 'shot', shot: shot.id, scene: shot.scene, cached: true, frames: ch.f1 - ch.f0 }); continue; }
       const sceneStartFrame = plan.scenes[shot.sceneIndex].frame0;
       const times: number[] = []; for (let f = ch.f0; f < ch.f1; f++) times.push((f - sceneStartFrame) / fps);
+      if (host && framesOnHost + times.length > RECYCLE) { await (host as RenderHost).close().catch(() => {}); host = null; recycles++; progress({ stage: 'recycle', afterFrames: framesOnHost }); }
       for (let attempt = 1; ; attempt++) {
         const tmp = `${file}.${process.pid}.part.mp4`;
         const sink = ffmpegSink(tmp, width, height, fps, crf, preset);
@@ -206,6 +212,7 @@ export async function renderEpisode(project: string, episode: string, settings: 
             const part = times.slice(i, i + BATCH);
             await h.capture(shot.sceneIndex, part, 'raw', async (_i, data) => { if (data.length !== width * height * 4) throw new Error(`frame de tamaño inesperado ${data.length}`); await sink.write(data); });
             memPeak.rss = Math.max(memPeak.rss, process.memoryUsage().rss);
+            framesOnHost += part.length;
           }
           await sink.end();
           await rename(tmp, file);
@@ -214,11 +221,12 @@ export async function renderEpisode(project: string, episode: string, settings: 
           progress({ stage: 'shot', shot: shot.id, scene: shot.scene, cached: false, frames: times.length, ms: Date.now() - tc, fpsRender: +(times.length / ((Date.now() - tc) / 1000)).toFixed(2), rssMB: Math.round(process.memoryUsage().rss / 1048576), ...(mem ? { browserHeapMB: Math.round((mem.JSHeapUsedSize ?? 0) / 1048576), domNodes: mem.Nodes } : {}) });
           break;
         } catch (e) {
-          sink.kill(); await rm(tmp, { force: true });
+          progress({ stage: 'retry', shot: shot.id, scene: shot.scene, attempt, error: (e as Error).message });
+          await sink.kill();
+          await rm(tmp, { force: true, maxRetries: 10, retryDelay: 300 }).catch(() => {});
           if (host) { await (host as RenderHost).close().catch(() => {}); host = null; }
           retries++;
           if (attempt >= 3) throw new Error(`Fallo renderizando ${shot.scene}/${shot.id} tras ${attempt} intentos: ${(e as Error).message}`);
-          progress({ stage: 'retry', shot: shot.id, attempt, error: (e as Error).message });
         }
       }
     }
@@ -279,7 +287,7 @@ export async function renderEpisode(project: string, episode: string, settings: 
     await runProcess('ffmpeg', ['-nostdin', '-hide_banner', '-loglevel', 'error', '-y', '-i', videoOnly, '-i', audioMaster, '-i', srtFile, '-map', '0:v:0', '-map', '1:a:0', '-map', '2:s:0', '-c:v', 'copy', '-c:a', 'aac', '-b:a', '192k', '-ar', '48000', '-c:s', 'mov_text', '-metadata:s:s:0', 'language=spa', '-metadata:s:a:0', 'language=spa', '-metadata', `title=${plan.name}`, '-movflags', '+faststart', finalMp4 + '.part.mp4'], { timeoutMs: 1_200_000 });
     await rename(finalMp4 + '.part.mp4', finalMp4);
     await rm(videoOnly, { force: true }); await rm(list, { force: true });
-    const stats = { totalMs: Date.now() - t0, chunksRendered: rendered, chunksReused: reused, renderMs, retries, framesTotal: plan.frames, peakRssMB: Math.round(memPeak.rss / 1048576), gpu: host ? (host as RenderHost).info.renderer : null, lufsBeforeNorm: before, normGainDb: gainDb, limiterPeakIn: peakIn };
+    const stats = { totalMs: Date.now() - t0, chunksRendered: rendered, chunksReused: reused, renderMs, retries, hostRecycles: recycles, framesTotal: plan.frames, peakRssMB: Math.round(memPeak.rss / 1048576), gpu: host ? (host as RenderHost).info.renderer : null, lufsBeforeNorm: before, normGainDb: gainDb, limiterPeakIn: peakIn };
     const metadata = join(outDir, 'metadata.json');
     await writeFile(metadata, JSON.stringify({ schemaVersion: 2, project, episode, name: plan.name, settings, durationSec: plan.durationSec, frames: plan.frames, scenes: plan.scenes.map(s => ({ id: s.id, name: s.name, start: s.start, duration: s.duration, warnings: s.warnings })), shots: plan.shots.map(s => ({ id: s.id, scene: s.scene, start: s.start, end: s.end, hash: s.hash })), speech: plan.speech, audioCues: plan.audio.length, mix: mixReport, stats, licenses: licenseReport(p), generatedAt: new Date().toISOString() }, null, 2));
     progress({ stage: 'done', output: finalMp4, ...stats });
