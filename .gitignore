@@ -1,5 +1,6 @@
 node_modules/
 workspace/
+data/studio.json
 data/*.lock
 data/*.tmp
 data/previews/

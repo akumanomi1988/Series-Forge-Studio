@@ -96,6 +96,7 @@ export class FileWorkspace {
  projectPath(project){if(!safeSegment(project))throw new Error('ID de proyecto no válido');return join(this.root,project);}
  async securePath(project,rel=''){
   const root=this.projectPath(project);const abs=resolve(root,rel);if(abs!==root&&!abs.startsWith(root+sep))throw new Error('Ruta fuera del proyecto');
+  try{if((await lstat(root)).isSymbolicLink())throw new Error('Proyecto con enlace simbólico no permitido');}catch(e){if(e.code!=='ENOENT')throw e;}
   let next=root;for(const s of relative(root,abs).split(sep).filter(Boolean)){next=join(next,s);try{if((await lstat(next)).isSymbolicLink())throw new Error('Enlaces simbólicos no permitidos');}catch(e){if(e.code!=='ENOENT')throw e;}}
   return abs;
  }
