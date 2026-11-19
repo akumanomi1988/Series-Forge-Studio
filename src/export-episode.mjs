@@ -3,6 +3,7 @@ import { spawn } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import { mkdir, readFile, writeFile, readdir, rm, stat } from 'node:fs/promises';
 import { join, resolve } from 'node:path';
+import { pathToFileURL } from 'node:url';
 import { FileWorkspace, validateScene } from './workspace.mjs';
 import { compileRenderPlan } from './production.mjs';
 import { renderSvgFrame } from './frame-renderer.mjs';
@@ -41,5 +42,5 @@ export async function exportEpisode({workspace=new FileWorkspace(),project,episo
  }
  const concat=join(root,'.concat.txt');await writeFile(concat,segments.map(x=>`file '${x.replace(/'/g,"'\\''")}'`).join('\n')+'\n');const video=join(root,`episode-${width}x${height}-${fps}fps.mp4`);await runTool(ffmpeg,['-y','-nostdin','-hide_banner','-loglevel','error','-f','concat','-safe','0','-i',concat,'-c','copy','-movflags','+faststart',video],{timeout:600000});const srt=join(root,'subtitulos.srt');await writeFile(srt,subtitlesForScenes(usedScenes));const metadata=join(root,'production.json');await writeFile(metadata,txt({schemaVersion:1,project,episode,width,height,fps,speech,segments:segments.length,durationSec:usedScenes.reduce((s,x)=>s+x.durationSec,0),renderMode:'svg-animatic',quality:'animatic-not-final-character-render',video,srt,generatedAt:new Date().toISOString()}));progress({status:'done',video,srt});return {video,srt,metadata,segments:segments.length};
 }
-const direct=process.argv[1]&&new URL(`file://${resolve(process.argv[1]).replace(/\\/g,'/')}`).pathname===new URL(import.meta.url).pathname;
+const direct=process.argv[1]&&pathToFileURL(resolve(process.argv[1])).href===import.meta.url;
 if(direct){const [project,episode,...flags]=process.argv.slice(2),value=(key,def)=>{const i=flags.indexOf(`--${key}`);return i<0?def:Number(flags[i+1]);};const opts={project,episode,width:value('width',960),height:value('height',540),fps:value('fps',24),maxSeconds:value('max-seconds',null),speech:flags.includes('--sapi')?'sapi':'none',progress:x=>console.log(JSON.stringify(x))};exportEpisode(opts).then(x=>console.log(JSON.stringify(x,null,2))).catch(e=>{console.error(e.stack||e.message);process.exitCode=1;});}
