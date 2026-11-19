@@ -17,6 +17,7 @@ import { compileScene } from '../engine/director.ts';
 import { assetLibrary } from '../pipeline/project.ts';
 import { scaffold } from '../pipeline/scaffold.ts';
 import { migrateProject } from '../pipeline/migrate.ts';
+import { exportGlb } from '../pipeline/gltf.ts';
 import { listVersions, revertTo, recordVersion } from '../pipeline/history.ts';
 
 const HELP = `Series Forge Studio — CLI para agentes y personas (sin LLM integrado).
@@ -38,6 +39,7 @@ const HELP = `Series Forge Studio — CLI para agentes y personas (sin LLM integ
   studio migrate <project>                          Reescribe assets v1 (v0.2–v0.4) en v2 (copias .v1.json)
   studio history <project> <ruta>                   Versiones guardadas de un archivo (editor y cambios detectados)
   studio revert <project> <ruta> <versión>          Restaura una versión (queda registrada como nueva versión)
+  studio export character|prop <project> <id>       Geometría compilada a GLB (characters/<id>/compiled/<id>.glb)
   studio voices                                     Voces TTS locales disponibles
   studio say <project> <character> "<texto>" [--emotion angry]   Prueba de voz (WAV en generated/)
 `;
@@ -135,6 +137,7 @@ async function main() {
       throw new Error('Uso: studio story status|confirm|amend|revert');
     }
     case 'migrate': return out(await migrateProject(sub));
+    case 'export': { if (sub !== 'character' && sub !== 'prop') throw new Error('Uso: studio export character|prop <project> <id>'); return out(await exportGlb(a1, sub, a2)); }
     case 'history': { const p = await loadProject(sub); const f = await readFile(join(p.root, a1), 'utf8').catch(() => null); if (f !== null) await recordVersion(sub, a1, f, 'disk'); return out(await listVersions(sub, a1)); }
     case 'revert': return out({ reverted: a1, to: a2, bytes: (await revertTo(sub, a1, a2)).length });
     case 'voices': return out(await listOneCoreVoices());

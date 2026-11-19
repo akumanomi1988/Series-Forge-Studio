@@ -81,7 +81,7 @@ function ensureWatcher(project: string) {
   entry.w = watch(root, { recursive: true }, (_ev, filename) => {
     if (!filename) return;
     const rel = String(filename).split(sep).join('/');
-    if (/(^|\/)(generated|output|\.render-cache)(\/|$)/.test(rel) || rel.endsWith('.tmp') || rel.includes('.part')) return;
+    if (/(^|\/)(generated|output|compiled|\.render-cache)(\/|$)/.test(rel) || rel.endsWith('.tmp') || rel.includes('.part')) return;
     entry.pending.add(rel);
     if (entry.timer) clearTimeout(entry.timer);
     // debounce: agents often write several files; incomplete JSON is retried on the next tick

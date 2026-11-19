@@ -98,3 +98,15 @@ test('studio migrate reescribe un proyecto v0.2–v0.4 a v2 conservando copias .
   assert.equal(p.episodes[ep.id].scenes[sc.id].dialogue[0].text, 'Hola.');
   assert.ok(readFileSync(join(ws, project, 'characters', c.id, 'geometry.v1.json'), 'utf8').includes('"schemaVersion": 1'));
 });
+
+test('exporta la geometría compilada a GLB con esqueleto y mallas con skinning', async () => {
+  const { exportGlb } = await import('../src/pipeline/gltf.ts');
+  const r = await exportGlb('el-ultimo-turno', 'character', 'lara');
+  assert.ok(r.bytes > 100_000);
+  const { GLTFLoader } = await import('three/examples/jsm/loaders/GLTFLoader.js');
+  const b = readFileSync(r.file);
+  const gltf = await new GLTFLoader().parseAsync(b.buffer.slice(b.byteOffset, b.byteOffset + b.length) as ArrayBuffer, '');
+  let skinned = 0; const bones = new Set<string>();
+  gltf.scene.traverse(o => { const s = o as unknown as { isSkinnedMesh?: boolean; skeleton: { bones: { name: string }[] } }; if (s.isSkinnedMesh) { skinned++; s.skeleton.bones.forEach(x => bones.add(x.name)); } });
+  assert.ok(skinned >= 6 && bones.has('leftUpperArm') && bones.has('head'));
+});
