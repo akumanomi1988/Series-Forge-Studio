@@ -82,7 +82,34 @@
         "prop": "robot",
         "anchor": "panel"
       },
-      "durationSec": 3.4
+      "durationSec": 7.5
+    },
+    {
+      "id": "piensa",
+      "type": "play",
+      "actor": "bruno",
+      "with": "b0",
+      "clip": "think",
+      "durationSec": 3.2
+    },
+    {
+      "id": "pitido-inicio",
+      "type": "effect",
+      "effect": "glow",
+      "prop": "robot",
+      "part": "antennaTip",
+      "at": 0.9,
+      "durationSec": 0.5,
+      "intensity": 2
+    },
+    {
+      "id": "mira-alrededor",
+      "type": "play",
+      "actor": "bruno",
+      "after": "cabeza-robot-2",
+      "offset": 0.1,
+      "clip": "look-around",
+      "speed": 1.3
     },
     {
       "id": "chispas",
@@ -231,12 +258,20 @@
   ],
   "dialogue": [
     {
+      "id": "b0",
+      "actor": "bruno",
+      "text": "A ver, Erre Siete. Respira hondo... si es que respiras.",
+      "emotion": "thinking",
+      "at": 1.4,
+      "pauseAfter": 0.9
+    },
+    {
       "id": "b1",
       "actor": "bruno",
       "text": "Vamos, pequeño. No me hagas esto ahora.",
       "emotion": "nervous",
       "intensity": 0.8,
-      "pauseAfter": 2.6
+      "pauseAfter": 2.9
     },
     {
       "id": "b2",
@@ -263,6 +298,15 @@
       "to": "lara",
       "emotion": "nervous",
       "gesture": "present",
+      "pauseAfter": 0.6
+    },
+    {
+      "id": "l1b",
+      "actor": "lara",
+      "text": "Ajustando tornillos. Con el panel abierto y oliendo a quemado.",
+      "to": "bruno",
+      "emotion": "smirk",
+      "intensity": 0.7,
       "pauseAfter": 0.5
     }
   ],
@@ -296,7 +340,7 @@
     },
     {
       "id": "sh-02",
-      "with": "b1",
+      "with": "b0",
       "offset": -0.3,
       "camera": {
         "framing": "medium-close",
@@ -388,6 +432,17 @@
         "fov": 32,
         "handheld": 0.35
       }
+    },
+    {
+      "id": "sh-08",
+      "with": "l1b",
+      "offset": -0.15,
+      "camera": {
+        "framing": "medium-close",
+        "subject": "lara",
+        "azimuthDeg": 15,
+        "fov": 32
+      }
     }
   ],
   "sound": [
@@ -406,6 +461,13 @@
       "sound": "robot-sad",
       "with": "pitido",
       "gainDb": -6
+    },
+    {
+      "id": "pitido-hola",
+      "kind": "sfx",
+      "sound": "robot-beep",
+      "with": "pitido-inicio",
+      "gainDb": -9
     }
   ],
   "transitionOut": {

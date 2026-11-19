@@ -56,7 +56,7 @@ class Cdp {
 }
 
 export type FrameSink = (index: number, data: Buffer, label: string) => Promise<void> | void;
-export interface RenderHost { capture(scene: number, times: number[], format: 'raw' | 'png', sink: FrameSink, labels?: string[]): Promise<{ frames: number; ms: number }>; info: { renderer: string; webgl2: boolean }; close(): Promise<void> }
+export interface RenderHost { capture(scene: number, times: number[], format: 'raw' | 'png', sink: FrameSink, labels?: string[]): Promise<{ frames: number; ms: number }>; info: { renderer: string; webgl2: boolean }; metrics(): Promise<Record<string, number>>; close(): Promise<void> }
 
 /** Start a capture host for a job (job JSON must be serialisable: resolved scenes + asset library). */
 export async function openRenderHost(job: unknown, opts: { width: number; height: number; timeoutMs?: number } ): Promise<RenderHost> {
@@ -113,7 +113,7 @@ export async function openRenderHost(job: unknown, opts: { width: number; height
     cdp = new Cdp(ws);
     const consoleErrors: string[] = [];
     cdp.onEvent = (method, params) => { if (method === 'Runtime.exceptionThrown') consoleErrors.push(JSON.stringify(params).slice(0, 800)); if (method === 'Log.entryAdded') { const e = (params as { entry: { level: string; text: string } }).entry; if (e.level === 'error') consoleErrors.push(e.text); } };
-    await cdp.send('Runtime.enable'); await cdp.send('Log.enable').catch(() => {}); await cdp.send('Page.enable');
+    await cdp.send('Runtime.enable'); await cdp.send('Log.enable').catch(() => {}); await cdp.send('Page.enable'); await cdp.send('Performance.enable').catch(() => {});
     await cdp.send('Emulation.setDeviceMetricsOverride', { width: opts.width, height: opts.height, deviceScaleFactor: 1, mobile: false });
     await cdp.send('Page.navigate', { url: `http://127.0.0.1:${port}/?token=${token}` });
     const deadline = Date.now() + (opts.timeoutMs ?? 60_000);
@@ -128,6 +128,7 @@ export async function openRenderHost(job: unknown, opts: { width: number; height
     const info = await cdp.eval<{ renderer: string; webgl2: boolean }>('window.__SF_INFO__');
     return {
       info,
+      async metrics() { const r = await cdp!.send<{ metrics: { name: string; value: number }[] }>('Performance.getMetrics'); return Object.fromEntries(r.metrics.map(m => [m.name, m.value])); },
       async capture(scene, times, format, s, labels) {
         if (exited) throw new Error('El navegador se cerró inesperadamente');
         sink = s;
@@ -137,5 +138,27 @@ export async function openRenderHost(job: unknown, opts: { width: number; height
       },
       close
     };
+  } catch (e) { await close(); throw e; }
+}
+
+/** Generic headless page driver (UI end-to-end tests and screenshots of the editor). */
+export async function openPage(url: string, width = 1600, height = 900): Promise<{ eval<T>(expr: string): Promise<T>; screenshot(file: string): Promise<void>; consoleErrors: string[]; close(): Promise<void> }> {
+  const userDir = await mkdtemp(join(tmpdir(), 'sf-ui-'));
+  const child = spawn(findBrowser(), ['--headless=new', '--no-first-run', '--no-default-browser-check', '--disable-extensions', '--ignore-gpu-blocklist', '--enable-webgl', '--remote-debugging-port=0', `--user-data-dir=${userDir}`, `--window-size=${width},${height}`, 'about:blank'], { stdio: 'ignore', windowsHide: true });
+  let exited = false; child.once('exit', () => { exited = true; });
+  let cdp: Cdp | null = null;
+  const close = async () => { cdp?.close(); if (!exited) { child.kill(); for (let i = 0; i < 30 && !exited; i++) await delay(100); } await rm(userDir, { recursive: true, force: true, maxRetries: 6, retryDelay: 200 }).catch(() => {}); };
+  try {
+    let port = 0; for (let i = 0; i < 150 && !port; i++) { try { port = Number((await readFile(join(userDir, 'DevToolsActivePort'), 'utf8')).split('\n')[0]); } catch { await delay(100); } }
+    let ws = ''; for (let i = 0; i < 100 && !ws; i++) { const tabs = await fetch(`http://127.0.0.1:${port}/json/list`).then(r => r.json() as Promise<{ type: string; webSocketDebuggerUrl?: string }[]>).catch(() => []); ws = tabs.find(t => t.type === 'page')?.webSocketDebuggerUrl ?? ''; if (!ws) await delay(100); }
+    const sock = new WebSocket(ws); await new Promise((ok, fail) => { sock.addEventListener('open', ok, { once: true }); sock.addEventListener('error', fail, { once: true }); });
+    cdp = new Cdp(sock);
+    const consoleErrors: string[] = [];
+    cdp.onEvent = (m, p) => { if (m === 'Runtime.exceptionThrown') consoleErrors.push(JSON.stringify(p).slice(0, 600)); if (m === 'Runtime.consoleAPICalled' && (p as { type: string }).type === 'error') consoleErrors.push(JSON.stringify((p as { args: unknown[] }).args).slice(0, 600)); };
+    await cdp.send('Runtime.enable'); await cdp.send('Page.enable');
+    await cdp.send('Emulation.setDeviceMetricsOverride', { width, height, deviceScaleFactor: 1, mobile: false });
+    await cdp.send('Page.navigate', { url });
+    const c = cdp;
+    return { eval: <T>(e: string) => c.eval<T>(e), consoleErrors, close, screenshot: async (file: string) => { const r = await c.send<{ data: string }>('Page.captureScreenshot', { format: 'png' }); const { writeFile } = await import('node:fs/promises'); await writeFile(file, Buffer.from(r.data, 'base64')); } };
   } catch (e) { await close(); throw e; }
 }

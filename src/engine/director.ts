@@ -252,7 +252,7 @@ export function compileScene(scene: SceneV2, lib: AssetLibrary, opts: DirectorOp
       if (info.estimated) warnings.push(`Duración estimada (sin audio sintetizado) para ${l.id}`);
       const e = s + info.duration;
       actor(l.actor).speech.push({ lineId: l.id, start: s, end: e, visemes: info.visemes, text: l.text });
-      audio.push({ id: l.id, kind: 'dialogue', sound: l.id, start: s, duration: info.duration, gainDb: 0, fadeIn: 0, fadeOut: 0, pan: 0, duck: false, file: info.file, actor: l.actor, text: l.text });
+      audio.push({ id: l.id, kind: 'dialogue', sound: l.id, start: s, duration: info.duration, gainDb: /susurr|en voz baja|whisper/i.test(l.direction ?? '') ? -3 : /grit|shout/i.test(l.direction ?? '') ? 2 : 0, fadeIn: 0, fadeOut: 0, pan: 0, duck: false, file: info.file, actor: l.actor, text: l.text });
       const emo = resolveEmotion(l.emotion);
       if (emo && emo !== 'neutral') {
         if (!charOf(l.actor).expressions[emo]) warnings.push(`Emoción sin expresión: ${l.emotion} (${l.id})`);

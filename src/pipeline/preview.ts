@@ -23,7 +23,7 @@ export async function renderStills(p: LoadedProject, requests: StillRequest[], o
   return files;
 }
 
-function scene(extra: Partial<SceneV2> & Record<string, unknown>): SceneV2 { return SceneSchemaV2.parse({ schemaVersion: 2, id: 'sc-900', name: 'preview', environmentId: null, durationSec: 4, ...extra }); }
+function scene(extra: Record<string, unknown>): SceneV2 { return SceneSchemaV2.parse({ schemaVersion: 2, id: 'sc-900', name: 'preview', environmentId: null, durationSec: 4, ...extra }); }
 
 export function turnaroundScene(p: LoadedProject, characterId: string, yaws = [0, 35, 90, 180, 270]): ResolvedScene {
   const spacing = 1.05;

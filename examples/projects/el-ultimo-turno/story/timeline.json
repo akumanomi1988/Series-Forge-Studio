@@ -1,0 +1,10 @@
+{
+  "schemaVersion": 1,
+  "events": [
+    {
+      "id": "fundacion",
+      "episode": "canon",
+      "text": "Fundación del Taller 7."
+    }
+  ]
+}

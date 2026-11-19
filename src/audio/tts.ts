@@ -14,18 +14,18 @@ import type { Alignment, WordTiming } from './align.ts';
 import { estimateSpeech } from './phonetics-es.ts';
 import { REPO_ROOT } from '../pipeline/project.ts';
 
-export const TTS_VERSION = 4;
+export const TTS_VERSION = 7;
 export interface SpeechRequest { text: string; voice: VoiceProfile; emotion?: string; intensity?: number; direction?: string; rate?: number; pitchSemitones?: number }
 export interface SpeechResult { file: string; duration: number; alignment: Alignment; cached: boolean; provider: string; key: string; trimmedLead: number }
 
-export function runProcess(cmd: string, args: string[], opts: { timeoutMs?: number; input?: Buffer | string; cwd?: string } = {}): Promise<{ stdout: string; stderr: string }> {
+export function runProcess(cmd: string, args: string[], opts: { timeoutMs?: number; input?: Buffer | string; cwd?: string } = {}): Promise<{ stdout: string; stderr: string; stdoutBuf: Buffer }> {
   return new Promise((ok, fail) => {
     const p = spawn(cmd, args, { windowsHide: true, cwd: opts.cwd, stdio: ['pipe', 'pipe', 'pipe'] });
-    let out = '', err = '', done = false;
+    let out = '', err = '', done = false; const bufs: Buffer[] = [];
     const timer = setTimeout(() => { if (done) return; done = true; p.kill('SIGKILL'); fail(new Error(`${cmd}: tiempo agotado`)); }, opts.timeoutMs ?? 120_000);
-    p.stdout.on('data', d => { out = (out + d).slice(-400_000); }); p.stderr.on('data', d => { err = (err + d).slice(-100_000); });
+    p.stdout.on('data', (d: Buffer) => { bufs.push(d); out = (out + d.toString('utf8')).slice(-400_000); }); p.stderr.on('data', d => { err = (err + d).slice(-100_000); });
     p.on('error', e => { if (done) return; done = true; clearTimeout(timer); fail(e); });
-    p.on('close', code => { if (done) return; done = true; clearTimeout(timer); code === 0 ? ok({ stdout: out, stderr: err }) : fail(new Error(`${cmd} salió con ${code}: ${err.slice(-2000)}`)); });
+    p.on('close', code => { if (done) return; done = true; clearTimeout(timer); code === 0 ? ok({ stdout: out, stderr: err, stdoutBuf: Buffer.concat(bufs) }) : fail(new Error(`${cmd} salió con ${code}: ${err.slice(-2000)}`)); });
     if (opts.input !== undefined) p.stdin.end(opts.input); else p.stdin.end();
   });
 }

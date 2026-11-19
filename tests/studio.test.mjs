@@ -1,3 +1,4 @@
+import { fileURLToPath } from 'node:url';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { mkdtemp, readFile } from 'node:fs/promises';
@@ -56,7 +57,7 @@ test('MCP descubre herramientas y exporta un asset SVG',async()=>{
 
 test('el servidor MCP stdio responde al handshake de protocolo y tools/list', async()=>{
  const dir=await mkdtemp(join(tmpdir(),'sf-mcp-'));
- const proc=spawn(process.execPath,['src/mcp.mjs'],{cwd:new URL('../',import.meta.url).pathname,env:{...process.env,STUDIO_DATA_DIR:dir},stdio:['pipe','pipe','pipe']});
+ const proc=spawn(process.execPath,['src/mcp.mjs'],{cwd:fileURLToPath(new URL('../',import.meta.url)),env:{...process.env,STUDIO_DATA_DIR:dir},stdio:['pipe','pipe','pipe']});
  try{
   const lines=[];let buf='';proc.stdout.on('data',chunk=>{buf+=chunk.toString();let idx;while((idx=buf.indexOf('\n'))>=0){lines.push(JSON.parse(buf.slice(0,idx)));buf=buf.slice(idx+1);}});
   proc.stdin.write(JSON.stringify({jsonrpc:'2.0',id:1,method:'initialize',params:{protocolVersion:'2025-11-25',clientInfo:{name:'test',version:'1.0'},capabilities:{}}})+'\n');

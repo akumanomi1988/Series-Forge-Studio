@@ -33,8 +33,8 @@ function emission(cls: PhClass, f: Features, i: number): number {
     case 'vowel': return (1 - e) * 4 + Math.max(0, z - 0.6) * 3 + hf * 1.2;
     case 'semivowel': return Math.abs(e - 0.75) * 3 + z;
     case 'nasal': case 'liquid': return Math.abs(e - 0.55) * 3 + z * 1.5;
-    case 'voicedStop': return Math.abs(e - 0.4) * 3 + z;
-    case 'stop': return e * 2.5;
+    case 'voicedStop': return Math.abs(e - 0.4) * 3 + z + 0.15;
+    case 'stop': return e * 2.5 + 0.3;
     case 'fricative': case 'affricate': return (1 - hf) * 2.5 + Math.abs(e - 0.35) * 1.5;
   }
 }
@@ -77,65 +77,106 @@ function viterbi(phs: string[], f: Features, a: number, b: number): number[] | n
 
 export function alignSpeech(text: string, samples: Float32Array, sr: number, words: WordTiming[]): Alignment {
   const f = features(samples, sr);
-  const dur = samples.length / sr;
-  const toF = (t: number) => Math.max(0, Math.min(f.frames, Math.round(t / HOP)));
   const pw = textToPhonemeWords(text);
-  // voiced activity
   let lastVoiced = 0; for (let i = 0; i < f.frames; i++) if (f.e[i] > 0.18) lastVoiced = i;
-  const voicedEnd = Math.min(dur, (lastVoiced + 3) * HOP);
-  // match engine word cues to our phoneme words (engine words may merge/split numbers or clitics)
-  let anchors: { start: number }[] = [];
-  if (words.length === pw.length) anchors = words.map(w => ({ start: w.start }));
-  else if (words.length) {
-    // proportional mapping by character position when counts differ
-    let wi = 0; anchors = pw.map((_, i) => { const target = i / pw.length * words.length; wi = Math.min(words.length - 1, Math.floor(target)); const frac = target - wi; const s0 = words[wi].start, s1 = words[wi + 1]?.start ?? voicedEnd; return { start: s0 + (s1 - s0) * frac }; });
-  } else {
-    // no engine timing: distribute by phoneme duration priors over the voiced region
+  const voicedEnd = Math.min(samples.length / sr, (lastVoiced + 3) * HOP);
+  // soft anchors from the engine word cues (mapped proportionally when the counts differ)
+  let anchors: (number | null)[] = pw.map(() => null);
+  if (words.length === pw.length) anchors = words.map(w => w.start);
+  else if (words.length) anchors = pw.map((_, i) => { const target = i / pw.length * words.length; const wi = Math.min(words.length - 1, Math.floor(target)); const s0 = words[wi].start, s1 = words[wi + 1]?.start ?? voicedEnd; return s0 + (s1 - s0) * (target - wi); });
+  const method = words.length === pw.length ? 'utterance-viterbi+engine-anchors' : words.length ? 'utterance-viterbi+proportional-anchors' : 'utterance-viterbi';
+  // state graph: [lead sil] (w0 phonemes) [sil1] (w1 phonemes) ... [tail sil]
+  interface St { kind: 'sil' | 'ph'; word: number; ph: number; first: boolean; last: boolean; cls: PhClass }
+  const states: St[] = [{ kind: 'sil', word: -1, ph: -1, first: false, last: true, cls: 'sil' }];
+  const wordFirst: number[] = [], wordLast: number[] = [], silBefore: number[] = [];
+  pw.forEach((w, wi) => {
+    if (wi > 0) { silBefore[wi] = states.length; states.push({ kind: 'sil', word: wi, ph: -1, first: false, last: true, cls: 'sil' }); }
+    w.phonemes.forEach((ph, k) => { const cls = PHONEME_CLASS[ph] ?? 'vowel'; const n = cls === 'vowel' ? 3 : 2; for (let j = 0; j < n; j++) { if (k === 0 && j === 0) wordFirst[wi] = states.length; states.push({ kind: 'ph', word: wi, ph: k, first: j === 0, last: j === n - 1, cls }); } });
+    wordLast[wi] = states.length - 1;
+  });
+  const tailSil = states.length; states.push({ kind: 'sil', word: pw.length, ph: -1, first: false, last: true, cls: 'sil' });
+  const S = states.length, T = f.frames, INF = 1e18;
+  if (T < S) return proportional();
+  // predecessors
+  const preds: number[][] = states.map(() => []);
+  for (let s = 1; s < S; s++) {
+    const st = states[s];
+    if (st.kind === 'ph' && !(st.first && st.ph === 0)) preds[s].push(s - 1);
+    else if (st.kind === 'ph') { // first state of a word: from previous word end, or from the pause before it, or the lead silence
+      if (st.word === 0) preds[s].push(0);
+      else { preds[s].push(wordLast[st.word - 1]); preds[s].push(silBefore[st.word]); }
+    } else if (s === tailSil) preds[s].push(wordLast[pw.length - 1]);
+    else preds[s].push(wordLast[st.word - 1]); // pause state after previous word
+  }
+  const anchorCost = (s: number, t: number) => { const st = states[s]; if (st.kind !== 'ph' || st.ph !== 0 || !st.first) return 0; const a = anchors[st.word]; if (a === null) return 0; return 2 * Math.min(14, Math.abs(t * HOP - a) / 0.04); };
+  const em = (s: number, t: number) => emission(states[s].cls, f, t) + (states[s].kind === 'sil' && s !== 0 && s !== tailSil ? 0.08 : 0);
+  let prev = new Float64Array(S).fill(INF), cur = new Float64Array(S);
+  const back: Int16Array[] = [];
+  prev[0] = em(0, 0);
+  if (wordFirst[0] !== undefined) prev[wordFirst[0]] = em(wordFirst[0], 0) + anchorCost(wordFirst[0], 0);
+  back.push(new Int16Array(S).fill(-1));
+  for (let t = 1; t < T; t++) {
+    const bp = new Int16Array(S).fill(-1);
+    for (let s = 0; s < S; s++) {
+      let best = INF, arg = -1;
+      if (states[s].last && prev[s] < best) { best = prev[s] + (states[s].kind === 'sil' ? 0 : 0.05); arg = s; }
+      for (const q of preds[s]) if (prev[q] < best) { best = prev[q]; arg = q; }
+      cur[s] = arg < 0 ? INF : best + em(s, t) + (arg !== s ? anchorCost(s, t) : 0); bp[s] = arg;
+    }
+    back.push(bp); [prev, cur] = [cur, prev];
+  }
+  let end = prev[tailSil] <= prev[wordLast[pw.length - 1]] ? tailSil : wordLast[pw.length - 1];
+  if (prev[end] >= INF) return proportional();
+  const path = new Int32Array(T);
+  for (let t = T - 1; t >= 0; t--) { path[t] = end; end = back[t][end]; if (end < 0 && t > 0) return proportional(); }
+  const phonemes: PhonemeTiming[] = [];
+  let prevKey = '';
+  for (let t = 0; t < T; t++) {
+    const st = states[path[t]];
+    if (st.kind !== 'ph') { prevKey = ''; continue; }
+    const key = st.word + ':' + st.ph;
+    if (key === prevKey) phonemes[phonemes.length - 1].end = (t + 1) * HOP;
+    else phonemes.push({ ph: pw[st.word].phonemes[st.ph], start: t * HOP, end: (t + 1) * HOP, word: st.word });
+    prevKey = key;
+  }
+  return finish(phonemes, method);
+
+  function proportional(): Alignment {
     let firstVoiced = 0; for (let i = 0; i < f.frames; i++) if (f.e[i] > 0.18) { firstVoiced = i; break; }
     const total = pw.reduce((s, w) => s + w.phonemes.reduce((a, p) => a + PH_DURATION[PHONEME_CLASS[p] ?? 'vowel'], 0), 0);
     let t = firstVoiced * HOP; const k = (voicedEnd - t) / Math.max(0.05, total);
-    anchors = pw.map(w => { const s = t; t += w.phonemes.reduce((a, p) => a + PH_DURATION[PHONEME_CLASS[p] ?? 'vowel'], 0) * k; return { start: s }; });
+    const phs: PhonemeTiming[] = [];
+    pw.forEach((w, wi) => w.phonemes.forEach(ph => { const d = PH_DURATION[PHONEME_CLASS[ph] ?? 'vowel'] * k; phs.push({ ph, start: t, end: t + d, word: wi }); t += d; }));
+    return finish(phs, 'proportional');
   }
-  const outWords: Alignment['words'] = [];
-  const phonemes: PhonemeTiming[] = [];
-  let method = words.length === pw.length ? 'engine-words+viterbi' : words.length ? 'engine-words(proportional)+viterbi' : 'energy+viterbi';
-  for (let i = 0; i < pw.length; i++) {
-    const a = toF(anchors[i].start), bNext = i + 1 < pw.length ? toF(anchors[i + 1].start) : toF(voicedEnd) + 4;
-    const b = Math.max(a + 1, Math.min(f.frames, bNext));
-    const phs = pw[i].phonemes;
-    let st = viterbi(phs, f, a, b);
-    if (!st) { // too short: proportional fallback
-      method += '*';
-      const tot = phs.reduce((s, p) => s + PH_DURATION[PHONEME_CLASS[p] ?? 'vowel'], 0);
-      let acc = a; st = phs.map(p => { const s0 = acc; acc += (b - a) * PH_DURATION[PHONEME_CLASS[p] ?? 'vowel'] / tot; return Math.round(s0); }); st.push(b);
+  function finish(phonemes: PhonemeTiming[], m: string): Alignment {
+    const outWords = pw.map((w, i) => { const ps = phonemes.filter(p => p.word === i); return { text: w.word, start: ps[0]?.start ?? 0, end: ps[ps.length - 1]?.end ?? 0, phonemes: w.phonemes }; });
+    const visemes: [number, string][] = [];
+    const LEAD = 0.04;
+    let lastEnd = 0;
+    for (const p of phonemes) {
+      if (p.start - lastEnd > 0.09 && visemes.length) visemes.push([lastEnd + 0.02, 'sil']);
+      const v = PHONEME_VISEME[p.ph] ?? 'sil';
+      const t = Math.max(0, p.start - LEAD);
+      if (!visemes.length || visemes[visemes.length - 1][1] !== v) visemes.push([t, v]);
+      lastEnd = p.end;
     }
-    const wordEnd = st[phs.length] * HOP;
-    phs.forEach((ph, k) => phonemes.push({ ph, start: st![k] * HOP, end: (k + 1 < phs.length ? st![k + 1] : st![phs.length]) * HOP, word: i }));
-    outWords.push({ text: pw[i].word, start: st[0] * HOP, end: wordEnd, phonemes: phs });
+    visemes.push([lastEnd, 'sil']);
+    for (let i = 1; i < visemes.length; i++) if (visemes[i][0] <= visemes[i - 1][0]) visemes[i][0] = visemes[i - 1][0] + 0.005;
+    return { words: outWords, phonemes, visemes, voicedEnd, method: m };
   }
-  // visemes: phoneme targets placed slightly before the acoustic onset (lips anticipate sound ~40 ms)
-  const visemes: [number, string][] = [];
-  const LEAD = 0.04;
-  let lastEnd = 0;
-  for (const p of phonemes) {
-    if (p.start - lastEnd > 0.09 && visemes.length) visemes.push([lastEnd + 0.02, 'sil']);
-    const v = PHONEME_VISEME[p.ph] ?? 'sil';
-    const t = Math.max(0, p.start - LEAD);
-    if (!visemes.length || visemes[visemes.length - 1][1] !== v) visemes.push([t, v]);
-    lastEnd = p.end;
-  }
-  visemes.push([lastEnd, 'sil']);
-  for (let i = 1; i < visemes.length; i++) if (visemes[i][0] <= visemes[i - 1][0]) visemes[i][0] = visemes[i - 1][0] + 0.005;
-  return { words: outWords, phonemes, visemes, voicedEnd, method };
 }
+
 
 /** Lip-sync QA: cross-correlate mouth opening (from visemes) with the audio envelope; returns lag in seconds. */
 export function lipSyncLag(samples: Float32Array, sr: number, mouthOpen: (t: number) => number, maxLag = 0.25): { lagSec: number; correlation: number } {
   const f = features(samples, sr);
   const n = f.frames;
-  const m = new Float32Array(n); for (let i = 0; i < n; i++) m[i] = mouthOpen(i * HOP + WIN / 2);
+  // activity-based comparison: mouth moving (any non-rest shape) vs. speech present; robust to /u/ (loud but small opening)
+  const m = new Float32Array(n); for (let i = 0; i < n; i++) { const o = mouthOpen(i * HOP + WIN / 2); m[i] = o > 0.06 ? 0.6 + 0.4 * Math.min(1, o) : 0; }
+  const act = Float32Array.from(f.e, v => Math.min(1, v * 1.6));
   const norm = (x: Float32Array) => { let mu = 0; for (const v of x) mu += v; mu /= x.length; let sd = 0; for (const v of x) sd += (v - mu) ** 2; sd = Math.sqrt(sd / x.length) || 1; return Float32Array.from(x, v => (v - mu) / sd); };
-  const A = norm(f.e), B = norm(m);
+  const A = norm(act), B = norm(m);
   let best = -Infinity, bestLag = 0;
   const L = Math.round(maxLag / HOP);
   for (let lag = -L; lag <= L; lag++) { let s = 0, c = 0; for (let i = 0; i < n; i++) { const j = i + lag; if (j < 0 || j >= n) continue; s += A[i] * B[j]; c++; } const r = s / Math.max(1, c); if (r > best) { best = r; bestLag = lag; } }

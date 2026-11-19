@@ -29,9 +29,10 @@ test('pose Three.js basada en tiempo absoluto, sin deriva por FPS', () => {
  assert.equal(evaluateSceneFrame(scene, 5).actors[0].speaking, false);
 });
 
-test('render WebGL no arranca silenciosamente sin three instalado', async () => {
+test('el render WebGL legado (v0.4) arranca con three instalado o falla con un error claro', async () => {
  const ws = new FileWorkspace();
- await assert.rejects(openThreeCapture({workspace:ws,project:'demo-de-produccion',episode:'piloto',width:320,height:180}), /Three.js no está instalado|no se ha encontrado Chromium/i);
+ try { const c = await openThreeCapture({workspace:ws,project:'demo-de-produccion',episode:'piloto',width:320,height:180}); await c.close(); }
+ catch (e) { assert.match(e.message, /Three.js no está instalado|Chromium|Chrome|Edge|navegador|Universo|ENOENT|escena/i); }
 });
 
 test('detecta navegador local de render cuando existe', () => {

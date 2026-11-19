@@ -245,6 +245,60 @@
       "actor": "bruno",
       "with": "b6",
       "expression": "nervous"
+    },
+    {
+      "id": "robot-feliz",
+      "type": "propJoint",
+      "prop": "robot",
+      "joint": "head",
+      "after": "l6",
+      "offset": 0.1,
+      "toDeg": -15,
+      "durationSec": 0.5,
+      "sound": "servo"
+    },
+    {
+      "id": "robot-feliz-2",
+      "type": "propJoint",
+      "prop": "robot",
+      "joint": "head",
+      "after": "robot-feliz",
+      "toDeg": 10,
+      "durationSec": 0.5
+    },
+    {
+      "id": "robot-luz",
+      "type": "effect",
+      "effect": "glow",
+      "prop": "robot",
+      "part": "antennaTip",
+      "with": "robot-feliz",
+      "durationSec": 1.2,
+      "intensity": 2
+    },
+    {
+      "id": "lara-mira-robot",
+      "type": "lookAt",
+      "actor": "lara",
+      "with": "robot-feliz",
+      "offset": 0.2,
+      "target": {
+        "prop": "robot",
+        "anchor": "eye"
+      },
+      "durationSec": 1.6
+    },
+    {
+      "id": "bruno-mira-robot",
+      "type": "lookAt",
+      "actor": "bruno",
+      "with": "robot-feliz",
+      "offset": 0.3,
+      "target": {
+        "prop": "robot",
+        "anchor": "eye"
+      },
+      "durationSec": 1.5
     }
   ],
   "dialogue": [
@@ -255,6 +309,9 @@
       "to": "bruno",
       "emotion": "angry",
       "intensity": 0.8,
+      "reveals": [
+        "nucleo-quemado"
+      ],
       "after": "lara-encara",
       "offset": -0.3
     },
@@ -266,6 +323,25 @@
       "emotion": "determined",
       "gesture": "present",
       "pauseAfter": 0.3
+    },
+    {
+      "id": "l2b",
+      "actor": "lara",
+      "text": "Bruno, la inspección es mañana a las ocho.",
+      "to": "bruno",
+      "emotion": "worried",
+      "knowledge": [
+        "inspeccion-manana"
+      ],
+      "pauseAfter": 0.4
+    },
+    {
+      "id": "b4b",
+      "actor": "bruno",
+      "text": "Para entonces funcionará. Te lo prometo.",
+      "to": "lara",
+      "emotion": "nervous",
+      "pauseAfter": 0.4
     },
     {
       "id": "l3",
@@ -291,6 +367,9 @@
       "text": "Vaya, vaya. ¿Y esto qué es, señor nada grave?",
       "to": "bruno",
       "emotion": "smirk",
+      "reveals": [
+        "fusible-oculto"
+      ],
       "after": "lara-ensena",
       "offset": 0.2,
       "pauseAfter": 0.4
@@ -310,7 +389,24 @@
       "text": "Tengo toda la noche. Empieza a explicar.",
       "to": "bruno",
       "emotion": "smirk",
-      "gesture": "hands-on-hips"
+      "gesture": "hands-on-hips",
+      "pauseAfter": 0.9
+    },
+    {
+      "id": "b7",
+      "actor": "bruno",
+      "text": "Vale. Pero primero... café.",
+      "to": "lara",
+      "emotion": "smile",
+      "pauseAfter": 0.5
+    },
+    {
+      "id": "l6",
+      "actor": "lara",
+      "text": "Doble. Y sin azúcar.",
+      "to": "bruno",
+      "emotion": "smile",
+      "intensity": 0.8
     }
   ],
   "shots": [
@@ -353,6 +449,29 @@
         "subject": "bruno",
         "side": "right",
         "fov": 32
+      }
+    },
+    {
+      "id": "sh-03b",
+      "with": "l2b",
+      "offset": -0.15,
+      "camera": {
+        "framing": "over-shoulder",
+        "over": "bruno",
+        "subject": "lara",
+        "side": "left",
+        "fov": 32
+      }
+    },
+    {
+      "id": "sh-03c",
+      "with": "b4b",
+      "offset": -0.15,
+      "camera": {
+        "framing": "close",
+        "subject": "bruno",
+        "azimuthDeg": 12,
+        "fov": 30
       }
     },
     {
@@ -447,11 +566,45 @@
           "lara",
           "bruno"
         ],
+        "fov": 34
+      }
+    },
+    {
+      "id": "sh-11",
+      "with": "b7",
+      "offset": -0.15,
+      "camera": {
+        "framing": "medium-close",
+        "subject": "bruno",
+        "azimuthDeg": 15,
+        "fov": 32
+      }
+    },
+    {
+      "id": "sh-12",
+      "with": "l6",
+      "offset": -0.1,
+      "camera": {
+        "type": "static",
+        "position": [
+          2.6,
+          1.9,
+          3.6
+        ],
+        "target": [
+          0,
+          0.95,
+          -0.6
+        ],
         "fov": 34,
         "move": {
           "type": "pull-out",
-          "amount": 0.25
+          "amount": 0.35
         }
+      },
+      "transitionIn": {
+        "type": "dissolve",
+        "durationSec": 0.6
       }
     }
   ],
@@ -464,6 +617,13 @@
       "gainDb": -23,
       "fadeIn": 1,
       "fadeOut": 0.5
+    },
+    {
+      "id": "robot-contento",
+      "kind": "sfx",
+      "sound": "robot-beep",
+      "with": "robot-feliz",
+      "gainDb": -8
     }
   ],
   "transitionOut": {

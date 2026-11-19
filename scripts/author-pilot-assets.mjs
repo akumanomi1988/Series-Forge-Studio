@@ -63,4 +63,15 @@ w('environments/taller/environment.json', { schemaVersion: 2, kind: 'room', size
     { id: 'planta', propId: 'planta', position: [3.9, 0, -3.1], yawDeg: 0, scale: 1 },
     { id: 'puerta', propId: 'puerta-taller', position: [-4.47, 0, 0.6], yawDeg: 90, scale: 1 }],
   decor: [{ type: 'pegboard', wall: 'back', offset: 1.7, height: 1.75, color: '#7b6a55', width: 1.6 }, { type: 'sign', wall: 'back', offset: 3.4, height: 2.7, color: '#e8a33d', width: 1.2 }, { type: 'poster', wall: 'left', offset: -2.2, height: 1.7, color: '#2f8f83', width: 0.6 }, { type: 'pipe', wall: 'back', offset: 0, height: 3.2, color: '#7f8c8d', width: 9 }, { type: 'vent', wall: 'right', offset: -1.5, height: 2.8, color: '#555555', width: 0.8 }, { type: 'clock', wall: 'right', offset: 1.2, height: 2.4, color: '#eeeeee', width: 0.4 }, { type: 'shelf-boxes', wall: 'right', offset: -0.2, height: 1.9, color: '#6d5640', width: 1.4 }] });
+w('story/canon.json', { schemaVersion: 1,
+  facts: [
+    { id: 'taller-7', text: 'Bruno y Lara fundaron juntos el Taller 7 hace seis años.', since: 'canon', status: 'canon', amended: [] },
+    { id: 'inspeccion-manana', text: 'La inspección de seguridad del Taller 7 es mañana a las ocho.', since: 'canon', status: 'canon', amended: [] },
+    { id: 'deuda-pasada', text: 'El año pasado Bruno ocultó a Lara una deuda del taller.', since: 'canon', status: 'canon', amended: [] }
+  ],
+  characters: { bruno: { knows: ['taller-7', 'inspeccion-manana', 'deuda-pasada'], emotionalState: 'agotado', goals: ['Arreglar el R-7 antes de la inspección'], arc: [] }, lara: { knows: ['taller-7', 'inspeccion-manana', 'deuda-pasada'], emotionalState: 'tensa por la inspección', goals: ['Aprobar la inspección'], arc: [] } },
+  relationships: [{ a: 'bruno', b: 'lara', type: 'socios', trust: 0.7, history: [] }, { a: 'lara', b: 'bruno', type: 'socios', trust: 0.6, history: [] }],
+  confirmedEpisodes: [] });
+w('story/canon.md', '# El último turno — canon\n\n- Bruno y Lara fundaron juntos el Taller 7 hace seis años.\n- La inspección de seguridad es mañana a las ocho.\n- El año pasado Bruno ocultó a Lara una deuda.\n\nLos hechos confirmados viven en `canon.json`; las propuestas de cada episodio en `episodes/<id>/story.json` hasta `studio story confirm`.\n');
+w('story/timeline.json', { schemaVersion: 1, events: [{ id: 'fundacion', episode: 'canon', text: 'Fundación del Taller 7.' }] });
 console.log('ok');

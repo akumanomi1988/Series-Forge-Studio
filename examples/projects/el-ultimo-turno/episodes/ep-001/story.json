@@ -1,0 +1,47 @@
+{
+  "schemaVersion": 1,
+  "status": "draft",
+  "facts": [
+    {
+      "id": "nucleo-quemado",
+      "text": "El núcleo del robot R-7 está quemado y medio circuito fundido.",
+      "since": "ep-001"
+    },
+    {
+      "id": "fusible-oculto",
+      "text": "Bruno intentó ocultar a Lara el fusible quemado del R-7.",
+      "since": "ep-001"
+    }
+  ],
+  "knowledge": [],
+  "relationships": [
+    {
+      "a": "lara",
+      "b": "bruno",
+      "trustDelta": -0.1,
+      "note": "Lara descubre que Bruno le ocultaba la gravedad de la avería."
+    },
+    {
+      "a": "bruno",
+      "b": "lara",
+      "trustDelta": 0.05,
+      "note": "Bruno agradece que Lara se quede a ayudar."
+    }
+  ],
+  "emotionalStates": {
+    "bruno": "avergonzado pero aliviado",
+    "lara": "irritada, aunque decidida a ayudar"
+  },
+  "events": [
+    {
+      "id": "r7-averia",
+      "text": "El R-7 sufre una avería grave la víspera de la inspección.",
+      "scene": "sc-001"
+    },
+    {
+      "id": "fusible-descubierto",
+      "text": "Lara descubre el fusible quemado que Bruno escondía.",
+      "scene": "sc-002"
+    }
+  ]
+}

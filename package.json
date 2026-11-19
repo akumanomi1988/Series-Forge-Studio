@@ -1,21 +1,25 @@
 {
   "name": "series-forge-studio",
-  "version": "0.4.0",
+  "version": "0.5.0",
   "private": true,
   "type": "module",
-  "description": "Estudio local file-first para assets procedurales, personajes 3D toon y escenas editables por agentes CLI",
+  "description": "Estudio audiovisual local file-first: personajes procedurales toon 3D, animación determinista, voces offline, lip-sync y exportación MP4 por agentes",
   "engines": {
     "node": ">=20"
   },
   "scripts": {
-    "start": "node src/studio-server.mjs",
+    "start": "node src/server/studio-server.ts",
+    "studio": "node src/cli/studio.ts",
+    "build": "node scripts/build.ts",
+    "test": "node --test --test-timeout=600000 tests/engine.test.ts tests/project.test.ts tests/story.test.ts tests/audio.test.ts tests/pipeline.test.ts tests/ui.test.ts tests/workspace.test.mjs tests/render.test.mjs tests/studio.test.mjs tests/live-assets.test.mjs tests/three-pipeline.test.mjs",
+    "typecheck": "tsc -p tsconfig.json",
+    "pilot": "node src/cli/studio.ts init pilot --force && node src/cli/studio.ts produce el-ultimo-turno ep-001",
+    "legacy-v04": "node src/studio-server.mjs",
     "legacy": "node src/server.mjs",
     "mcp": "node src/mcp.mjs",
-    "test": "node --test tests/*.test.mjs",
-    "check": "node --check src/workspace.mjs && node --check src/studio-server.mjs && node --check public/studio.js && node --check public/viewport.js && node --check public/scene-runtime.js && node --check src/browser-render.mjs",
+    "render:legacy": "node src/export-episode.mjs",
     "demo": "node scripts/demo.mjs",
-    "plan": "node src/production.mjs",
-    "render": "node src/export-episode.mjs"
+    "test:fast": "node --test tests/engine.test.ts tests/project.test.ts tests/story.test.ts"
   },
   "dependencies": {
     "esbuild": "^0.25.12",

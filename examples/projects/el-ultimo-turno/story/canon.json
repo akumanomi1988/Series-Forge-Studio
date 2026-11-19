@@ -1,0 +1,69 @@
+{
+  "schemaVersion": 1,
+  "facts": [
+    {
+      "id": "taller-7",
+      "text": "Bruno y Lara fundaron juntos el Taller 7 hace seis años.",
+      "since": "canon",
+      "status": "canon",
+      "amended": []
+    },
+    {
+      "id": "inspeccion-manana",
+      "text": "La inspección de seguridad del Taller 7 es mañana a las ocho.",
+      "since": "canon",
+      "status": "canon",
+      "amended": []
+    },
+    {
+      "id": "deuda-pasada",
+      "text": "El año pasado Bruno ocultó a Lara una deuda del taller.",
+      "since": "canon",
+      "status": "canon",
+      "amended": []
+    }
+  ],
+  "characters": {
+    "bruno": {
+      "knows": [
+        "taller-7",
+        "inspeccion-manana",
+        "deuda-pasada"
+      ],
+      "emotionalState": "agotado",
+      "goals": [
+        "Arreglar el R-7 antes de la inspección"
+      ],
+      "arc": []
+    },
+    "lara": {
+      "knows": [
+        "taller-7",
+        "inspeccion-manana",
+        "deuda-pasada"
+      ],
+      "emotionalState": "tensa por la inspección",
+      "goals": [
+        "Aprobar la inspección"
+      ],
+      "arc": []
+    }
+  },
+  "relationships": [
+    {
+      "a": "bruno",
+      "b": "lara",
+      "type": "socios",
+      "trust": 0.7,
+      "history": []
+    },
+    {
+      "a": "lara",
+      "b": "bruno",
+      "type": "socios",
+      "trust": 0.6,
+      "history": []
+    }
+  ],
+  "confirmedEpisodes": []
+}

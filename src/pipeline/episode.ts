@@ -161,9 +161,11 @@ function ffmpegSink(out: string, w: number, h: number, fps: number, crf: number,
   const p = spawn('ffmpeg', args, { windowsHide: true, stdio: ['pipe', 'ignore', 'pipe'] });
   let err = '';
   p.stderr.on('data', d => { err = (err + d).slice(-4000); });
-  const done = new Promise<void>((ok, fail) => { p.on('error', fail); p.on('close', code => code === 0 ? ok() : fail(new Error('ffmpeg: ' + err))); });
+  p.stdin.on('error', () => { /* EPIPE when ffmpeg dies: surfaced through done */ });
+  const done = new Promise<void>((ok, fail) => { p.on('error', fail); p.on('close', code => code === 0 ? ok() : fail(new Error(`ffmpeg salió con ${code}: ${err}`))); });
+  done.catch(() => {}); // observed via end(); avoids an unhandled rejection when the sink is killed on retry
   return {
-    write: (buf: Buffer) => new Promise<void>((ok, fail) => { p.stdin.write(buf, err => (err ? fail(err) : ok())); }),
+    write: (buf: Buffer) => new Promise<void>((ok, fail) => { p.stdin.write(buf, e => (e ? fail(e) : ok())); }),
     end: async () => { p.stdin.end(); await done; },
     kill: () => { try { p.kill('SIGKILL'); } catch { /* */ } }
   };
@@ -208,7 +210,8 @@ export async function renderEpisode(project: string, episode: string, settings: 
           await sink.end();
           await rename(tmp, file);
           rendered++; renderMs += Date.now() - tc;
-          progress({ stage: 'shot', shot: shot.id, scene: shot.scene, cached: false, frames: times.length, ms: Date.now() - tc, fpsRender: +(times.length / ((Date.now() - tc) / 1000)).toFixed(2) });
+          const mem = rendered % 10 === 1 ? await h.metrics().catch(() => null) : null;
+          progress({ stage: 'shot', shot: shot.id, scene: shot.scene, cached: false, frames: times.length, ms: Date.now() - tc, fpsRender: +(times.length / ((Date.now() - tc) / 1000)).toFixed(2), rssMB: Math.round(process.memoryUsage().rss / 1048576), ...(mem ? { browserHeapMB: Math.round((mem.JSHeapUsedSize ?? 0) / 1048576), domNodes: mem.Nodes } : {}) });
           break;
         } catch (e) {
           sink.kill(); await rm(tmp, { force: true });

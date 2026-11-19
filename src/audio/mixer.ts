@@ -51,8 +51,12 @@ export async function mixSegment(cues: AudioCue[], segStart: number, duration: n
     if (c.kind === 'dialogue') {
       if (!c.file || !existsSync(c.file)) { report.push({ id: c.id, kind: c.kind, start: c.start, duration: c.duration, peak: 0, missing: true }); continue; }
       const x = mono(await readWav(c.file));
+      // dialogue leveling: active-speech RMS to -20 dBFS so every line sits at the same level in the mix
+      let se = 0, sn = 0; for (let i = 0; i < x.length; i += 4) { const v = x[i] * x[i]; if (v > 1e-5) { se += v; sn++; } }
+      const lineRms = Math.sqrt(se / Math.max(1, sn));
+      const level = lineRms > 1e-5 ? Math.min(dbToGain(18), dbToGain(-20) / lineRms) : 1;
       let pk = 0;
-      for (let i = 0; i < x.length; i++) { const j = s0 + i; if (j < 0 || j >= N) continue; const v = x[i] * g; dl[j] += v * pl; dr[j] += v * pr; dialogue[j] += v; pk = Math.max(pk, Math.abs(v)); }
+      for (let i = 0; i < x.length; i++) { const j = s0 + i; if (j < 0 || j >= N) continue; const v = x[i] * g * level; dl[j] += v * pl; dr[j] += v * pr; dialogue[j] += v; pk = Math.max(pk, Math.abs(v)); }
       report.push({ id: c.id, kind: c.kind, start: c.start, duration: x.length / SR, peak: pk });
     } else if (c.kind === 'sfx') {
       const def = ctx.sfx[c.sound];
