@@ -19,7 +19,7 @@ function startRender(options){
  for(const [key,item] of renderJobs)if(Date.now()-item.createdAt>24*3600_000)renderJobs.delete(key);
  exportEpisode({...options,workspace,progress:x=>{job.progress=x;}}).then(result=>{job.state='done';job.result=result;}).catch(e=>{job.state='error';job.error=e.message;});return {id,state:job.state};
 }
-const files=new Map([['/','studio.html'],['/studio.html','studio.html'],['/studio.js','studio.js'],['/studio.css','studio.css'],['/viewport.js','viewport.js']]);
+const files=new Map([['/','studio.html'],['/studio.html','studio.html'],['/studio.js','studio.js'],['/studio.css','studio.css'],['/viewport.js','viewport.js'],['/scene-runtime.js','scene-runtime.js']]);
 function json(res,status,value){res.writeHead(status,{'Content-Type':'application/json; charset=utf-8','Cache-Control':'no-store'});res.end(JSON.stringify(value));}
 async function requestBody(req){if(!String(req.headers['content-type']||'').startsWith('application/json'))throw new Error('Se requiere application/json');const chunks=[];let size=0;for await(const chunk of req){size+=chunk.length;if(size>750_000)throw new Error('Petición demasiado grande');chunks.push(chunk);}return JSON.parse(Buffer.concat(chunks).toString('utf8')||'{}');}
 async function bundle(project,kind,id){
@@ -43,7 +43,7 @@ async function handler(req,res){
    if(req.headers.origin&&!['http://127.0.0.1:'+port,'http://localhost:'+port].includes(req.headers.origin))return json(res,403,{error:'Origen no permitido'});
    const body=await requestBody(req);
    if(path==='/api/projects')return json(res,201,await workspace.createProject(body.name));
-   if(path==='/api/render')return json(res,202,startRender({project:body.project,episode:body.episode,width:body.full?1920:640,height:body.full?1080:360,fps:body.full?24:12,maxSeconds:body.full?null:8,speech:body.speech==='sapi'?'sapi':'none'}));
+   if(path==='/api/render')return json(res,202,startRender({project:body.project,episode:body.episode,width:body.full?1920:640,height:body.full?1080:360,fps:body.full?24:12,maxSeconds:body.full?null:8,speech:body.speech==='sapi'?'sapi':'none',renderer:body.renderer==='svg'?'svg':'three'}));
    if(path==='/api/assets')return json(res,201,await workspace.createAsset(body.project,body.kind,body.name));
    if(path==='/api/scenes')return json(res,201,await workspace.createScene(body.project,body.episode,body.name));
    if(path==='/api/file')return json(res,200,await workspace.put(body.project,body.path,body.content,body.expectedHash??null));
@@ -64,8 +64,8 @@ async function handler(req,res){
    const timer=setInterval(()=>{if(!res.destroyed)res.write(': keepalive\n\n');},20000);
    res.on('close',()=>{clearInterval(timer);clearTimeout(pending);stop();});return;
   }
-  if(path==='/vendor/three.module.js'){
-   try{const data=await readFile(join(cwd,'node_modules','three','build','three.module.js'));res.writeHead(200,{'Content-Type':'text/javascript','Cache-Control':'public, max-age=3600'});res.end(data);}catch{json(res,404,{error:'Three.js no instalado. Ejecuta npm install.'});}return;
+  if(path==='/vendor/three.module.js'||path==='/vendor/three.core.js'){
+   try{const data=await readFile(join(cwd,'node_modules','three','build',path.endsWith('three.core.js')?'three.core.js':'three.module.js'));res.writeHead(200,{'Content-Type':'text/javascript','Cache-Control':'public, max-age=3600'});res.end(data);}catch{json(res,404,{error:'Three.js no instalado. Ejecuta npm install.'});}return;
   }
   if(path==='/legacy')return res.writeHead(302,{Location:'http://127.0.0.1:4318'}).end();
   if(files.has(path)){
