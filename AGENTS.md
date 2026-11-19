@@ -1,39 +1,36 @@
-# AGENTS — SERIES FORGE STUDIO
+# AGENTS.md — SERIES FORGE STUDIO (dirección v0.2 file-first)
 
-> **DOCUMENTO OBLIGATORIO PARA CONTINUAR:** `docs/MASTER_IMPLEMENTATION_SPEC.md` es la fuente de verdad actualizada sobre producto, arquitectura, implementación, prioridades, contratos MCP y pruebas. **Léelo entero antes de cambiar código.** Compara después con `docs/IMPLEMENTATION_STATUS.md` (estado verificado), `README.md` (comandos actuales) y `docs/AGENTS_original.md` (referencia histórica). La misión es ejecutar P0→P1 y avanzar con código probado, no volver a redactar un plan.
+## Misión
 
-**No se trata de un concepto: existe una versión ejecutable 0.1.** Revisa `README.md` y ejecuta `npm test` antes de modificarla. Existe también `docs/AGENTS_original.md`, con la especificación a largo plazo de motor audiovisual completo. **Preserva la implementación funcional**; no sustituyas el proyecto por documentación o una demo nueva.
+Desarrolla un estudio local de producción de series animadas 2D/2.5D, con personajes/entornos/objetos **procedurales y reutilizables**, guion, continuidad, escenas, cámaras, voces, música, lip-sync y exportación de episodios de hasta 20 minutos.
 
-## Qué está implementado
+**Cambio de arquitectura obligatorio:** el usuario trabaja desde **Claude Code, Codex u OpenCode ya instalados en su PC**. Los agentes **escriben archivos JSON/Markdown en `workspace/<universo>/`**; el editor en `localhost:4317` observa esos archivos y muestra los cambios. No implementar un gestor de modelos, selector de harness ni configuración de endpoints de IA como dependencia principal. El MCP legado es opcional.
 
-Servidor web Node sin dependencias, editor browser, assets SVG procedurales, poses simples, expresiones, modo charla local, adaptador LLM OpenAI-compatible opcional, personajes con fichas y voces configurables, entornos/objetos, relaciones y memoria, escenas, diálogo WebSpeech de preview, efectos WebAudio mínimos, servidor MCP por stdio, operación transaccional `episode_compile_plan`, exportación SVG y persistencia robusta con lock entre procesos.
+Lee íntegramente `docs/FILE_FIRST_STUDIO.md`, luego `README.md` y `docs/IMPLEMENTATION_STATUS.md`. `docs/MASTER_IMPLEMENTATION_SPEC.md` es referencia histórica y sus decisiones incompatibles quedan reemplazadas por la presente arquitectura. Ejecuta `npm test` antes y después de tocar código.
 
-## Qué NO está implementado
+## Implementación existente
 
-Rigs IK avanzados, auto-rigging de criaturas/personajes, motores 2.5D potentes, exportación MP4, alineación fonética auténtica, voces TTS almacenadas por personaje, actuación temporal precisa, música y SFX offline avanzados, montaje final completo y generación autónoma de un episodio de 15 minutos. No decir que está hecho sin pruebas audiovisuales.
+- `src/workspace.mjs`: modelo file-first, formatos declarativos, plantillas de humanos, creación de carpetas, validación de animaciones/escenas, lectura/escritura con hash y observación.
+- `src/studio-server.mjs`: API web local, SSE, importador de assets legados y servidor de Three.js local.
+- `public/studio.html`, `studio.js`, `studio.css`: explorador, visor, edición JSON/MD, escenas/diálogos y timeline básica.
+- `public/viewport.js`: Three.js toon procedural; bones articulados, yaw, cabeza independiente, clips `idle/walk`, expresión y escena.
+- `src/production.mjs`: **plan de producción y hashes, NO renderizador de MP4**.
+- `scripts/demo.mjs`: ejemplo Bruno/Lara y escena de 45 s.
+- `src/server.mjs`, `src/core.mjs`, `public/index.html`: editor v0.1 legado, sin borrar.
 
-## Instrucción al agente que recibe una sinopsis
+## Regla de desarrollo
 
-1. Analiza la sinopsis y consulta `studio_get_state` para reutilizar personajes, props, escenarios y hechos existentes.
-2. Diseña un plan JSON con las referencias lógicas `ref`, nombres, atributos, relaciones, escenas, diálogos y eventos; consulta `examples/episode-plan.json`.
-3. Llama a `episode_compile_plan` para crear un **universo nuevo** de manera atómica. Para una serie ya existente, utiliza herramientas granulares para NO duplicar identidades.
-4. Inspecciona todas las fichas y previsualizaciones usando `asset_get` y `asset_render_svg`.
-5. Presenta el storyboard vectorial creado; declara la capacidad audiovisual pendiente, sin fingir MP4.
+1. Modifica el formato de assets solo mediante versionado y migraciones, preservando IDs y proyectos previos.
+2. Crear una animación no debe requerir cambiar el motor de render; usar `animations/<nombre>.json` y `rig.json`.
+3. En el modelo 3D el eje Y es vertical y los ángulos humanos se expresan en grados; el motor transforma a radianes internamente.
+4. Separar fuente editable (JSON/MD), caché compilable (GLB opcional), previsualización y exportación audiovisual.
+5. La calidad artística y biomecánica debe verificarse visualmente, no solo en tests unitarios.
+6. Antes de ampliar a 20 min, completar el piloto de 30 segundos con movimiento, expresiones, diálogos y audio reales.
+7. Evitar Docker, pipelines GitHub Actions, servicios cloud de pago y dependencias innecesarias. Nunca añadir claves al repositorio.
+8. Preferir TypeScript para módulos nuevos amplios; los módulos v0.2 iniciales usan ESM de Node para mantener la migración acotada.
+9. Informar con precisión: hoy **NO** hay IK, TTS real, lip-sync fonético, producción de MP4 ni capítulos terminados.
+10. Entregar código probado, pasos de reproducción, imágenes/vídeo de prueba cuando proceda y documentación del resultado, no solo planes.
 
-## Instrucción al agente de desarrollo
+## Tarea recomendada a continuación
 
-Objetivo: convertir esta base ejecutable en un **DCC audiovisual** (Digital Content Creation) conversacional, reutilizable, controlable por MCP y adecuado para producción 2D/2.5D comercial.
-
-**Restricciones**: Windows local, Node/TS, sin Docker, sin pipelines de Actions o CI remota, sin dependencias gratuitas de licencia comercial dudosa, sin generadores de imágenes raster como fuente maestra y sin renderizar por IA cada frame. Reutilización de assets, determinismo y versionado.
-
-**Prioridades de ejecución**:
-
-1. Migrar paulatinamente UI a React/TS y viewport a PixiJS con rig/IK real, conservando los contratos de `src/core.mjs`, IDs, render vectorial y pruebas.
-2. Implementar `AssetSchema` versionado, tipos explícitos, zod, generadores paramétricos más ricos, esqueleto con anchors, articulaciones, composición de ropas, skins y accesorios.
-3. Incorporar interacciones espaciales actor↔objeto, estados de poses, agarres, físicas simplificadas, dirección de mirada, animación facial y retargeting de acciones.
-4. Integrar TTS local offline con validación de licencia, fichero de audio por diálogo y voz estable por personaje, alineador de palabras/visemas y SFX/música originales proceduralmente.
-5. Implementar Scene DSL y render determinista por frame con Remotion y FFmpeg, previsualización por escenas, caché segmentada y exportación MP4/WAV/SRT/metadata.
-6. Director IA desde sinopsis con guion, actos, duración y chequeos de continuidad; no actualizar el canon narrativo hasta aprobación.
-7. Sustituir el MCP manual por SDK oficial v2, conservando herramientas y contratos; añadir manejo de progreso/cancelación y recursos.
-
-**Criterio de aceptación de cada capacidad:** código ejecutable + test + prueba audiovisual/visual reproducible. En toda entrega indica qué está hecho, probado, pendiente y fallido. No ejecutar pushes, PRs ni Actions salvo orden explícita.
+Conseguir un piloto renderizable real: humanoides 3D toon de calidad, IK en pies/manos, acciones semánticas (caminar, girar, sentarse, coger objeto), cámara editada, diálogos en español con TTS, alineación de visemas y MP4 de 30 segundos. Usar el código actual y no reconstruir otro proyecto desde cero.
