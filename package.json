@@ -1,6 +1,6 @@
 {
   "name": "series-forge-studio",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "private": true,
   "type": "module",
   "description": "Estudio local file-first para assets procedurales, personajes 3D toon y escenas editables por agentes CLI",
@@ -12,7 +12,7 @@
     "legacy": "node src/server.mjs",
     "mcp": "node src/mcp.mjs",
     "test": "node --test tests/*.test.mjs",
-    "check": "node --check src/workspace.mjs && node --check src/studio-server.mjs && node --check public/studio.js && node --check public/viewport.js",
+    "check": "node --check src/workspace.mjs && node --check src/studio-server.mjs && node --check public/studio.js && node --check public/viewport.js && node --check public/scene-runtime.js && node --check src/browser-render.mjs",
     "demo": "node scripts/demo.mjs",
     "plan": "node src/production.mjs",
     "render": "node src/export-episode.mjs"
