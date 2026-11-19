@@ -7,7 +7,7 @@ await ws.put(slug,`characters/${bruno.id}/personalidad.md`,'# Bruno\n\nMecánico
 await ws.put(slug,`characters/${lara.id}/personalidad.md`,'# Lara\n\nIngeniera impulsiva, muy observadora. Confía en Bruno, pero odia las evasivas.\n');
 await ws.put(slug,`characters/${bruno.id}/relaciones.json`,JSON.stringify({schemaVersion:1,relations:[{characterId:lara.id,type:'amistad',feeling:'confianza',history:['Repararon juntos un reactor.']}]},null,2)+'\n');
 const taller=await asset('environments','Taller'),silla=await asset('props','Silla'),episode=await asset('episodes','Piloto');
-let sc;try{sc=await ws.createScene(slug,episode.id,'La avería');}catch(e){throw e;}
+const previousScenes=await ws.listScenes(slug,episode.id);const sc=previousScenes.find(x=>x.id==='sc-001')||await ws.createScene(slug,episode.id,'La avería');
 const path=`episodes/${episode.id}/scenes/${sc.id}/scene.json`,s=JSON.parse((await ws.read(slug,path)).content);
 s.environmentId=taller.id;s.durationSec=45;s.actors=[{characterId:bruno.id,position:[-1,0,0],yawDeg:35,headYawDeg:20,animation:'idle',expression:'neutral'},{characterId:lara.id,position:[1.4,0,0],yawDeg:-35,headYawDeg:-20,animation:'idle',expression:'neutral'}];
 s.props=[{propId:silla.id,position:[-2.4,0,.3],yawDeg:0}];
