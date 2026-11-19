@@ -1,3 +1,7 @@
+# ACTUALIZACIÓN v0.3
+
+El exportador animatic SVG/MP4 y SRT está implementado. Las limitaciones y próximos hitos se describen en `docs/VIDEO_EXPORT_V03.md`. Los apartados siguientes describen el estado histórico v0.2 y no deben interpretarse como el estado actual del exportador.
+
 # SERIES FORGE STUDIO — Especificación ejecutable file-first (v0.2)
 
 **Estado:** arquitectura acordada e implementada parcialmente. **No** afirma que exista un motor capaz de producir por sí solo 20 minutos de animación cinematográfica. Fuente prioritaria para el flujo de trabajo, por delante del antiguo documento `MASTER_IMPLEMENTATION_SPEC.md` (conservado como referencia histórica).
