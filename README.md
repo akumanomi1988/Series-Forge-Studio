@@ -1,3 +1,5 @@
+> **Novedad v0.4:** el editor y el renderizador Three.js comparten `public/viewport.js` y `public/scene-runtime.js`. El comando `npm run render` usa por defecto `--renderer three` con Chromium/Edge/Chrome local; `--renderer svg` conserva el animatic anterior. Lee `docs/THREE_RENDER_PIPELINE_V04.md` para requisitos, limitaciones y pruebas pendientes.
+
 # Series Forge Studio v0.3 — 19 de noviembre de 2026
 
 **Novedad:** exportación de animatic MP4/SRT por FFmpeg, caché por escena, seguimiento desde la web y descubrimiento de clips creados por agentes. Consulta [docs/VIDEO_EXPORT_V03.md](docs/VIDEO_EXPORT_V03.md). El renderizador final 3D toon, IK avanzado, lip-sync fonético y episodios de 20 minutos comerciales aún están pendientes.
