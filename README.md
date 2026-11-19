@@ -1,3 +1,7 @@
+# Series Forge Studio v0.3 — 19 de noviembre de 2026
+
+**Novedad:** exportación de animatic MP4/SRT por FFmpeg, caché por escena, seguimiento desde la web y descubrimiento de clips creados por agentes. Consulta [docs/VIDEO_EXPORT_V03.md](docs/VIDEO_EXPORT_V03.md). El renderizador final 3D toon, IK avanzado, lip-sync fonético y episodios de 20 minutos comerciales aún están pendientes.
+
 # Series Forge Studio v0.2 — Estudio de animación file-first
 
 Aplicación **local para Windows** que muestra assets de personajes 3D-toon, escenarios y escenas generados por **Claude Code, Codex u OpenCode mediante archivos**, sin configurar modelos en el editor. El objetivo es producir series 2D/2.5D y capítulos de 20 minutos; esa capacidad final **aún no está implementada**.
