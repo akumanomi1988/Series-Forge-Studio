@@ -1,3 +1,7 @@
+# ESTADO ACTUAL v0.3 (19/11/2026)
+
+**Verificado localmente:** 22/22 tests, exportación H.264/AAC real de una escena corta, caché por renderHash, SRT, API de trabajos, descubrimiento de clips nuevos. **Sin verificar / pendiente:** pruebas de SAPI en Windows, render final Three.js, IK robusto, lip-sync multilingüe y un episodio de 20 minutos. Véase `docs/VIDEO_EXPORT_V03.md`.
+
 # Estado real — Series Forge Studio
 
 ## v0.2 (nuevo, file-first)
