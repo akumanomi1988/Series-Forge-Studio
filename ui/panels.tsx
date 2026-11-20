@@ -120,3 +120,50 @@ export function ScriptEditor({ project, episode, sceneId, version, onPlay }: { p
     <button onClick={() => save(s => { const n = s.dialogue.length + 1; s.dialogue.push({ id: `linea-${Date.now().toString(36)}`, actor: scene.actors[0]?.id ?? '', text: 'Nueva línea.' }); void n; })}>+ Añadir línea</button>
   </div>;
 }
+
+// ------------------------------------------------------------------ YouTube publishing (OAuth + upload)
+interface YtStatus { client: boolean; connected: boolean; channel?: { id: string; title: string } }
+interface YtDefaults { file: string; meta: { title: string; description: string; tags: string[]; privacy: string; madeForKids: boolean }; history: { videoId: string; url: string; privacy: string; uploadedAt: string }[] }
+export function YouTubePanel({ project, episode, version, toast }: { project: string; episode: string; version: number; toast: (m: string) => void }) {
+  const [st, setSt] = useState<YtStatus | null>(null);
+  const [def, setDef] = useState<YtDefaults | null>(null);
+  const [err, setErr] = useState('');
+  const [client, setClient] = useState('');
+  const [form, setForm] = useState({ title: '', description: '', tags: '', privacy: 'private', madeForKids: false });
+  const refresh = () => api<YtStatus>('/api/youtube/status').then(setSt).catch(e => setErr(e.message));
+  useEffect(() => { refresh(); }, [version]);
+  useEffect(() => {
+    api<YtDefaults>(`/api/project/${project}/youtube?episode=${episode}`)
+      .then(d => { setDef(d); setErr(''); setForm({ title: d.meta.title, description: d.meta.description, tags: d.meta.tags.join(', '), privacy: 'private', madeForKids: false }); })
+      .catch(e => { setDef(null); setErr(e.message); });
+  }, [project, episode, version]);
+  if (!st) return null;
+  const saveClient = () => api('/api/youtube/client', { method: 'POST', body: client }).then(() => { toast('Cliente OAuth guardado'); setClient(''); return refresh(); }).catch(e => toast(e.message));
+  const upload = () => {
+    if (!confirm(`¿Subir «${form.title}» a ${st.channel?.title ?? 'tu canal'} como ${form.privacy}?`)) return;
+    api(`/api/project/${project}/youtube/upload`, { method: 'POST', body: JSON.stringify({ episode, title: form.title, description: form.description, tags: form.tags.split(',').map(t => t.trim()).filter(Boolean), privacy: form.privacy, madeForKids: form.madeForKids }) })
+      .then(() => toast('Subida iniciada: sigue el progreso en el registro')).catch(e => toast(e.message));
+  };
+  return <details className="youtube" open={st.connected}>
+    <summary>YouTube {st.connected ? `· conectado${st.channel ? ` a «${st.channel.title}»` : ''}` : '· sin conectar'}</summary>
+    {!st.client && <div>
+      <p>1. En Google Cloud Console crea un proyecto, activa «YouTube Data API v3» y crea un ID de cliente OAuth de tipo <b>App de escritorio</b>. 2. Pega aquí el JSON descargado (se guarda fuera del repositorio, en tu carpeta de usuario).</p>
+      <textarea rows={4} value={client} onChange={e => setClient(e.target.value)} placeholder={'{"installed":{"client_id":"…","client_secret":"…"}}'} />
+      <button onClick={saveClient} disabled={!client.trim()}>Guardar cliente</button>
+    </div>}
+    {st.client && !st.connected && <p><a href="/api/youtube/connect" target="_blank" rel="noopener">Conectar con YouTube</a> (se abre Google; al terminar vuelve aquí y pulsa <button onClick={refresh}>Comprobar</button>).</p>}
+    {st.connected && <>
+      {def ? <div className="yt-form">
+        <label>Título <input value={form.title} maxLength={100} onChange={e => setForm({ ...form, title: e.target.value })} /></label>
+        <label>Descripción <textarea rows={5} value={form.description} onChange={e => setForm({ ...form, description: e.target.value })} /></label>
+        <label>Etiquetas <input value={form.tags} onChange={e => setForm({ ...form, tags: e.target.value })} /></label>
+        <label>Visibilidad <select value={form.privacy} onChange={e => setForm({ ...form, privacy: e.target.value })}><option value="private">Privado</option><option value="unlisted">Oculto (con enlace)</option><option value="public">Público</option></select></label>
+        <label className="check"><input type="checkbox" checked={form.madeForKids} onChange={e => setForm({ ...form, madeForKids: e.target.checked })} /> Contenido dirigido a niños</label>
+        <small>Archivo: {def.file}. Se declara como contenido sintético (voces y animación generadas).</small>
+        <button onClick={upload}>Subir a YouTube</button>
+        {def.history.length > 0 && <ul>{def.history.map(h => <li key={h.videoId}><a href={h.url} target="_blank" rel="noopener">{h.url}</a> · {h.privacy} · {h.uploadedAt.slice(0, 16)}</li>)}</ul>}
+      </div> : <p className="msg">{err || 'Cargando…'}</p>}
+      <button onClick={() => api('/api/youtube/disconnect', { method: 'POST', body: '{}' }).then(refresh)}>Desconectar</button>
+    </>}
+  </details>;
+}

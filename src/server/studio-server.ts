@@ -16,7 +16,10 @@ import { renderEpisode } from '../pipeline/episode.ts';
 import type { RenderSettings } from '../pipeline/episode.ts';
 import { validateEpisode } from '../pipeline/validate.ts';
 import { validateStory, loadStory, confirmEpisode } from '../pipeline/story.ts';
-import { synthesize, speechKey } from '../audio/tts.ts';
+import { synthesize, speechKey, resolveVoice, listOneCoreVoices } from '../audio/tts.ts';
+import { kokoroAvailable, listKokoroVoices, voiceboxHealth, listVoiceboxProfiles } from '../audio/providers.ts';
+import * as youtube from '../pipeline/youtube.ts';
+import { VOICE_PROVIDERS } from '../engine/schema.ts';
 import { resolveEmotion } from '../engine/director.ts';
 import { estimateSpeech } from '../audio/phonetics-es.ts';
 import { buildBrowser } from '../../scripts/build.ts';
@@ -55,6 +58,8 @@ const EDITABLE = /^(project\.json|universe\.json|story\/[a-z0-9_-]+\.(json|md)|(
 export function editablePath(rel: string): boolean { return EDITABLE.test(rel) && !rel.split('/').some(s => s === '..' || s === 'generated' || s === 'output'); }
 
 async function body(req: IncomingMessage, limit = 2_000_000): Promise<string> { const chunks: Buffer[] = []; let n = 0; for await (const c of req) { n += (c as Buffer).length; if (n > limit) throw Object.assign(new Error('Cuerpo demasiado grande'), { status: 413 }); chunks.push(c as Buffer); } return Buffer.concat(chunks).toString('utf8'); }
+/** Strict CSRF guard for actions that publish or store credentials: the browser must send our own origin. */
+function sameOrigin(req: IncomingMessage): boolean { return /^http:\/\/(127\.0\.0\.1|localhost):\d+$/.test(req.headers.origin ?? ''); }
 function json(res: ServerResponse, status: number, data: unknown) { res.writeHead(status, { 'Content-Type': 'application/json; charset=utf-8', 'Cache-Control': 'no-store', 'X-Content-Type-Options': 'nosniff' }); res.end(JSON.stringify(data)); }
 async function sendFile(req: IncomingMessage, res: ServerResponse, file: string) {
   const st = await stat(file);
@@ -113,7 +118,8 @@ async function speechFor(project: string, episode: string, sceneId: string, synt
     const a = sc.actors.find(x => x.id === l.actor); const ch = a ? p.characters[a.characterId] : null;
     if (!ch?.voice) { out[l.id] = { ...estimateSpeech(l.text), estimated: true }; continue; }
     const emo = resolveEmotion(l.emotion);
-    const req = { text: l.text, voice: ch.voice, emotion: emo, intensity: l.intensity, direction: l.direction, rate: l.rate, pitchSemitones: l.pitchSemitones };
+    const vp = p.episodes[episode]?.episode.voiceProvider ?? (p.meta.voiceProvider as string | undefined);
+    const req = { text: l.text, voice: resolveVoice(ch.voice, vp), emotion: emo, intensity: l.intensity, direction: l.direction, rate: l.rate, pitchSemitones: l.pitchSemitones };
     const key = speechKey(req, emo);
     const meta = join(cache, `${key}.json`);
     if (existsSync(meta)) { const m = JSON.parse(await readFile(meta, 'utf8')); out[l.id] = { duration: m.duration, visemes: m.alignment.visemes, file: join(cache, `${key}.wav`) }; }
@@ -144,6 +150,23 @@ const server = createServer(async (req, res) => {
       const ping = setInterval(() => res.write(': ping\n\n'), 20_000);
       req.on('close', () => { clearInterval(ping); clients.delete(c); });
       return;
+    }
+    if (path === '/api/voices') {
+      const k = kokoroAvailable(), vb = await voiceboxHealth();
+      return json(res, 200, {
+        kokoro: k.ok ? { ok: true, voices: await listKokoroVoices().catch(() => []) } : { ok: false, error: k.reason },
+        voicebox: vb.ok ? { ok: true, profiles: await listVoiceboxProfiles().catch(() => []) } : { ok: false, error: vb.detail },
+        'windows-onecore': await listOneCoreVoices().then(v => ({ ok: true, voices: v })).catch(e => ({ ok: false, error: (e as Error).message }))
+      });
+    }
+    if (path === '/api/youtube/status') return json(res, 200, await youtube.status());
+    if (path === '/api/youtube/client' && req.method === 'POST') { if (!sameOrigin(req)) return json(res, 403, { error: 'Origen no permitido' }); try { return json(res, 200, await youtube.saveClient(JSON.parse(await body(req, 20_000)))); } catch (e) { return json(res, 422, { error: (e as Error).message }); } }
+    if (path === '/api/youtube/disconnect' && req.method === 'POST') { if (!sameOrigin(req)) return json(res, 403, { error: 'Origen no permitido' }); return json(res, 200, await youtube.disconnect()); }
+    if (path === '/api/youtube/connect') { const u = await youtube.authUrl(`http://${req.headers.host}/api/youtube/callback`).catch(e => e as Error); if (u instanceof Error) return json(res, 422, { error: u.message }); res.writeHead(302, { location: u, 'cache-control': 'no-store' }); res.end(); return; }
+    if (path === '/api/youtube/callback') {
+      let msg: string;
+      try { const r = await youtube.completeAuth(url.searchParams); msg = `YouTube conectado${r.channel ? ` (canal «${r.channel.title.replace(/[<>&]/g, '')}»)` : ''}.`; } catch (e) { msg = 'Error: ' + (e as Error).message.replace(/[<>&]/g, ''); }
+      res.writeHead(200, { 'content-type': 'text/html; charset=utf-8', 'cache-control': 'no-store' }); res.end(`<!doctype html><meta charset="utf-8"><title>YouTube</title><p style="font:16px system-ui">${msg} <a href="/">Volver al estudio</a></p>`); return;
     }
     const m = /^\/api\/project\/([a-z0-9][a-z0-9_-]{0,79})(\/.*)?$/.exec(path);
     if (m) {
@@ -206,11 +229,11 @@ const server = createServer(async (req, res) => {
         try { return json(res, 200, compileScene(sc, assetLibrary(p), { speech })); } catch (e) { return json(res, 422, { error: (e as Error).message }); }
       }
       if (req.method === 'POST' && sub === '/say') {
-        const { character, text, emotion } = JSON.parse(await body(req)) as { character: string; text: string; emotion?: string };
+        const { character, text, emotion, provider } = JSON.parse(await body(req)) as { character: string; text: string; emotion?: string; provider?: string };
         const p = await loadProject(project); const c = p.characters[character];
         if (!c?.voice) return json(res, 422, { error: 'Personaje sin voice.json v2' });
-        const r = await synthesize({ text: String(text).slice(0, 600), voice: c.voice, emotion: resolveEmotion(emotion) }, join(p.root, 'generated', 'audio', 'voices'), resolveEmotion(emotion));
-        return json(res, 200, { url: `/api/project/${project}/media?path=${encodeURIComponent(relative(root, r.file).split(sep).join('/'))}`, duration: r.duration, words: r.alignment.words, method: r.alignment.method });
+        const r = await synthesize({ text: String(text).slice(0, 600), voice: resolveVoice(c.voice, provider ?? (p.meta.voiceProvider as string | undefined)), emotion: resolveEmotion(emotion) }, join(p.root, 'generated', 'audio', 'voices'), resolveEmotion(emotion));
+        return json(res, 200, { url: `/api/project/${project}/media?path=${encodeURIComponent(relative(root, r.file).split(sep).join('/'))}`, duration: r.duration, words: r.alignment.words, method: r.alignment.method, provider: r.provider });
       }
       if (req.method === 'GET' && sub === '/media') {
         const rel = url.searchParams.get('path') ?? '';
@@ -224,15 +247,40 @@ const server = createServer(async (req, res) => {
         const files = (await readdir(dir)).filter(f => !f.startsWith('.'));
         const story = existsSync(join(dir, 'storyboard')) ? (await readdir(join(dir, 'storyboard'))).map(f => `storyboard/${f}`) : [];
         const report = existsSync(join(dir, 'validation-report.json')) ? JSON.parse(await readFile(join(dir, 'validation-report.json'), 'utf8')) : null;
-        return json(res, 200, { base: `episodes/${episode}/output`, files, storyboard: story, report });
+        const latest = existsSync(join(dir, 'metadata.json')) ? (JSON.parse(await readFile(join(dir, 'metadata.json'), 'utf8')) as { video?: string }).video : undefined;
+        return json(res, 200, { base: `episodes/${episode}/output`, files, storyboard: story, report, latest });
       }
       if (req.method === 'POST' && sub === '/render') {
         if (activeJob?.status === 'running') return json(res, 409, { error: 'Ya hay un render en curso', job: activeJob.id });
         const { episode, settings } = JSON.parse(await body(req)) as { episode: string; settings: RenderSettings };
+        if (settings.voiceProvider && !['auto', ...VOICE_PROVIDERS].includes(settings.voiceProvider)) return json(res, 400, { error: 'Motor de voz desconocido' });
         const job: Job = { id: randomUUID(), project, episode, status: 'running', events: [], started: Date.now() };
         jobs.set(job.id, job); activeJob = job;
         (async () => {
           try { const r = await renderEpisode(project, episode, settings, e => { job.events.push(e); broadcast(project, 'job', { id: job.id, event: e }); }); const v = await validateEpisode(project, episode); job.result = { video: r.video, ok: v.ok, stats: r.stats }; job.status = 'done'; }
+          catch (e) { job.error = (e as Error).message; job.status = 'failed'; }
+          broadcast(project, 'job', { id: job.id, status: job.status, error: job.error, result: job.result });
+        })();
+        return json(res, 202, { id: job.id });
+      }
+      if (req.method === 'GET' && sub === '/youtube') {
+        const episode = url.searchParams.get('episode') ?? ''; const p = await loadProject(project); const ep = p.episodes[episode];
+        if (!ep) return json(res, 404, { error: 'Episodio desconocido' });
+        try { const d = await youtube.episodeUploadDefaults(p.root, p.meta, { id: ep.id, name: ep.name, dir: ep.dir }); return json(res, 200, { file: relative(p.root, d.file).split(sep).join('/'), meta: d.meta, history: JSON.parse(await readFile(join(p.root, ep.dir, 'output', 'youtube.json'), 'utf8').catch(() => '[]')) }); }
+        catch (e) { return json(res, 422, { error: (e as Error).message }); }
+      }
+      if (req.method === 'POST' && sub === '/youtube/upload') {
+        if (!sameOrigin(req)) return json(res, 403, { error: 'Origen no permitido' });
+        if (activeJob?.status === 'running') return json(res, 409, { error: 'Hay otro trabajo en curso', job: activeJob.id });
+        const b = JSON.parse(await body(req)) as { episode: string; title?: string; description?: string; tags?: string[]; privacy?: youtube.UploadMeta['privacy']; madeForKids?: boolean };
+        const p = await loadProject(project); const ep = p.episodes[b.episode];
+        if (!ep) return json(res, 404, { error: 'Episodio desconocido' });
+        const d = await youtube.episodeUploadDefaults(p.root, p.meta, { id: ep.id, name: ep.name, dir: ep.dir });
+        const meta = youtube.validateMeta({ ...d.meta, title: b.title ?? d.meta.title, description: b.description ?? d.meta.description, tags: Array.isArray(b.tags) ? b.tags.map(String) : d.meta.tags, privacy: b.privacy ?? 'private', madeForKids: b.madeForKids === true });
+        const job: Job = { id: randomUUID(), project, episode: b.episode, status: 'running', events: [], started: Date.now() };
+        jobs.set(job.id, job); activeJob = job;
+        (async () => {
+          try { const r = await youtube.uploadVideo(d.file, meta, e => { job.events.push(e); broadcast(project, 'job', { id: job.id, event: e }); }, youtube.GOOGLE, { thumbnail: d.thumbnail }); await youtube.recordUpload(p.root, ep.dir, r, meta); job.result = r; job.status = 'done'; }
           catch (e) { job.error = (e as Error).message; job.status = 'failed'; }
           broadcast(project, 'job', { id: job.id, status: job.status, error: job.error, result: job.result });
         })();

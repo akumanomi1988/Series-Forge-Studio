@@ -3,7 +3,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import './styles.css';
 import { api, subscribe, updateJson, getFile } from './api.ts';
 import { Viewport } from './Viewport.tsx';
-import { FileEditor, CharacterInspector, Timeline, ScriptEditor } from './panels.tsx';
+import { FileEditor, CharacterInspector, Timeline, ScriptEditor, YouTubePanel } from './panels.tsx';
 import { compileScene } from '../src/engine/director.ts';
 import { SceneSchemaV2 } from '../src/engine/schema.ts';
 import type { ResolvedScene, AssetLibrary } from '../src/engine/timeline.ts';
@@ -38,7 +38,8 @@ function App() {
   const [selectedActor, setSelectedActor] = useState<string | null>(null);
   const [gizmo, setGizmo] = useState<'translate' | 'rotate' | null>(null);
   const [jobLog, setJobLog] = useState<string[]>([]);
-  const [outputs, setOutputs] = useState<{ base: string; files: string[]; storyboard: string[]; report: { ok: boolean; checks: { id: string; ok: boolean; severity?: string }[] } | null } | null>(null);
+  const [voiceProvider, setVoiceProvider] = useState(store.get('sf.voiceProvider') ?? 'auto');
+  const [outputs, setOutputs] = useState<{ base: string; files: string[]; storyboard: string[]; latest?: string; report: { ok: boolean; checks: { id: string; ok: boolean; severity?: string }[] } | null } | null>(null);
   const audioRef = useRef<HTMLAudioElement>(null);
   const toast = (m: string) => { setToasts(t => [...t.slice(-3), m]); setTimeout(() => setToasts(t => t.slice(1)), 6000); };
 
@@ -71,6 +72,8 @@ function App() {
       if (sc) { setResolved(compileScene(sc, lib)); if (sel.kind !== 'scene') setCameraMode('free'); }
     } catch (e) { toast((e as Error).message); }
   }, [sel?.kind, sel?.id, sel?.episode, project, lib, version, preview]);
+  // newest render (metadata.json names it: episodio-<timestamp>.mp4 when episodio.mp4 was locked by a player)
+  const latestVideo = outputs?.latest && outputs.files.includes(outputs.latest) ? outputs.latest : outputs?.files.includes('episodio.mp4') ? 'episodio.mp4' : undefined;
   useEffect(() => { if (tab === 'render' && sel?.episode) api<typeof outputs>(`/api/project/${project}/outputs?episode=${sel.episode}`).then(setOutputs); }, [tab, sel?.episode, version]);
 
   const episode = sel?.episode ?? (sel?.kind === 'episode' ? sel.id : undefined);
@@ -148,11 +151,14 @@ function App() {
         {tab === 'render' && <div className="render">
           {episode ? <>
             <div className="row">
-              <button onClick={() => api(`/api/project/${project}/render`, { method: 'POST', body: JSON.stringify({ episode, settings: { width: 640, height: 360, fps: 24, crf: 23, preset: 'veryfast' } }) }).then(() => setJobLog([])).catch(e => toast(e.message))}>Previsualización 360p</button>
-              <button onClick={() => api(`/api/project/${project}/render`, { method: 'POST', body: JSON.stringify({ episode, settings: { width: 1920, height: 1080, fps: 24, crf: 18, preset: 'medium' } }) }).then(() => setJobLog([])).catch(e => toast(e.message))}>Render final 1080p</button>
+              <button onClick={() => api(`/api/project/${project}/render`, { method: 'POST', body: JSON.stringify({ episode, settings: { width: 640, height: 360, fps: 24, crf: 23, preset: 'veryfast', voiceProvider: voiceProvider === 'auto' ? undefined : voiceProvider } }) }).then(() => setJobLog([])).catch(e => toast(e.message))}>Previsualización 360p</button>
+              <button onClick={() => api(`/api/project/${project}/render`, { method: 'POST', body: JSON.stringify({ episode, settings: { width: 1920, height: 1080, fps: 24, crf: 18, preset: 'medium', voiceProvider: voiceProvider === 'auto' ? undefined : voiceProvider } }) }).then(() => setJobLog([])).catch(e => toast(e.message))}>Render final 1080p</button>
+              <label title="Motor de voz para este render (usa las alternativas de cada voice.json)">Voces <select value={voiceProvider} onChange={e => { setVoiceProvider(e.target.value); store.set('sf.voiceProvider', e.target.value); }}>
+                <option value="auto">Según cada personaje</option><option value="kokoro">Kokoro (local)</option><option value="voicebox">Voicebox (app local)</option><option value="windows-onecore">Windows OneCore</option></select></label>
               {outputs?.report && <span className={`badge ${outputs.report.ok ? 'good' : 'bad'}`}>QA {outputs.report.ok ? 'superada' : 'fallida'}</span>}
             </div>
-            {outputs?.files.includes('episodio.mp4') && <video controls src={`/api/project/${project}/media?path=${outputs.base}/episodio.mp4&v=${version}`} />}
+            {latestVideo && <video controls src={`/api/project/${project}/media?path=${outputs!.base}/${latestVideo}&v=${version}`} />}
+            <YouTubePanel project={project} episode={episode} version={version} toast={toast} />
             <div className="storyboard">{outputs?.storyboard.map(f => <img key={f} title={f} src={`/api/project/${project}/media?path=${outputs.base}/${f}&v=${version}`} />)}</div>
             {outputs?.report && <ul className="checks">{outputs.report.checks.map(c => <li key={c.id} className={c.ok ? 'ok' : c.severity === 'warning' ? 'warn' : 'fail'}>{c.ok ? '✓' : '✗'} {c.id}</li>)}</ul>}
             <pre className="log">{jobLog.slice(-30).join('\n')}</pre>

@@ -12,7 +12,11 @@ import { validateEpisode, pacingReport } from '../pipeline/validate.ts';
 import { validateStory, confirmEpisode, amendFact, revertStory, loadStory } from '../pipeline/story.ts';
 import { renderStills, turnaroundScene, expressionScene } from '../pipeline/preview.ts';
 import { contactSheet } from '../pipeline/media.ts';
-import { listOneCoreVoices, synthesize } from '../audio/tts.ts';
+import { listOneCoreVoices, synthesize, resolveVoice } from '../audio/tts.ts';
+import * as youtube from '../pipeline/youtube.ts';
+import { createServer } from 'node:http';
+import { spawn } from 'node:child_process';
+import { listKokoroVoices, listVoiceboxProfiles, kokoroAvailable, voiceboxHealth, stopKokoro } from '../audio/providers.ts';
 import { compileScene } from '../engine/director.ts';
 import { assetLibrary } from '../pipeline/project.ts';
 import { scaffold } from '../pipeline/scaffold.ts';
@@ -40,8 +44,13 @@ const HELP = `Series Forge Studio — CLI para agentes y personas (sin LLM integ
   studio history <project> <ruta>                   Versiones guardadas de un archivo (editor y cambios detectados)
   studio revert <project> <ruta> <versión>          Restaura una versión (queda registrada como nueva versión)
   studio export character|prop <project> <id>       Geometría compilada a GLB (characters/<id>/compiled/<id>.glb)
-  studio voices                                     Voces TTS locales disponibles
-  studio say <project> <character> "<texto>" [--emotion angry]   Prueba de voz (WAV en generated/)
+  studio voices [kokoro|voicebox|onecore]           Voces TTS locales disponibles por motor
+  studio say <project> <character> "<texto>" [--emotion angry] [--voice-provider kokoro]   Prueba de voz (WAV en generated/)
+  studio youtube client <client_secret.json>        Guarda tu cliente OAuth de Google (tipo «App de escritorio»)
+  studio youtube connect                            Abre el navegador para autorizar tu canal (redirección local)
+  studio youtube status | disconnect
+  studio youtube upload <project> <episode> [--privacy private|unlisted|public] [--title ".."] [--tags a,b] [--yes]
+  (compile/render/produce aceptan --voice-provider kokoro|voicebox|windows-onecore: usa voice.json "alternatives")
 `;
 const args = process.argv.slice(2);
 const flag = (name: string, def?: string) => { const i = args.indexOf(`--${name}`); return i >= 0 ? args[i + 1] : def; };
@@ -140,20 +149,72 @@ async function main() {
     case 'export': { if (sub !== 'character' && sub !== 'prop') throw new Error('Uso: studio export character|prop <project> <id>'); return out(await exportGlb(a1, sub, a2)); }
     case 'history': { const p = await loadProject(sub); const f = await readFile(join(p.root, a1), 'utf8').catch(() => null); if (f !== null) await recordVersion(sub, a1, f, 'disk'); return out(await listVersions(sub, a1)); }
     case 'revert': return out({ reverted: a1, to: a2, bytes: (await revertTo(sub, a1, a2)).length });
-    case 'voices': return out(await listOneCoreVoices());
+    case 'voices': {
+      const want = sub ?? 'all', res: Record<string, unknown> = {};
+      if (want === 'all' || want === 'kokoro') { const a = kokoroAvailable(); res.kokoro = a.ok ? await listKokoroVoices() : { error: a.reason }; }
+      if (want === 'all' || want === 'voicebox') { const h = await voiceboxHealth(); res.voicebox = h.ok ? await listVoiceboxProfiles() : { error: h.detail }; }
+      if (want === 'all' || want === 'onecore' || want === 'windows-onecore') res['windows-onecore'] = await listOneCoreVoices().catch(e => ({ error: (e as Error).message }));
+      stopKokoro();
+      return out(res);
+    }
     case 'say': {
       const p = await loadProject(sub); const c = p.characters[a1];
       if (!c?.voice) throw new Error('Personaje sin voice.json v2');
-      const r = await synthesize({ text: a2, voice: c.voice, emotion: flag('emotion') }, join(p.root, 'generated', 'audio', 'voices'), flag('emotion'));
+      const voice = resolveVoice(c.voice, flag('voice-provider') ?? (p.meta.voiceProvider as string | undefined));
+      const r = await synthesize({ text: a2, voice, emotion: flag('emotion'), direction: flag('direction') }, join(p.root, 'generated', 'audio', 'voices'), flag('emotion'));
+      stopKokoro();
       const dest = join(p.root, 'generated', `say-${a1}.wav`); await copyFile(r.file, dest);
-      return out({ file: dest, duration: r.duration, alignment: r.alignment.method, words: r.alignment.words.map(w => `${w.text}@${w.start.toFixed(2)}`).join(' ') });
+      return out({ file: dest, provider: r.provider, voice: voice.voice, duration: r.duration, alignment: r.alignment.method, words: r.alignment.words.map(w => `${w.text}@${w.start.toFixed(2)}`).join(' ') });
     }
+    case 'youtube': return out(await youtubeCmd(sub, a1, a2));
     default: throw new Error(`Comando desconocido: ${cmd}\n${HELP}`);
+  }
+}
+async function youtubeCmd(sub?: string, a1?: string, a2?: string): Promise<unknown> {
+  switch (sub) {
+    case 'client': { if (!a1) throw new Error('Uso: studio youtube client <client_secret.json>'); return youtube.saveClient(JSON.parse(await readFile(a1, 'utf8'))); }
+    case 'status': return youtube.status();
+    case 'disconnect': return youtube.disconnect();
+    case 'connect': {
+      // one-shot loopback listener on a random port; Google redirects the browser back to it
+      return new Promise((ok, fail) => {
+        const srv = createServer(async (req, res) => {
+          const u = new URL(req.url ?? '/', 'http://127.0.0.1');
+          if (u.pathname !== '/callback') { res.writeHead(404).end(); return; }
+          try {
+            const r = await youtube.completeAuth(u.searchParams);
+            res.writeHead(200, { 'content-type': 'text/html; charset=utf-8' }).end('<h3>Series Forge Studio: YouTube conectado. Puedes cerrar esta pestaña.</h3>');
+            srv.close(); ok({ connected: true, channel: r.channel ?? null });
+          } catch (e) { res.writeHead(400, { 'content-type': 'text/plain; charset=utf-8' }).end((e as Error).message); srv.close(); fail(e); }
+        });
+        srv.listen(0, '127.0.0.1', async () => {
+          const port = (srv.address() as { port: number }).port;
+          try {
+            const url = await youtube.authUrl(`http://127.0.0.1:${port}/callback`);
+            console.log(`Abre esta dirección si el navegador no se abre solo:\n${url}`);
+            if (process.platform === 'win32') spawn('rundll32', ['url.dll,FileProtocolHandler', url], { detached: true, stdio: 'ignore' }).unref();
+          } catch (e) { srv.close(); fail(e); }
+        });
+        setTimeout(() => { srv.close(); fail(new Error('Tiempo agotado esperando la autorización (10 min)')); }, 600_000).unref();
+      });
+    }
+    case 'upload': {
+      if (!a1 || !a2) throw new Error('Uso: studio youtube upload <project> <episode> [--privacy private] [--yes]');
+      const p = await loadProject(a1); const ep = p.episodes[a2];
+      if (!ep) throw new Error(`Episodio desconocido: ${a2}`);
+      const d = await youtube.episodeUploadDefaults(p.root, p.meta, { id: ep.id, name: ep.name, dir: ep.dir });
+      const meta = youtube.validateMeta({ ...d.meta, privacy: (flag('privacy') ?? 'private') as youtube.UploadMeta['privacy'], title: flag('title') ?? d.meta.title, tags: flag('tags')?.split(',') ?? d.meta.tags, description: flag('description-file') ? await readFile(flag('description-file')!, 'utf8') : d.meta.description, madeForKids: has('made-for-kids') });
+      if (!has('yes')) return { dryRun: true, file: d.file, meta, hint: 'Revisa los datos y repite con --yes para subir.' };
+      const r = await youtube.uploadVideo(d.file, meta, e => console.log(JSON.stringify(e)), youtube.GOOGLE, { thumbnail: d.thumbnail });
+      await youtube.recordUpload(p.root, ep.dir, r, meta);
+      return r;
+    }
+    default: throw new Error('Uso: studio youtube client|connect|status|disconnect|upload');
   }
 }
 function renderSettings(): RenderSettings {
   const draft = has('draft');
-  return { width: Number(flag('width', draft ? '640' : '1920')), height: Number(flag('height', draft ? '360' : '1080')), fps: Number(flag('fps', '24')), maxSeconds: flag('max-seconds') ? Number(flag('max-seconds')) : undefined, crf: Number(flag('crf', draft ? '23' : '18')), preset: flag('preset', draft ? 'veryfast' : 'medium'), scenes: flag('scenes')?.split(','), speech: has('estimate-speech') ? 'estimate' : 'tts' };
+  return { width: Number(flag('width', draft ? '640' : '1920')), height: Number(flag('height', draft ? '360' : '1080')), fps: Number(flag('fps', '24')), maxSeconds: flag('max-seconds') ? Number(flag('max-seconds')) : undefined, crf: Number(flag('crf', draft ? '23' : '18')), preset: flag('preset', draft ? 'veryfast' : 'medium'), scenes: flag('scenes')?.split(','), speech: has('estimate-speech') ? 'estimate' : 'tts', voiceProvider: flag('voice-provider') };
 }
 main().catch(e => { console.error(`Error: ${(e as Error).message}`); process.exitCode = 1; });
 void readFile; void writeFile; void rename;

@@ -39,3 +39,6 @@ main { display: grid; grid-template-rows: minmax(260px, 1fr) auto auto minmax(18
 .log { font-size: 11px; color: var(--muted); max-height: 160px; overflow: auto; }
 .issues { padding: 8px 20px; } .issues .error b { color: var(--bad); } .issues .warning b { color: var(--warn); }
 .toasts { position: fixed; right: 400px; bottom: 16px; display: flex; flex-direction: column; gap: 6px; z-index: 10; } .toasts div { background: #2b3746; border: 1px solid var(--accent); padding: 6px 10px; border-radius: 6px; max-width: 520px; }
+.youtube { margin: 10px 0; border: 1px solid var(--line); padding: 6px 10px; max-width: 640px; } .youtube summary { cursor: pointer; color: var(--accent); }
+.youtube textarea, .yt-form input:not([type=checkbox]), .yt-form textarea, .yt-form select { width: 100%; box-sizing: border-box; }
+.yt-form { display: flex; flex-direction: column; gap: 6px; } .yt-form label { display: flex; flex-direction: column; gap: 2px; } .yt-form label.check { flex-direction: row; align-items: center; gap: 6px; }
