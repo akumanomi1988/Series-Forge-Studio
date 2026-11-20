@@ -1,8 +1,8 @@
 # LA PEOR CITA DEL MUNDO
 
-Guion del episodio piloto de «Casi normales». Español de España. Narrador en primera persona y tiempo pasado. La voz en off no debe mover los labios de Nico en pantalla; se utiliza un actor técnico fuera de plano, con la misma voz. Los diálogos, direcciones y escenas están en JSON.
+Piloto de **Casi normales**. Comedia adulta en español de España, narración en primera persona y pasado. La voz del narrador puede exagerar o contradecir la imagen. Los JSON de escena son la fuente de verdad para dirección, interpretación y timing.
 
-## 1. No somos pareja (restaurant)
+## 1. No somos pareja
 
 **Dirección:** Cold open: cena desastrosa, agente Inés pide explicaciones. Corte a unas horas antes.
 
@@ -34,7 +34,7 @@ Guion del episodio piloto de «Casi normales». Español de España. Narrador en
 
 **NICO (NARRADOR)** _(voz en off; narración retrospectiva, confidencial, con ironía española)_: Por supuesto. Porque cuando crees que tu vida ya no puede ir a peor, siempre queda alguien con las llaves del coche. Pero para entender cómo llegué a esa mesa, hay que retroceder unas horas. A cuando todavía conservaba mi dignidad. Bueno, parte de ella.
 
-## 2. Siete meses y una freidora (apartment)
+## 2. Siete meses y una freidora
 
 **Dirección:** Nico prepara la cita, ensaya, comete errores con los mensajes. Autocrítica retrospectiva.
 
@@ -66,7 +66,7 @@ Guion del episodio piloto de «Casi normales». Español de España. Narrador en
 
 **NICO (NARRADOR)** _(voz en off; narración retrospectiva, confidencial, con ironía española)_: Y por último, el mensaje definitivo. «Voy de camino». Lo envié veintidós minutos antes de salir de casa, porque quería parecer espontáneo. Y eso, amigos, es el resumen perfecto de mi personalidad.
 
-## 3. La norma de Vera (apartment)
+## 3. La norma de Vera
 
 **Dirección:** Vera se prepara y habla por teléfono con Sofía. Se justifica cómo lo sabe el narrador.
 
@@ -106,7 +106,7 @@ Guion del episodio piloto de «Casi normales». Español de España. Narrador en
 
 **NICO (NARRADOR)** _(voz en off; narración retrospectiva, confidencial, con ironía española)_: Vera se rió, cogió el bolso y salió. Años después, me contó que en ese momento pensaba que lo peor que podía pasar era una cena aburrida. Y me preguntó si recordaba que a mí me había pasado exactamente lo mismo.
 
-## 4. El restaurante de los ricos (restaurant)
+## 4. El restaurante de los ricos
 
 **Dirección:** Nico llega; agua con hielo, recibimiento, golpe en la mesa y primeras miradas.
 
@@ -152,7 +152,7 @@ Guion del episodio piloto de «Casi normales». Español de España. Narrador en
 
 **NICO (NARRADOR)** _(voz en off; narración retrospectiva, confidencial, con ironía española)_: Y yo pensé: todavía quedan un montón de horas para que esto empeore. Qué ingenuo era.
 
-## 5. La conversación más incómoda (restaurant)
+## 5. La conversación más incómoda
 
 **Dirección:** Malentendidos sobre comida y aficiones; hay interés real bajo la torpeza.
 
@@ -218,7 +218,7 @@ Guion del episodio piloto de «Casi normales». Español de España. Narrador en
 
 **NICO (NARRADOR)** _(voz en off; narración retrospectiva, confidencial, con ironía española)_: Por un instante pensé que quizá teníamos posibilidades. Una noche normal, incluso divertida. Se podría decir que el universo nos concedió cuarenta segundos de tregua.
 
-## 6. Por fin dos personas normales (restaurant)
+## 6. Por fin dos personas normales
 
 **Dirección:** Los dos dejan de fingir, se sinceran; plantamos el botón de 'ser normal'.
 
@@ -262,7 +262,7 @@ Guion del episodio piloto de «Casi normales». Español de España. Narrador en
 
 **NICO (NARRADOR)** _(voz en off; narración retrospectiva, confidencial, con ironía española)_: Eso fue exactamente un minuto antes de que apareciera Dani.
 
-## 7. Un hombre sin invitación (restaurant)
+## 7. Un hombre sin invitación
 
 **Dirección:** Vera descubre que su ex es dueño del local; sonrisa desaparece; Dani se sienta sin permiso.
 
@@ -326,7 +326,7 @@ Guion del episodio piloto de «Casi normales». Español de España. Narrador en
 
 **DANI**: Claro, claro. Si es un segundo.
 
-## 8. El concurso del macho alfa (restaurant)
+## 8. El concurso del macho alfa
 
 **Dirección:** Dani presume y humilla a Nico. Vera confronta al ex; Nico se posiciona.
 
@@ -382,7 +382,7 @@ Guion del episodio piloto de «Casi normales». Español de España. Narrador en
 
 **NICO (NARRADOR)** _(voz en off; narración retrospectiva, confidencial, con ironía española)_: Y justo cuando estábamos convencidos de haber superado lo peor, llegó un camarero que en realidad no era camarero.
 
-## 9. La chaqueta y el bolso (restaurant)
+## 9. La chaqueta y el bolso
 
 **Dirección:** Roban sus pertenencias. Nico descubre después que las llaves estaban en la chaqueta.
 
@@ -422,7 +422,7 @@ Guion del episodio piloto de «Casi normales». Español de España. Narrador en
 
 **NICO (NARRADOR)** _(voz en off; narración retrospectiva, confidencial, con ironía española)_: Fui por la derecha. Y esa fue la última decisión lógica que tomé durante varios minutos.
 
-## 10. La persecución menos épica (kitchen)
+## 10. La persecución menos épica
 
 **Dirección:** Comedia física en cocina: bandejas, cubo, cuarto de limpieza y recuperación del bolso.
 
@@ -474,7 +474,7 @@ Guion del episodio piloto de «Casi normales». Español de España. Narrador en
 
 **NICO**: He encontrado los productos de limpieza.
 
-## 11. Una declaración imposible (restaurant)
+## 11. Una declaración imposible
 
 **Dirección:** Comisaría improvisada en el restaurante tras el robo; Dani se enreda accidentalmente en mantel.
 
@@ -528,7 +528,7 @@ Guion del episodio piloto de «Casi normales». Español de España. Narrador en
 
 **VERA** _(gritando con intensidad)_: ¡Ni de coña!
 
-## 12. La mejor de las peores citas (street)
+## 12. La mejor de las peores citas
 
 **Dirección:** Final cálido: no hay romance, sí amistad; Nico valora cinco estrellas, promesa de serie.
 
@@ -594,13 +594,13 @@ Guion del episodio piloto de «Casi normales». Español de España. Narrador en
 
 **NICO**: Ah, mierda. Es verdad.
 
-**NICO (NARRADOR)** _(voz en off; narración retrospectiva, confidencial, con ironía española)_: Era una notificación de la aplicación de citas. «¿Cómo ha ido tu cita con Vera? Valora tu experiencia». Tenía cinco estrellas delante.
+**NICO (NARRADOR)** _(voz en off; narración retrospectiva, confidencial, con ironía española)_: Era una notificación de la aplicación de citas. «¿Cómo ha ido tu cita con Vera? Valora tu experiencia». Tenía cinco estrellas delante. Marqué cinco estrellas, por si acaso el universo necesitaba una propina.
 
 **NICO**: Inolvidable.
 
 **NICO (NARRADOR)** _(voz en off; narración retrospectiva, confidencial, con ironía española)_: Y así fue como conocí a Vera. No conseguí novia, pero encontré a alguien que podía decirme la verdad en la cara sin que me molestara. Lo peor de todo es que aquella no iba a ser nuestra última noche desastrosa.
 
-## 13. Poscréditos: La última palabra (restaurant)
+## 13. Poscréditos: La última palabra
 
 **Dirección:** El ex sigue atrapado en el mantel. Remate final.
 

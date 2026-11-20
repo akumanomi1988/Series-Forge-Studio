@@ -1,15 +1,23 @@
-# Producción pendiente de ejecución local
+# Estado del piloto: listo para validación y render local
 
-Capítulo completo guionizado y modelado como datos nativos de Series Forge Studio v0.5. No se ha renderizado un MP4 en este entorno.
+- 13 escenas, 285 intervenciones, 3048 palabras habladas, de ellas 1529 de narración (50.2 %).
+- 146 planos especificados, 83 acciones, 8 identidades (incluye el doble técnico de voz de Nico, fuera de campo), 4 escenarios, música procedural y efectos.
+- **OBJETIVO: ~20 min. Duración y calidad todavía sin validar con TTS Kokoro ni con un MP4 real.** Los tiempos de cámara son estimaciones; deben ajustarse después de `compile`.
+- El nuevo universo está en `examples/projects/casi-normales`; solo se usan datos JSON/Markdown del programa. No se cambia código ni se pisa `ultima-ronda`.
+- El libro de guion de este episodio se genera desde los diálogos definitivos de `scene.json`.
 
-- **13 escenas, 285 intervenciones, 3037 palabras habladas**, de las cuales 1518 (50 %) son narración retrospectiva.
-- **Duración prevista:** ~20 minutos. El cálculo aproximado a partir de palabras y pausas es 21 min, **no es una medición del audio Kokoro**.
-- Todos los planos son manuales para evitar que se muestre al actor técnico `nico-voz` (posicionado fuera de decorado). Voz igual que Nico protagonista.
-- Por diseño, no se ha modificado ni el motor, ni el programa, ni los proyectos existentes.
-- Los tiempos de cámara se han estimado sin TTS; al ejecutar `compile`, habrá que cotejar duración real, corregir los planos y revisar `storyboard` antes del render final.
+## Comprobaciones estructurales
 
-## Reproducir en Windows
+- IDs de diálogo y de escena coherentes; 13/13 escenas definidas.
+- 0 planos que apunten al actor técnico `nico-voz`.
+- Recursos de decorado y objetos compartidos reutilizados; ambiente procedural `traffic` añadido para la calle.
+- Pendiente ejecutar **validación real del programa**: `npm run studio -- validate casi-normales`.
+- Pendiente previsualización real y QA audiovisual. No aprobar ni confirmar el canon todavía.
+
+## Cómo finalizar en Windows
+
 ```powershell
+git fetch origin
 git switch content/piloto-la-peor-cita
 npm install
 npm run build
@@ -23,4 +31,4 @@ npm run studio -- produce casi-normales ep-001 --draft
 npm run studio -- validate episode casi-normales ep-001
 ```
 
-Después de aprobar storyboard y voces, producir sin `--draft`. Requiere Kokoro local, Chrome/Edge y FFmpeg.
+Si pasa la QA del borrador, repetir `npm run studio -- produce casi-normales ep-001` sin `--draft` para exportación 1080p. Revisar planos, sincronía y duración antes de publicar.
