@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 2,
+  "id": "traffic",
+  "kind": "ambience",
+  "generator": "traffic",
+  "params": {
+    "density": 0.18,
+    "lowpass": 0.58
+  },
+  "durationSec": 120,
+  "seed": 2026,
+  "license": {
+    "id": "procedural-original",
+    "source": "Series Forge procedural synthesis",
+    "commercialUse": "allowed"
+  }
+}
