@@ -1,0 +1,52 @@
+{
+  "schemaVersion": 2,
+  "generator": "parts",
+  "material": "plastic",
+  "restHeight": 0,
+  "params": {
+    "lightIntensity": 0.35,
+    "lightColor": "#ff4fa8",
+    "lightY": 0.12,
+    "lightDistance": 1.4
+  },
+  "parts": [
+    {
+      "id": "cuerpo",
+      "primitive": "cylinder",
+      "size": [
+        0.07,
+        0.18,
+        0.07
+      ],
+      "position": [
+        0,
+        0.09,
+        0
+      ],
+      "color": "#202024"
+    },
+    {
+      "id": "anillo",
+      "primitive": "torus",
+      "size": [
+        0.07,
+        0.008,
+        0
+      ],
+      "position": [
+        0,
+        0.18,
+        0
+      ],
+      "color": "#ff4fa8",
+      "rotationDeg": [
+        90,
+        0,
+        0
+      ],
+      "emissive": "#ff4fa8",
+      "emissiveIntensity": 2,
+      "outline": false
+    }
+  ]
+}

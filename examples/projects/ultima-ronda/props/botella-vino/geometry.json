@@ -1,0 +1,54 @@
+{
+  "schemaVersion": 2,
+  "generator": "parts",
+  "material": "glass",
+  "restHeight": 0,
+  "parts": [
+    {
+      "id": "cuerpo",
+      "primitive": "cylinder",
+      "size": [
+        0.04,
+        0.22,
+        0.04
+      ],
+      "position": [
+        0,
+        0.11,
+        0
+      ],
+      "color": "#3a0e18"
+    },
+    {
+      "id": "cuello",
+      "primitive": "cylinder",
+      "size": [
+        0.015,
+        0.09,
+        0.015
+      ],
+      "position": [
+        0,
+        0.265,
+        0
+      ],
+      "color": "#3a0e18"
+    },
+    {
+      "id": "etiqueta",
+      "primitive": "cylinder",
+      "size": [
+        0.041,
+        0.07,
+        0.041
+      ],
+      "position": [
+        0,
+        0.1,
+        0
+      ],
+      "color": "#e8dcc0",
+      "outline": false
+    }
+  ]
+}

@@ -1,0 +1,33 @@
+{
+  "schemaVersion": 2,
+  "id": "pasion-vol3",
+  "kind": "music",
+  "generator": "procedural",
+  "license": {
+    "id": "procedural-original",
+    "source": "Series Forge procedural composer",
+    "commercialUse": "allowed"
+  },
+  "style": "lounge",
+  "tempo": 68,
+  "key": "D#",
+  "mode": "major",
+  "sevenths": true,
+  "swing": 0.15,
+  "progression": [
+    "I",
+    "vi",
+    "IV",
+    "V"
+  ],
+  "instruments": [
+    "keys",
+    "bass",
+    "strings",
+    "lead",
+    "snaps"
+  ],
+  "seed": 69,
+  "durationSec": 40,
+  "mood": "«Noches de pasión vol. 3»: balada hortera de la lista de Óscar (diegética)"
+}

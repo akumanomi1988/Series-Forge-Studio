@@ -1,0 +1,766 @@
+{
+  "schemaVersion": 2,
+  "id": "sc-005",
+  "name": "Crujiente",
+  "synopsis": "Óscar se esconde en el dormitorio; llega Susana; la cena quemada, el estornudo, la lista de Óscar suena sola; Dani se sincera; suena el timbre.",
+  "environmentId": "piso-dani",
+  "durationSec": "auto",
+  "tailSec": 0.6,
+  "autoLook": true,
+  "autoActing": 1,
+  "coverage": "auto",
+  "actors": [
+    {
+      "id": "dani",
+      "characterId": "dani",
+      "position": [
+        -0.9,
+        0,
+        -0.6
+      ],
+      "yawDeg": 120,
+      "expression": "nervous",
+      "idle": "idle"
+    },
+    {
+      "id": "oscar",
+      "characterId": "oscar",
+      "position": [
+        -0.2,
+        0,
+        -0.1
+      ],
+      "yawDeg": -100,
+      "expression": "worried",
+      "idle": "idle-relaxed"
+    },
+    {
+      "id": "susana",
+      "characterId": "susana",
+      "position": [
+        4.6,
+        0,
+        1.2
+      ],
+      "yawDeg": -90,
+      "expression": "smile",
+      "idle": "idle-relaxed"
+    }
+  ],
+  "props": [
+    {
+      "id": "olla",
+      "propId": "olla",
+      "position": [
+        -2.25,
+        0.91,
+        -1.6
+      ]
+    },
+    {
+      "id": "colonia",
+      "propId": "colonia",
+      "position": [
+        -1.2,
+        0.91,
+        -1.5
+      ]
+    },
+    {
+      "id": "plato-1",
+      "propId": "plato",
+      "position": [
+        0.62,
+        0.76,
+        0.2
+      ]
+    },
+    {
+      "id": "plato-2",
+      "propId": "plato",
+      "position": [
+        1.38,
+        0.76,
+        0.2
+      ]
+    },
+    {
+      "id": "copa-1",
+      "propId": "copa-vino",
+      "position": [
+        0.7,
+        0.76,
+        0.48
+      ]
+    },
+    {
+      "id": "copa-2",
+      "propId": "copa-vino",
+      "position": [
+        1.3,
+        0.76,
+        0.48
+      ]
+    },
+    {
+      "id": "botella",
+      "propId": "botella-vino",
+      "position": [
+        1,
+        0.76,
+        -0.12
+      ]
+    },
+    {
+      "id": "vela-mesa",
+      "propId": "vela",
+      "position": [
+        1,
+        0.76,
+        0.32
+      ]
+    }
+  ],
+  "shots": [
+    {
+      "id": "i-esconde",
+      "with": "oscar-huye",
+      "offset": 0.6,
+      "durationSec": 2.4,
+      "camera": {
+        "type": "static",
+        "position": [
+          -1.4,
+          1.55,
+          2.3
+        ],
+        "target": [
+          -3.7,
+          1.2,
+          0.6
+        ],
+        "fov": 40
+      }
+    },
+    {
+      "id": "i-puerta",
+      "with": "abre",
+      "offset": -0.1,
+      "durationSec": 2.6,
+      "camera": {
+        "type": "static",
+        "position": [
+          1,
+          1.6,
+          2.9
+        ],
+        "target": [
+          3.7,
+          1.25,
+          1.2
+        ],
+        "fov": 40
+      }
+    },
+    {
+      "id": "i-mesa",
+      "with": "v7",
+      "offset": -0.2,
+      "durationSec": 3,
+      "camera": {
+        "type": "static",
+        "position": [
+          1,
+          1.32,
+          2.5
+        ],
+        "target": [
+          1,
+          0.98,
+          0.2
+        ],
+        "fov": 38
+      }
+    },
+    {
+      "id": "i-estornudo",
+      "with": "o1",
+      "offset": -0.1,
+      "durationSec": 1.8,
+      "camera": {
+        "type": "static",
+        "position": [
+          -1.4,
+          1.55,
+          2.3
+        ],
+        "target": [
+          -3.7,
+          1.2,
+          0.6
+        ],
+        "fov": 40
+      }
+    },
+    {
+      "id": "i-altavoz",
+      "with": "pasion",
+      "offset": 0.1,
+      "durationSec": 2.2,
+      "camera": {
+        "type": "static",
+        "position": [
+          1.5,
+          0.95,
+          -0.5
+        ],
+        "target": [
+          2.3,
+          0.55,
+          -1.4
+        ],
+        "fov": 30
+      }
+    },
+    {
+      "id": "i-timbre",
+      "with": "timbre",
+      "offset": 0.2,
+      "durationSec": 2.4,
+      "camera": {
+        "type": "static",
+        "position": [
+          0.9,
+          1.75,
+          4.2
+        ],
+        "target": [
+          1.2,
+          1.15,
+          0.6
+        ],
+        "fov": 44,
+        "move": {
+          "type": "push-in",
+          "amount": 0.15
+        }
+      }
+    }
+  ],
+  "actions": [
+    {
+      "id": "empuja",
+      "type": "play",
+      "actor": "dani",
+      "with": "d0",
+      "clip": "point",
+      "target": "puerta-cuarto",
+      "durationSec": 1.5
+    },
+    {
+      "id": "oscar-huye",
+      "type": "walk",
+      "actor": "oscar",
+      "with": "o0",
+      "offset": 0.8,
+      "to": [
+        -4.6,
+        0,
+        0.6
+      ],
+      "gait": "walk-brisk"
+    },
+    {
+      "id": "dani-a-puerta",
+      "type": "walk",
+      "actor": "dani",
+      "after": "oscar-huye",
+      "offset": -1.6,
+      "to": [
+        2.9,
+        0,
+        1
+      ],
+      "faceTo": "puerta"
+    },
+    {
+      "id": "abre",
+      "type": "propJoint",
+      "prop": "puerta",
+      "joint": "leaf",
+      "after": "dani-a-puerta",
+      "offset": 0.1,
+      "toDeg": -95,
+      "durationSec": 0.8,
+      "sound": "door-creak"
+    },
+    {
+      "id": "susana-entra",
+      "type": "walk",
+      "actor": "susana",
+      "with": "abre",
+      "offset": 0.3,
+      "to": [
+        2.35,
+        0,
+        1.35
+      ],
+      "faceTo": "dani"
+    },
+    {
+      "id": "cierra",
+      "type": "propJoint",
+      "prop": "puerta",
+      "joint": "leaf",
+      "with": "susana-entra",
+      "offset": 1.8,
+      "toDeg": 0,
+      "durationSec": 0.8,
+      "sound": "click"
+    },
+    {
+      "id": "susana-mira-olla",
+      "type": "lookAt",
+      "actor": "susana",
+      "with": "v5",
+      "target": "olla",
+      "durationSec": 1.6
+    },
+    {
+      "id": "susana-se-sienta",
+      "type": "sit",
+      "actor": "susana",
+      "after": "d6",
+      "offset": -0.6,
+      "prop": "silla-2",
+      "durationSec": 1.2
+    },
+    {
+      "id": "dani-rodea",
+      "type": "walk",
+      "actor": "dani",
+      "with": "susana-se-sienta",
+      "offset": 0.2,
+      "to": [
+        0.6,
+        0,
+        1.15
+      ]
+    },
+    {
+      "id": "dani-se-sienta",
+      "type": "sit",
+      "actor": "dani",
+      "after": "dani-rodea",
+      "prop": "silla-1",
+      "durationSec": 1.1
+    },
+    {
+      "id": "susana-copa",
+      "type": "pickUp",
+      "actor": "susana",
+      "after": "susana-se-sienta",
+      "offset": 0.6,
+      "prop": "copa-2",
+      "hand": "right",
+      "durationSec": 1
+    },
+    {
+      "id": "susana-bebe",
+      "type": "hold",
+      "actor": "susana",
+      "after": "susana-copa",
+      "hand": "right",
+      "pose": "raised",
+      "durationSec": 0.6
+    },
+    {
+      "id": "susana-baja",
+      "type": "hold",
+      "actor": "susana",
+      "after": "susana-bebe",
+      "offset": 0.8,
+      "hand": "right",
+      "pose": "front",
+      "durationSec": 0.6
+    },
+    {
+      "id": "pasion",
+      "type": "effect",
+      "effect": "glow",
+      "prop": "altavoz",
+      "part": "anillo",
+      "with": "o2",
+      "offset": -0.6,
+      "until": "d14",
+      "intensity": 1.5
+    },
+    {
+      "id": "dani-tapa",
+      "type": "play",
+      "actor": "dani",
+      "with": "d12",
+      "clip": "facepalm",
+      "durationSec": 1.6
+    },
+    {
+      "id": "timbre",
+      "type": "effect",
+      "effect": "flicker",
+      "prop": "lampara",
+      "after": "d13",
+      "offset": 0.2,
+      "durationSec": 0.15
+    },
+    {
+      "id": "miran-puerta-v",
+      "type": "lookAt",
+      "actor": "susana",
+      "with": "timbre",
+      "offset": 0.2,
+      "target": "puerta",
+      "durationSec": 2.5
+    },
+    {
+      "id": "miran-puerta-d",
+      "type": "lookAt",
+      "actor": "dani",
+      "with": "timbre",
+      "offset": 0.3,
+      "target": "puerta",
+      "durationSec": 2
+    }
+  ],
+  "dialogue": [
+    {
+      "id": "d0",
+      "actor": "dani",
+      "to": "oscar",
+      "text": "¡Ya está aquí! ¡Al dormitorio!",
+      "emotion": "fear",
+      "at": 0.6,
+      "intensity": 1.2
+    },
+    {
+      "id": "o0",
+      "actor": "oscar",
+      "to": "dani",
+      "text": "Vale, vale. Pero deja la puerta entornada, que tengo que supervisar.",
+      "emotion": "worried"
+    },
+    {
+      "id": "d0b",
+      "actor": "dani",
+      "to": "oscar",
+      "text": "¡Y no toques nada!",
+      "emotion": "angry",
+      "with": "dani-a-puerta",
+      "offset": 0.5
+    },
+    {
+      "id": "o0b",
+      "actor": "oscar",
+      "text": "¡Si aquí solo hay una cama y un flexo!",
+      "emotion": "worried",
+      "direction": "desde el dormitorio"
+    },
+    {
+      "id": "d0c",
+      "actor": "dani",
+      "text": "Pues no toques el flexo.",
+      "emotion": "nervous",
+      "direction": "en voz baja"
+    },
+    {
+      "id": "v1",
+      "actor": "susana",
+      "to": "dani",
+      "text": "Huele a... ¿Qué es eso? ¿Incendio o perfume?",
+      "emotion": "smirk",
+      "with": "susana-entra",
+      "offset": 1.2
+    },
+    {
+      "id": "d1",
+      "actor": "dani",
+      "to": "susana",
+      "text": "Las dos cosas. Es una colonia que se llama Tormenta salvaje.",
+      "emotion": "nervous"
+    },
+    {
+      "id": "v2",
+      "actor": "susana",
+      "to": "dani",
+      "text": "¿Te la has puesto tú?",
+      "emotion": "laugh"
+    },
+    {
+      "id": "d2",
+      "actor": "dani",
+      "to": "susana",
+      "text": "Me la han puesto. Es una historia larga.",
+      "emotion": "nervous"
+    },
+    {
+      "id": "v3",
+      "actor": "susana",
+      "to": "dani",
+      "text": "Me gustan las historias largas. Mientras no sean del tiempo.",
+      "emotion": "smirk"
+    },
+    {
+      "id": "d3",
+      "actor": "dani",
+      "to": "susana",
+      "text": "Hoy no hablo del tiempo. Tengo una lista nueva.",
+      "emotion": "joy"
+    },
+    {
+      "id": "v4",
+      "actor": "susana",
+      "to": "dani",
+      "text": "Cómo no.",
+      "emotion": "smirk"
+    },
+    {
+      "id": "d4",
+      "actor": "dani",
+      "to": "susana",
+      "text": "Punto uno: cocinar algo de mi abuela. Punto dos: no quemarlo.",
+      "emotion": "determined"
+    },
+    {
+      "id": "v5",
+      "actor": "susana",
+      "to": "dani",
+      "text": "¿Y qué tal va el punto dos?",
+      "emotion": "smirk"
+    },
+    {
+      "id": "d5",
+      "actor": "dani",
+      "to": "susana",
+      "text": "Está... caramelizado. Es una técnica italiana. Muy antigua.",
+      "emotion": "nervous"
+    },
+    {
+      "id": "v6",
+      "actor": "susana",
+      "to": "dani",
+      "text": "Como tu abuela.",
+      "emotion": "smirk"
+    },
+    {
+      "id": "d6",
+      "actor": "dani",
+      "to": "susana",
+      "text": "Exacto. Siéntate, por favor.",
+      "emotion": "joy"
+    },
+    {
+      "id": "s6b",
+      "actor": "susana",
+      "to": "dani",
+      "text": "¿Y tú dónde te sientas?",
+      "emotion": "smirk",
+      "with": "dani-rodea",
+      "offset": 0.3
+    },
+    {
+      "id": "d6b",
+      "actor": "dani",
+      "to": "susana",
+      "text": "Enfrente. Lo he medido: un metro cuarenta. Ni muy cerca ni muy lejos.",
+      "emotion": "nervous"
+    },
+    {
+      "id": "s6c",
+      "actor": "susana",
+      "to": "dani",
+      "text": "Qué romántico. Con cinta métrica.",
+      "emotion": "laugh"
+    },
+    {
+      "id": "v7",
+      "actor": "susana",
+      "to": "dani",
+      "text": "Pues... está crujiente.",
+      "emotion": "thinking",
+      "after": "dani-se-sienta",
+      "offset": 0.6
+    },
+    {
+      "id": "d7",
+      "actor": "dani",
+      "to": "susana",
+      "text": "El risotto crujiente es tendencia en Milán.",
+      "emotion": "nervous"
+    },
+    {
+      "id": "v8",
+      "actor": "susana",
+      "to": "dani",
+      "text": "Dani. Está quemado.",
+      "emotion": "laugh"
+    },
+    {
+      "id": "d8",
+      "actor": "dani",
+      "to": "susana",
+      "text": "Está muy quemado. Lo siento. Quería demostrarte que no soy solo el de la lámpara.",
+      "emotion": "sad"
+    },
+    {
+      "id": "v9",
+      "actor": "susana",
+      "to": "dani",
+      "text": "A mí me gustaba el de la lámpara.",
+      "emotion": "smile",
+      "direction": "en voz baja"
+    },
+    {
+      "id": "d9",
+      "actor": "dani",
+      "to": "susana",
+      "text": "¿En serio?",
+      "emotion": "surprise"
+    },
+    {
+      "id": "v10",
+      "actor": "susana",
+      "to": "dani",
+      "text": "El de la lámpara me hacía reír. Este de la colonia me hace llorar un poco, pero es por los ojos.",
+      "emotion": "smirk"
+    },
+    {
+      "id": "o1",
+      "actor": "oscar",
+      "text": "¡Achís!",
+      "emotion": "surprise",
+      "direction": "gritando"
+    },
+    {
+      "id": "v11",
+      "actor": "susana",
+      "to": "dani",
+      "text": "¿Hay alguien en tu dormitorio?",
+      "emotion": "surprise"
+    },
+    {
+      "id": "d10",
+      "actor": "dani",
+      "to": "susana",
+      "text": "No. Es el vecino. Las paredes son muy finas.",
+      "emotion": "fear"
+    },
+    {
+      "id": "v12",
+      "actor": "susana",
+      "to": "dani",
+      "text": "Tú eres arquitecto.",
+      "emotion": "smirk"
+    },
+    {
+      "id": "d11",
+      "actor": "dani",
+      "to": "susana",
+      "text": "Por eso lo sé.",
+      "emotion": "nervous"
+    },
+    {
+      "id": "o2",
+      "actor": "oscar",
+      "text": "¡Perdón, perdón! ¡Que era el botón del volumen!",
+      "emotion": "fear",
+      "direction": "susurrando",
+      "offset": 0.4
+    },
+    {
+      "id": "v13",
+      "actor": "susana",
+      "to": "dani",
+      "text": "¿Y esto qué es?",
+      "emotion": "laugh",
+      "with": "pasion",
+      "offset": 1.8
+    },
+    {
+      "id": "d12",
+      "actor": "dani",
+      "to": "susana",
+      "text": "«Noches de pasión, volumen tres».",
+      "emotion": "sad"
+    },
+    {
+      "id": "v14",
+      "actor": "susana",
+      "to": "dani",
+      "text": "¿Y el uno y el dos?",
+      "emotion": "smirk",
+      "intensity": 1.2
+    },
+    {
+      "id": "d13",
+      "actor": "dani",
+      "to": "susana",
+      "text": "Se quemaron. Como el risotto.",
+      "emotion": "nervous"
+    },
+    {
+      "id": "v15",
+      "actor": "susana",
+      "to": "dani",
+      "text": "¿Esperas a alguien más?",
+      "emotion": "surprise",
+      "after": "timbre",
+      "offset": 0.9
+    },
+    {
+      "id": "d14",
+      "actor": "dani",
+      "to": "susana",
+      "text": "Espero que no.",
+      "emotion": "fear",
+      "pauseAfter": 0.3
+    }
+  ],
+  "sound": [
+    {
+      "id": "ambiente",
+      "kind": "ambience",
+      "sound": "room-tone",
+      "at": 0,
+      "gainDb": -29,
+      "fadeIn": 0.3,
+      "fadeOut": 0.3
+    },
+    {
+      "id": "balada",
+      "kind": "music",
+      "sound": "pasion-vol3",
+      "with": "pasion",
+      "durationSec": 11,
+      "gainDb": -15,
+      "fadeIn": 0.3,
+      "fadeOut": 1.5,
+      "duck": true
+    },
+    {
+      "id": "ding",
+      "kind": "sfx",
+      "sound": "robot-beep",
+      "with": "timbre",
+      "gainDb": -8
+    },
+    {
+      "id": "tension",
+      "kind": "music",
+      "sound": "sirena-alarma",
+      "with": "timbre",
+      "offset": 0.6,
+      "durationSec": 2.6,
+      "gainDb": -11,
+      "duck": false
+    }
+  ]
+}

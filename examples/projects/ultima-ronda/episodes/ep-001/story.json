@@ -4,42 +4,42 @@
   "facts": [
     {
       "id": "lista-servilleta",
-      "text": "Dani apuntó en una servilleta su plan para invitar a Vera a cenar.",
+      "text": "Dani apuntó en una servilleta su plan para invitar a Susana a cenar.",
       "since": "ep-001"
     },
     {
       "id": "poco-hielo",
-      "text": "Vera le ponía poco hielo a Dani para que se quedara más rato.",
+      "text": "Susana le ponía poco hielo a Dani para que se quedara más rato.",
       "since": "ep-001"
     },
     {
       "id": "coctel-punto-dos",
-      "text": "El cóctel nuevo de Vera se llama «Punto dos».",
+      "text": "El cóctel nuevo de Susana se llama «Punto dos».",
       "since": "ep-001"
     },
     {
       "id": "primera-cita",
-      "text": "Dani invitó a Vera a cenar y ella aceptó.",
+      "text": "Dani invitó a Susana a cenar y ella aceptó.",
       "since": "ep-001"
     }
   ],
   "knowledge": [],
   "relationships": [
     {
-      "a": "vera",
+      "a": "susana",
       "b": "dani",
       "trustDelta": 0.15,
       "note": "Dani se atreve a pedirle una cita."
     },
     {
       "a": "dani",
-      "b": "vera",
+      "b": "susana",
       "trustDelta": 0.15,
-      "note": "Vera le confiesa que también le esperaba."
+      "note": "Susana le confiesa que también le esperaba."
     }
   ],
   "emotionalStates": {
-    "vera": "ilusionada y divertida",
+    "susana": "ilusionada y divertida",
     "dani": "eufórico"
   },
   "events": [
@@ -50,12 +50,12 @@
     },
     {
       "id": "apagon",
-      "text": "Se va la luz mientras Vera le pide el punto dos.",
+      "text": "Se va la luz mientras Susana le pide el punto dos.",
       "scene": "sc-002"
     },
     {
       "id": "cita",
-      "text": "Dani invita a Vera a cenar; el cóctel se llama «Punto dos».",
+      "text": "Dani invita a Susana a cenar; el cóctel se llama «Punto dos».",
       "scene": "sc-003"
     }
   ]

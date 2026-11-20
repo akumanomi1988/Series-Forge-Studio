@@ -1,0 +1,50 @@
+{
+  "schemaVersion": 2,
+  "id": "ep-002",
+  "type": "episode",
+  "name": "Tormenta salvaje",
+  "number": 2,
+  "scenes": [
+    "sc-001",
+    "sc-002",
+    "sc-003",
+    "sc-004",
+    "sc-005",
+    "sc-006",
+    "sc-007",
+    "sc-008"
+  ],
+  "targetDurationSec": 960,
+  "score": {
+    "theme": {
+      "music": "sirena-tema",
+      "gainDb": -12,
+      "durationSec": 9,
+      "fadeOut": 3
+    },
+    "underscore": {
+      "music": "sirena-cama",
+      "gainDb": -22
+    },
+    "bumpers": {
+      "music": "sirena-cortinilla",
+      "gainDb": -12,
+      "durationSec": 4.2,
+      "leadSec": 0.35
+    },
+    "ending": {
+      "music": "sirena-tema",
+      "gainDb": -12,
+      "durationSec": 8,
+      "fadeOut": 2.5
+    }
+  },
+  "render": {
+    "width": 1920,
+    "height": 1080,
+    "fps": 24,
+    "sampleRate": 48000,
+    "loudnessLufs": -16
+  },
+  "status": "draft"
+}

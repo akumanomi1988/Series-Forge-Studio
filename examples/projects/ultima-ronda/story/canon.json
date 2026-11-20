@@ -3,7 +3,7 @@
   "facts": [
     {
       "id": "sirena",
-      "text": "Vera Montero es la dueña del bar de cócteles Sirena, que cierra a las dos.",
+      "text": "Susana Montero es la dueña del bar de cócteles Sirena, que cierra a las dos.",
       "since": "canon",
       "status": "canon",
       "amended": []
@@ -24,7 +24,7 @@
     }
   ],
   "characters": {
-    "vera": {
+    "susana": {
       "knows": [
         "sirena",
         "reforma",
@@ -44,14 +44,14 @@
       ],
       "emotionalState": "nervioso",
       "goals": [
-        "Invitar a Vera a cenar"
+        "Invitar a Susana a cenar"
       ],
       "arc": []
     }
   },
   "relationships": [
     {
-      "a": "vera",
+      "a": "susana",
       "b": "dani",
       "type": "clienta y cliente que se gustan",
       "trust": 0.55,
@@ -59,7 +59,7 @@
     },
     {
       "a": "dani",
-      "b": "vera",
+      "b": "susana",
       "type": "cliente enamorado",
       "trust": 0.6,
       "history": []

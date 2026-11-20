@@ -14,14 +14,14 @@ import { execFileSync } from 'node:child_process';
 
 const base = VoiceSchema.parse({
   schemaVersion: 2, provider: 'kokoro', voice: 'ef_dora', rate: 1, license: { id: 'Apache-2.0', commercialUse: 'allowed' },
-  alternatives: { voicebox: { voice: 'Vera', engine: 'qwen', instruct: 'sultry, low and warm' }, 'windows-onecore': { voice: 'Microsoft Laura', rate: 1.04 } },
+  alternatives: { voicebox: { voice: 'Susana', engine: 'qwen', instruct: 'sultry, low and warm' }, 'windows-onecore': { voice: 'Microsoft Laura', rate: 1.04 } },
   emotions: { smirk: { voice: 'ef_dora:0.8+af_bella:0.2', rate: 0.94, instruct: 'teasing, half-smiling' } }
 });
 
 test('voices: alternatives switch engine, unknown ones keep the main voice', () => {
   assert.equal(resolveVoice(base, 'auto').provider, 'kokoro');
   const vb = resolveVoice(base, 'voicebox');
-  assert.equal(vb.provider, 'voicebox'); assert.equal(vb.voice, 'Vera'); assert.equal(vb.engine, 'qwen');
+  assert.equal(vb.provider, 'voicebox'); assert.equal(vb.voice, 'Susana'); assert.equal(vb.engine, 'qwen');
   assert.equal(resolveVoice(base, 'windows-onecore').rate, 1.04);
   assert.equal(resolveVoice(base, 'piper').provider, 'kokoro');
 });
@@ -47,7 +47,7 @@ test('voicebox: only loopback, profile by name, instruct sent, WAV stored', asyn
   let got: Record<string, unknown> = {};
   const srv = createServer(async (req, res) => {
     const chunks: Buffer[] = []; for await (const c of req) chunks.push(c as Buffer);
-    if (req.url === '/profiles') { res.end(JSON.stringify([{ id: 'p-77', name: 'Vera' }])); return; }
+    if (req.url === '/profiles') { res.end(JSON.stringify([{ id: 'p-77', name: 'Susana' }])); return; }
     if (req.url === '/generate/stream' && req.method === 'POST') { got = JSON.parse(Buffer.concat(chunks).toString()); res.writeHead(200, { 'content-type': 'audio/wav' }).end(wavBytes); return; }
     res.writeHead(404).end();
   });
@@ -55,7 +55,7 @@ test('voicebox: only loopback, profile by name, instruct sent, WAV stored', asyn
   process.env.SERIES_FORGE_VOICEBOX_URL = `http://127.0.0.1:${(srv.address() as { port: number }).port}`;
   try {
     const out = join(dir, 'out.wav');
-    await synthVoicebox('Hola [pausa 0.5] guapo.', { voice: 'vera', language: 'es-ES', engine: 'qwen', instruct: 'teasing' }, out);
+    await synthVoicebox('Hola [pausa 0.5] guapo.', { voice: 'susana', language: 'es-ES', engine: 'qwen', instruct: 'teasing' }, out);
     assert.deepEqual(got, { profile_id: 'p-77', text: 'Hola … guapo.', language: 'es', normalize: true, engine: 'qwen', instruct: 'teasing' });
     assert.equal((await readWav(out)).sampleRate, 24000);
   } finally { srv.close(); delete process.env.SERIES_FORGE_VOICEBOX_URL; await rm(dir, { recursive: true, force: true }); }

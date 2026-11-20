@@ -1,0 +1,51 @@
+{
+  "schemaVersion": 2,
+  "provider": "kokoro",
+  "voice": "ef_dora:0.65+af_sarah:0.35",
+  "language": "es-ES",
+  "rate": 1.06,
+  "pitchSemitones": 1.2,
+  "formantPreserve": true,
+  "gainDb": 0,
+  "eq": {
+    "lowDb": 0,
+    "midDb": 1,
+    "highDb": 0
+  },
+  "emotionProsody": true,
+  "instruct": "Sharp, quick, sarcastic female voice, a little raspy",
+  "alternatives": {
+    "voicebox": {
+      "voice": "Marga",
+      "engine": "qwen",
+      "license": {
+        "id": "depende-del-motor",
+        "commercialUse": "unknown",
+        "notes": "Voicebox (MIT): la licencia depende del motor y de la muestra de voz. Usa solo muestras propias o con permiso."
+      }
+    },
+    "windows-onecore": {
+      "voice": "Microsoft Helena",
+      "rate": 1.05,
+      "license": {
+        "id": "windows-onecore-voices",
+        "commercialUse": "unknown",
+        "notes": "Voz del sistema Windows: revisar términos antes de uso comercial."
+      }
+    }
+  },
+  "emotions": {
+    "angry": {
+      "rate": 1.1,
+      "gainDb": 1
+    },
+    "smirk": {
+      "rate": 1
+    }
+  },
+  "license": {
+    "id": "Apache-2.0",
+    "commercialUse": "allowed",
+    "notes": "Kokoro-82M (hexgrad/Kokoro-82M, Apache-2.0) vía kokoro-onnx (MIT). Mezcla de estilos de voz incluida en el modelo."
+  }
+}

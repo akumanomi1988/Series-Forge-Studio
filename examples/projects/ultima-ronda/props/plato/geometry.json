@@ -1,0 +1,39 @@
+{
+  "schemaVersion": 2,
+  "generator": "parts",
+  "material": "glass",
+  "restHeight": 0,
+  "parts": [
+    {
+      "id": "plato",
+      "primitive": "cylinder",
+      "size": [
+        0.13,
+        0.015,
+        0.13
+      ],
+      "position": [
+        0,
+        0.008,
+        0
+      ],
+      "color": "#f4f1ea"
+    },
+    {
+      "id": "comida",
+      "primitive": "cylinder",
+      "size": [
+        0.07,
+        0.02,
+        0.07
+      ],
+      "position": [
+        0,
+        0.02,
+        0
+      ],
+      "color": "#3a2a1a",
+      "outline": false
+    }
+  ]
+}

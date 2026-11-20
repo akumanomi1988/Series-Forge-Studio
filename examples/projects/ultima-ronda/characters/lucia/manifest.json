@@ -1,0 +1,13 @@
+{
+  "schemaVersion": 2,
+  "id": "lucia",
+  "type": "character",
+  "name": "Lucía Vidal",
+  "rigType": "humanoid",
+  "age": 31,
+  "tags": [
+    "secundaria",
+    "influencer",
+    "ex de Dani"
+  ]
+}

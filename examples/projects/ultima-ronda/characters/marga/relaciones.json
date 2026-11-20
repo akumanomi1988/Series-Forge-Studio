@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 2,
+  "relations": [
+    {
+      "characterId": "susana",
+      "type": "mejor amiga y compañera",
+      "feeling": "protectora",
+      "trust": 0.85,
+      "history": [
+        "Trabaja en el Sirena desde el primer día."
+      ]
+    },
+    {
+      "characterId": "oscar",
+      "type": "exmarido",
+      "feeling": "rencor con nostalgia",
+      "trust": 0.2,
+      "history": [
+        "Estuvieron casados cinco años."
+      ]
+    }
+  ]
+}

@@ -34,14 +34,14 @@ async function request(req,res){
     if(store.snapshot().characters.length||store.snapshot().scenes.length)return json(res,409,{error:'El ejemplo solo se añade sobre una biblioteca vacía'});
     const series=await store.create('series',{name:'Archivo Boreal',prompt:'Una inventora y un robot intentan reparar una estación orbital averiada.'});
     const env=await store.create('environments',{name:'Laboratorio orbital',prompt:'crea un laboratorio nocturno azul'});
-    const lead=await store.create('characters',{name:'Vera',prompt:'crea una mujer de pelo largo con chaqueta roja y gafas, feliz'});
+    const lead=await store.create('characters',{name:'Susana',prompt:'crea una mujer de pelo largo con chaqueta roja y gafas, feliz'});
     const robot=await store.create('characters',{name:'Nox',prompt:'crea un robot con ojos azules y camisa verde'});
     const key=await store.create('objects',{name:'Llave de servicio',prompt:'crea una llave dorada'});
     const scene=await store.create('scenes',{name:'La última llave',environmentId:env.id,seriesId:series.id});
     await store.placeActor(scene.id,lead.id,{x:270,y:467});await store.placeActor(scene.id,robot.id,{x:675,y:467});await store.placeObject(scene.id,key.id,{x:492,y:467});
     await store.addDialogue(scene.id,lead.id,'Nox, sin esa llave no podremos salir.');
     await store.relationship(lead.id,robot.id,'compañero de aventuras','confianza');
-    await store.addEvent({characterId:lead.id,seriesId:series.id,summary:'Vera encontró la llave de servicio en la estación.',emotion:'feliz'});
+    await store.addEvent({characterId:lead.id,seriesId:series.id,summary:'Susana encontró la llave de servicio en la estación.',emotion:'feliz'});
     return json(res,201,{ok:true,sceneId:scene.id});
    }
    return json(res,404,{error:'Endpoint no encontrado'});

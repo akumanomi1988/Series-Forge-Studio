@@ -16,7 +16,7 @@
   "instruct": "Warm, low, slightly husky female voice; confident, amused and teasing",
   "alternatives": {
     "voicebox": {
-      "voice": "Vera",
+      "voice": "Susana",
       "engine": "qwen",
       "instruct": "Warm, low, slightly husky female voice; confident, amused and teasing",
       "license": {

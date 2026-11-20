@@ -1,0 +1,80 @@
+{
+  "schemaVersion": 2,
+  "generator": "parts",
+  "material": "glass",
+  "restHeight": 0,
+  "parts": [
+    {
+      "id": "caliz",
+      "primitive": "sphere",
+      "size": [
+        0.04,
+        0.05,
+        0.04
+      ],
+      "position": [
+        0,
+        0.15,
+        0
+      ],
+      "color": "#f2e6ee"
+    },
+    {
+      "id": "vino",
+      "primitive": "sphere",
+      "size": [
+        0.034,
+        0.025,
+        0.034
+      ],
+      "position": [
+        0,
+        0.135,
+        0
+      ],
+      "color": "#7a1022",
+      "outline": false
+    },
+    {
+      "id": "tallo",
+      "primitive": "cylinder",
+      "size": [
+        0.005,
+        0.1,
+        0.005
+      ],
+      "position": [
+        0,
+        0.05,
+        0
+      ],
+      "color": "#f2e6ee",
+      "outline": false
+    },
+    {
+      "id": "pie",
+      "primitive": "cylinder",
+      "size": [
+        0.03,
+        0.006,
+        0.03
+      ],
+      "position": [
+        0,
+        0.003,
+        0
+      ],
+      "color": "#f2e6ee",
+      "outline": false
+    }
+  ],
+  "anchors": {
+    "grip": {
+      "position": [
+        0,
+        0.06,
+        0
+      ]
+    }
+  }
+}

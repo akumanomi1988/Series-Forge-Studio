@@ -1,0 +1,91 @@
+{
+  "schemaVersion": 1,
+  "status": "draft",
+  "facts": [
+    {
+      "id": "risotto-abuela",
+      "text": "El risotto de la abuela de Dani nunca le salió bien a nadie.",
+      "since": "ep-002"
+    },
+    {
+      "id": "lucia-vuelve",
+      "text": "Lucía, la ex de Dani, ha vuelto a la ciudad para abrir una tienda.",
+      "since": "ep-002"
+    },
+    {
+      "id": "oscar-marga",
+      "text": "Óscar, el mejor amigo de Dani, es el exmarido de Marga.",
+      "since": "ep-002"
+    },
+    {
+      "id": "tormenta-salvaje",
+      "text": "La colonia Tormenta salvaje de Óscar se la regaló Marga.",
+      "since": "ep-002"
+    },
+    {
+      "id": "punto-tres",
+      "text": "Susana escribió el punto tres de la lista de Dani: «Repetir».",
+      "since": "ep-002"
+    }
+  ],
+  "knowledge": [],
+  "relationships": [
+    {
+      "a": "susana",
+      "b": "dani",
+      "trustDelta": 0.15,
+      "note": "Dani elige a Susana delante de su ex."
+    },
+    {
+      "a": "dani",
+      "b": "susana",
+      "trustDelta": 0.1,
+      "note": "A Susana le gusta «el de la lámpara»."
+    },
+    {
+      "a": "marga",
+      "b": "oscar",
+      "trustDelta": 0.1,
+      "note": "Óscar vuelve con la colonia vacía."
+    }
+  ],
+  "emotionalStates": {
+    "susana": "enamorándose",
+    "dani": "aliviado y feliz",
+    "marga": "descolocada",
+    "oscar": "esperanzado",
+    "lucia": "ofendida"
+  },
+  "events": [
+    {
+      "id": "apuestas",
+      "text": "Marga y Susana apuestan sobre la cita.",
+      "scene": "sc-001"
+    },
+    {
+      "id": "lucia-llega",
+      "text": "Lucía aparece en el Sirena buscando a Dani.",
+      "scene": "sc-003"
+    },
+    {
+      "id": "direccion",
+      "text": "Óscar le da a Lucía la dirección de Dani.",
+      "scene": "sc-004"
+    },
+    {
+      "id": "cita",
+      "text": "La cena: risotto quemado y Óscar escondido.",
+      "scene": "sc-005"
+    },
+    {
+      "id": "todos-los-ex",
+      "text": "Lucía, Óscar y Marga coinciden en el piso; Dani elige a Susana.",
+      "scene": "sc-006"
+    },
+    {
+      "id": "punto-tres",
+      "text": "Susana escribe «Repetir».",
+      "scene": "sc-007"
+    }
+  ]
+}

@@ -1,0 +1,48 @@
+{
+  "schemaVersion": 2,
+  "provider": "kokoro",
+  "voice": "em_alex",
+  "language": "es-ES",
+  "rate": 1.05,
+  "pitchSemitones": -0.6,
+  "formantPreserve": true,
+  "gainDb": 0.5,
+  "eq": {
+    "lowDb": 2,
+    "midDb": 0,
+    "highDb": 0
+  },
+  "emotionProsody": true,
+  "instruct": "Loud, confident, cheerful male voice, a bit of a show-off",
+  "alternatives": {
+    "voicebox": {
+      "voice": "Óscar",
+      "engine": "qwen",
+      "license": {
+        "id": "depende-del-motor",
+        "commercialUse": "unknown",
+        "notes": "Voicebox (MIT): la licencia depende del motor y de la muestra de voz. Usa solo muestras propias o con permiso."
+      }
+    },
+    "windows-onecore": {
+      "voice": "Microsoft Pablo",
+      "rate": 1.06,
+      "license": {
+        "id": "windows-onecore-voices",
+        "commercialUse": "unknown",
+        "notes": "Voz del sistema Windows: revisar términos antes de uso comercial."
+      }
+    }
+  },
+  "emotions": {
+    "fear": {
+      "rate": 1.12,
+      "pitchSemitones": 1.5
+    }
+  },
+  "license": {
+    "id": "Apache-2.0",
+    "commercialUse": "allowed",
+    "notes": "Kokoro-82M (hexgrad/Kokoro-82M, Apache-2.0) vía kokoro-onnx (MIT). Mezcla de estilos de voz incluida en el modelo."
+  }
+}

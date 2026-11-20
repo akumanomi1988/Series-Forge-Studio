@@ -1,0 +1,48 @@
+{
+  "schemaVersion": 2,
+  "generator": "parts",
+  "material": "cloth",
+  "restHeight": 0,
+  "parts": [
+    {
+      "id": "caja",
+      "primitive": "box",
+      "size": [
+        0.26,
+        0.12,
+        0.26
+      ],
+      "position": [
+        0,
+        0.06,
+        0
+      ],
+      "color": "#f2d7e4"
+    },
+    {
+      "id": "cinta",
+      "primitive": "box",
+      "size": [
+        0.27,
+        0.125,
+        0.03
+      ],
+      "position": [
+        0,
+        0.06,
+        0
+      ],
+      "color": "#c4122e",
+      "outline": false
+    }
+  ],
+  "anchors": {
+    "grip": {
+      "position": [
+        0,
+        0.06,
+        0
+      ]
+    }
+  }
+}

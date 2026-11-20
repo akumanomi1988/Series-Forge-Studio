@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 2,
+  "relations": [
+    {
+      "characterId": "dani",
+      "type": "mejor amigo",
+      "feeling": "lealtad absoluta",
+      "trust": 0.9,
+      "history": [
+        "Amigos desde el instituto."
+      ]
+    },
+    {
+      "characterId": "marga",
+      "type": "exmujer",
+      "feeling": "la sigue queriendo",
+      "trust": 0.3,
+      "history": [
+        "Cinco años casados."
+      ]
+    }
+  ]
+}

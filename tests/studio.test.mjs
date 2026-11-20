@@ -24,7 +24,7 @@ test('creación de personaje procedural y modificación por chat sin perder ID',
 
 test('entornos, objetos, escena y diálogo generan SVG sin depender de imágenes externas',async()=>{
  const store=await makeStore();
- const c=await store.create('characters',{prompt:'crea una mujer llamada Vera'});
+ const c=await store.create('characters',{prompt:'crea una mujer llamada Susana'});
  const o=await store.create('objects',{prompt:'crea una llave dorada'});
  const e=await store.create('environments',{prompt:'crea un laboratorio nocturno'});
  const scene=await store.create('scenes',{name:'Prueba',environmentId:e.id});

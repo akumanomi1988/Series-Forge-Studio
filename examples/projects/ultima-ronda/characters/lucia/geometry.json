@@ -1,0 +1,79 @@
+{
+  "schemaVersion": 2,
+  "generator": "humanoid-toon",
+  "body": {
+    "height": 1.75,
+    "headScale": 0.95,
+    "headWidth": 0.9,
+    "jaw": 0.2,
+    "shoulderWidth": 0.36,
+    "hipWidth": 0.34,
+    "torsoScale": 0.98,
+    "legScale": 1.1,
+    "armScale": 1,
+    "armThickness": 0.042,
+    "legThickness": 0.066,
+    "chestDepth": 0.22,
+    "belly": 0,
+    "chest": 0.5,
+    "neckLength": 0.09,
+    "handSize": 0.88,
+    "footSize": 0.86,
+    "skinColor": "#e6b48f",
+    "skinGloss": 0.55
+  },
+  "face": {
+    "eyeSize": 1.15,
+    "eyeSpacing": 0.98,
+    "eyeHeight": 0.05,
+    "irisColor": "#3d6fa8",
+    "eyeShape": "almond",
+    "browThickness": 0.75,
+    "browColor": "#8a6a3a",
+    "noseShape": "button",
+    "noseSize": 0.75,
+    "mouthWidth": 1,
+    "lipColor": "#d4507a",
+    "earSize": 0.8,
+    "freckles": false,
+    "blush": 0.4
+  },
+  "hair": {
+    "style": "ponytail",
+    "color": "#e2bd72",
+    "volume": 1.2,
+    "shine": 0.85
+  },
+  "beard": {
+    "style": "none"
+  },
+  "outfit": {
+    "top": {
+      "type": "dress",
+      "color": "#14141c",
+      "neckline": "off-shoulder",
+      "fabric": "sequin"
+    },
+    "bottom": {
+      "type": "skirt",
+      "color": "#14141c",
+      "fabric": "sequin"
+    },
+    "shoes": {
+      "type": "shoes",
+      "color": "#c9a24a"
+    }
+  },
+  "accessories": [
+    {
+      "type": "earrings",
+      "color": "#e8c25a"
+    },
+    {
+      "type": "glasses",
+      "color": "#2a1a14"
+    }
+  ],
+  "parts": [],
+  "outlineWidth": 0.01
+}

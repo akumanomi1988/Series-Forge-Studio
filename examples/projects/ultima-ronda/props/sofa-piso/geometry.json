@@ -1,0 +1,8 @@
+{
+  "schemaVersion": 2,
+  "generator": "sofa",
+  "params": {
+    "color": "#6b7f5a"
+  },
+  "material": "cloth"
+}

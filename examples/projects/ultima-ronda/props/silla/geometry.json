@@ -1,0 +1,9 @@
+{
+  "schemaVersion": 2,
+  "generator": "chair",
+  "params": {
+    "color": "#2e4a5e",
+    "seatHeight": 0.47
+  },
+  "material": "wood"
+}

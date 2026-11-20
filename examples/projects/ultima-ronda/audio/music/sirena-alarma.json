@@ -1,0 +1,29 @@
+{
+  "schemaVersion": 2,
+  "id": "sirena-alarma",
+  "kind": "music",
+  "generator": "procedural",
+  "license": {
+    "id": "procedural-original",
+    "source": "Series Forge procedural composer",
+    "commercialUse": "allowed"
+  },
+  "style": "sitcom",
+  "form": "sting",
+  "tempo": 132,
+  "key": "C",
+  "mode": "minor",
+  "progression": [
+    "iv",
+    "V"
+  ],
+  "instruments": [
+    "keys",
+    "bass",
+    "drums",
+    "strings"
+  ],
+  "seed": 13,
+  "durationSec": 2.6,
+  "mood": "cortinilla de tensión: llega la ex"
+}

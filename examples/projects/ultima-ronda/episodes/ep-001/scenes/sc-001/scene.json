@@ -2,7 +2,7 @@
   "schemaVersion": 2,
   "id": "sc-001",
   "name": "Las doce menos cinco",
-  "synopsis": "Vera espera a Dani; el cóctel sin nombre; la lista secreta.",
+  "synopsis": "Susana espera a Dani; el cóctel sin nombre; la lista secreta.",
   "environmentId": "sirena",
   "durationSec": "auto",
   "tailSec": 0.6,
@@ -11,8 +11,8 @@
   "coverage": "auto",
   "actors": [
     {
-      "id": "vera",
-      "characterId": "vera",
+      "id": "susana",
+      "characterId": "susana",
       "position": [
         -1.78,
         0,
@@ -40,7 +40,7 @@
       "id": "coctelera",
       "propId": "coctelera",
       "heldBy": {
-        "actor": "vera",
+        "actor": "susana",
         "hand": "right"
       }
     },
@@ -98,7 +98,7 @@
         "type": "fade",
         "durationSec": 0.8
       },
-      "notes": "Vera agita la coctelera mirando el reloj."
+      "notes": "Susana agita la coctelera mirando el reloj."
     },
     {
       "id": "i-puerta",
@@ -168,7 +168,7 @@
     {
       "id": "agita-1",
       "type": "hold",
-      "actor": "vera",
+      "actor": "susana",
       "at": 0.3,
       "hand": "right",
       "pose": "raised",
@@ -177,7 +177,7 @@
     {
       "id": "agita-2",
       "type": "hold",
-      "actor": "vera",
+      "actor": "susana",
       "after": "agita-1",
       "hand": "right",
       "pose": "front",
@@ -186,7 +186,7 @@
     {
       "id": "agita-3",
       "type": "hold",
-      "actor": "vera",
+      "actor": "susana",
       "after": "agita-2",
       "hand": "right",
       "pose": "raised",
@@ -195,7 +195,7 @@
     {
       "id": "agita-4",
       "type": "hold",
-      "actor": "vera",
+      "actor": "susana",
       "after": "agita-3",
       "hand": "right",
       "pose": "front",
@@ -204,7 +204,7 @@
     {
       "id": "agita-5",
       "type": "hold",
-      "actor": "vera",
+      "actor": "susana",
       "after": "agita-4",
       "hand": "right",
       "pose": "raised",
@@ -213,7 +213,7 @@
     {
       "id": "agita-6",
       "type": "hold",
-      "actor": "vera",
+      "actor": "susana",
       "after": "agita-5",
       "hand": "right",
       "pose": "front",
@@ -222,7 +222,7 @@
     {
       "id": "mira-reloj",
       "type": "lookAt",
-      "actor": "vera",
+      "actor": "susana",
       "at": 0.2,
       "target": [
         -0.4,
@@ -253,7 +253,7 @@
         0,
         0.35
       ],
-      "faceTo": "vera"
+      "faceTo": "susana"
     },
     {
       "id": "puerta-cierra",
@@ -267,9 +267,9 @@
       "sound": "click"
     },
     {
-      "id": "vera-mira-dani",
+      "id": "susana-mira-dani",
       "type": "lookAt",
-      "actor": "vera",
+      "actor": "susana",
       "with": "puerta-abre",
       "offset": 0.4,
       "target": "dani",
@@ -286,7 +286,7 @@
     {
       "id": "deja-coctelera",
       "type": "place",
-      "actor": "vera",
+      "actor": "susana",
       "with": "v6",
       "offset": 0.3,
       "prop": "coctelera",
@@ -300,7 +300,7 @@
     {
       "id": "coge-copa",
       "type": "pickUp",
-      "actor": "vera",
+      "actor": "susana",
       "after": "deja-coctelera",
       "prop": "copa",
       "hand": "right",
@@ -309,7 +309,7 @@
     {
       "id": "v-copa",
       "type": "place",
-      "actor": "vera",
+      "actor": "susana",
       "after": "coge-copa",
       "prop": "copa",
       "on": {
@@ -319,9 +319,9 @@
       "durationSec": 1.1
     },
     {
-      "id": "vera-se-gira",
+      "id": "susana-se-gira",
       "type": "turn",
-      "actor": "vera",
+      "actor": "susana",
       "after": "v8",
       "offset": 0.2,
       "yawDeg": -90,
@@ -331,7 +331,7 @@
       "id": "dani-saca-lista",
       "type": "hold",
       "actor": "dani",
-      "with": "vera-se-gira",
+      "with": "susana-se-gira",
       "offset": 0.3,
       "hand": "left",
       "pose": "show",
@@ -368,7 +368,7 @@
   "dialogue": [
     {
       "id": "v1",
-      "actor": "vera",
+      "actor": "susana",
       "text": "Las doce menos seis. Si llega puntual, me debo diez euros a mí misma.",
       "emotion": "smirk",
       "at": 1.6,
@@ -376,7 +376,7 @@
     },
     {
       "id": "v2",
-      "actor": "vera",
+      "actor": "susana",
       "text": "Doce menos cinco. Pago yo.",
       "emotion": "smile",
       "to": "dani",
@@ -388,11 +388,11 @@
       "actor": "dani",
       "text": "¿Perdón?",
       "emotion": "surprise",
-      "to": "vera"
+      "to": "susana"
     },
     {
       "id": "v3",
-      "actor": "vera",
+      "actor": "susana",
       "text": "Nada, hablaba con la coctelera. ¿Vienes otra vez a revisar la iluminación?",
       "emotion": "smirk",
       "to": "dani"
@@ -402,11 +402,11 @@
       "actor": "dani",
       "text": "Sí. Bueno... con la reforma, la luz cálida a estas horas hay que vigilarla.",
       "emotion": "nervous",
-      "to": "vera"
+      "to": "susana"
     },
     {
       "id": "v4",
-      "actor": "vera",
+      "actor": "susana",
       "text": "Y la vigilas muy de cerca. Siempre desde el mismo taburete.",
       "emotion": "smirk",
       "to": "dani",
@@ -418,11 +418,11 @@
       "actor": "dani",
       "text": "Es el que tiene mejor ángulo.",
       "emotion": "smile",
-      "to": "vera"
+      "to": "susana"
     },
     {
       "id": "v5",
-      "actor": "vera",
+      "actor": "susana",
       "text": "¿De la lámpara... o de la camarera?",
       "emotion": "smirk",
       "to": "dani",
@@ -433,12 +433,12 @@
       "actor": "dani",
       "text": "De la... de la lámpara. Clarísimamente de la lámpara.",
       "emotion": "nervous",
-      "to": "vera",
+      "to": "susana",
       "intensity": 1.2
     },
     {
       "id": "v6",
-      "actor": "vera",
+      "actor": "susana",
       "text": "Cóctel nuevo. Todavía no tiene nombre.",
       "emotion": "joy",
       "to": "dani",
@@ -450,13 +450,13 @@
       "actor": "dani",
       "text": "¿Por qué no?",
       "emotion": "thinking",
-      "to": "vera",
+      "to": "susana",
       "after": "v-copa",
       "offset": -0.3
     },
     {
       "id": "v8",
-      "actor": "vera",
+      "actor": "susana",
       "text": "Porque le falta algo. Ya lo descubrirás.",
       "emotion": "smirk",
       "to": "dani"

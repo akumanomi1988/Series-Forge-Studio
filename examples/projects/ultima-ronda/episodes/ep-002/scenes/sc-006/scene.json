@@ -1,0 +1,956 @@
+{
+  "schemaVersion": 2,
+  "id": "sc-006",
+  "name": "Todos los ex",
+  "synopsis": "Lucía irrumpe con champán; Óscar sale del dormitorio; Marga llega con la tarta y descubre a su exmarido; Dani elige.",
+  "environmentId": "piso-dani",
+  "durationSec": "auto",
+  "tailSec": 0.6,
+  "autoLook": true,
+  "autoActing": 1,
+  "coverage": "auto",
+  "continuous": true,
+  "actors": [
+    {
+      "id": "dani",
+      "characterId": "dani",
+      "position": [
+        0.3,
+        0,
+        0.2
+      ],
+      "yawDeg": 90,
+      "expression": "fear",
+      "idle": "idle"
+    },
+    {
+      "id": "susana",
+      "characterId": "susana",
+      "position": [
+        1.7,
+        0,
+        0.2
+      ],
+      "yawDeg": -90,
+      "expression": "smirk",
+      "idle": "idle-relaxed"
+    },
+    {
+      "id": "lucia",
+      "characterId": "lucia",
+      "position": [
+        4.6,
+        0,
+        1.2
+      ],
+      "yawDeg": -90,
+      "expression": "joy",
+      "idle": "idle-relaxed"
+    },
+    {
+      "id": "oscar",
+      "characterId": "oscar",
+      "position": [
+        -4.6,
+        0,
+        0.6
+      ],
+      "yawDeg": 90,
+      "expression": "worried",
+      "idle": "idle-relaxed"
+    },
+    {
+      "id": "marga",
+      "characterId": "marga",
+      "position": [
+        5.4,
+        0,
+        1.2
+      ],
+      "yawDeg": -90,
+      "expression": "joy",
+      "idle": "idle"
+    }
+  ],
+  "props": [
+    {
+      "id": "olla",
+      "propId": "olla",
+      "position": [
+        -2.25,
+        0.91,
+        -1.6
+      ]
+    },
+    {
+      "id": "plato-1",
+      "propId": "plato",
+      "position": [
+        0.62,
+        0.76,
+        0.2
+      ]
+    },
+    {
+      "id": "plato-2",
+      "propId": "plato",
+      "position": [
+        1.38,
+        0.76,
+        0.2
+      ]
+    },
+    {
+      "id": "copa-1",
+      "propId": "copa-vino",
+      "position": [
+        0.7,
+        0.76,
+        0.48
+      ]
+    },
+    {
+      "id": "copa-2",
+      "propId": "copa-vino",
+      "heldBy": {
+        "actor": "susana",
+        "hand": "right"
+      }
+    },
+    {
+      "id": "botella",
+      "propId": "botella-vino",
+      "position": [
+        1,
+        0.76,
+        -0.12
+      ]
+    },
+    {
+      "id": "vela-mesa",
+      "propId": "vela",
+      "position": [
+        1,
+        0.76,
+        0.32
+      ]
+    },
+    {
+      "id": "tarta",
+      "propId": "caja-tarta",
+      "heldBy": {
+        "actor": "marga",
+        "hand": "right"
+      }
+    }
+  ],
+  "shots": [
+    {
+      "id": "i-puerta",
+      "with": "abre",
+      "offset": -0.1,
+      "durationSec": 2.8,
+      "camera": {
+        "type": "static",
+        "position": [
+          1,
+          1.6,
+          2.9
+        ],
+        "target": [
+          3.7,
+          1.25,
+          1.2
+        ],
+        "fov": 40
+      }
+    },
+    {
+      "id": "i-oscar",
+      "with": "oscar-sale",
+      "offset": 0.2,
+      "durationSec": 2.4,
+      "camera": {
+        "type": "static",
+        "position": [
+          -1.4,
+          1.55,
+          2.3
+        ],
+        "target": [
+          -3.7,
+          1.2,
+          0.6
+        ],
+        "fov": 40
+      }
+    },
+    {
+      "id": "i-marga",
+      "with": "marga-entra",
+      "offset": 0.6,
+      "durationSec": 2.2,
+      "camera": {
+        "type": "static",
+        "position": [
+          1,
+          1.6,
+          2.9
+        ],
+        "target": [
+          3.7,
+          1.25,
+          1.2
+        ],
+        "fov": 40
+      }
+    },
+    {
+      "id": "i-grupo",
+      "with": "l8",
+      "offset": -0.2,
+      "durationSec": 3.4,
+      "camera": {
+        "type": "static",
+        "position": [
+          0.9,
+          1.75,
+          4.2
+        ],
+        "target": [
+          1.2,
+          1.15,
+          0.6
+        ],
+        "fov": 44,
+        "move": {
+          "type": "push-in",
+          "amount": 0.2
+        }
+      },
+      "notes": "Todos miran a Dani."
+    },
+    {
+      "id": "i-salen",
+      "with": "salen-lucia",
+      "offset": 0.4,
+      "durationSec": 2.6,
+      "camera": {
+        "type": "static",
+        "position": [
+          0.2,
+          1.95,
+          5
+        ],
+        "target": [
+          -0.2,
+          1.05,
+          -0.6
+        ],
+        "fov": 46
+      }
+    },
+    {
+      "id": "i-salen-2",
+      "with": "oscar-tras",
+      "offset": 0.1,
+      "durationSec": 4.5,
+      "camera": {
+        "type": "static",
+        "position": [
+          0.9,
+          1.75,
+          4.2
+        ],
+        "target": [
+          1.2,
+          1.15,
+          0.6
+        ],
+        "fov": 44
+      },
+      "notes": "Óscar y Marga se van discutiendo."
+    }
+  ],
+  "actions": [
+    {
+      "id": "sentado-d",
+      "type": "sit",
+      "actor": "dani",
+      "at": 0,
+      "prop": "silla-1",
+      "durationSec": 0.3
+    },
+    {
+      "id": "sentada-s",
+      "type": "sit",
+      "actor": "susana",
+      "at": 0,
+      "prop": "silla-2",
+      "durationSec": 0.3
+    },
+    {
+      "id": "dani-se-levanta",
+      "type": "stand",
+      "actor": "dani",
+      "at": 0.4,
+      "durationSec": 0.9
+    },
+    {
+      "id": "dani-a-puerta",
+      "type": "walk",
+      "actor": "dani",
+      "after": "dani-se-levanta",
+      "to": [
+        2.9,
+        0,
+        1.05
+      ],
+      "faceTo": "puerta"
+    },
+    {
+      "id": "susana-deja-copa",
+      "type": "place",
+      "actor": "susana",
+      "at": 0.6,
+      "prop": "copa-2",
+      "on": [
+        1.3,
+        0.76,
+        0.48
+      ],
+      "durationSec": 1
+    },
+    {
+      "id": "abre",
+      "type": "propJoint",
+      "prop": "puerta",
+      "joint": "leaf",
+      "after": "dani-a-puerta",
+      "offset": 0.1,
+      "toDeg": -95,
+      "durationSec": 0.8,
+      "sound": "door-creak"
+    },
+    {
+      "id": "lucia-entra",
+      "type": "walk",
+      "actor": "lucia",
+      "with": "abre",
+      "offset": 0.3,
+      "to": [
+        2.2,
+        0,
+        1.55
+      ],
+      "faceTo": "dani"
+    },
+    {
+      "id": "cierra-1",
+      "type": "propJoint",
+      "prop": "puerta",
+      "joint": "leaf",
+      "with": "lucia-entra",
+      "offset": 2,
+      "toDeg": 0,
+      "durationSec": 0.7,
+      "sound": "click"
+    },
+    {
+      "id": "dani-retrocede",
+      "type": "walk",
+      "actor": "dani",
+      "after": "l1",
+      "offset": -0.5,
+      "to": [
+        2,
+        0,
+        0.75
+      ],
+      "faceTo": "lucia"
+    },
+    {
+      "id": "susana-se-levanta",
+      "type": "stand",
+      "actor": "susana",
+      "with": "v1",
+      "offset": -0.3,
+      "durationSec": 0.9
+    },
+    {
+      "id": "susana-se-acerca",
+      "type": "walk",
+      "actor": "susana",
+      "after": "susana-se-levanta",
+      "to": [
+        1.25,
+        0,
+        0.95
+      ],
+      "faceTo": "lucia"
+    },
+    {
+      "id": "oscar-sale",
+      "type": "walk",
+      "actor": "oscar",
+      "after": "l5",
+      "offset": 0.2,
+      "to": [
+        -0.2,
+        0,
+        1.2
+      ],
+      "faceTo": "lucia"
+    },
+    {
+      "id": "abre-cuarto",
+      "type": "propJoint",
+      "prop": "puerta-cuarto",
+      "joint": "leaf",
+      "with": "oscar-sale",
+      "toDeg": 95,
+      "durationSec": 0.6,
+      "sound": "door-creak"
+    },
+    {
+      "id": "marga-entra",
+      "type": "walk",
+      "actor": "marga",
+      "after": "o2",
+      "offset": 0.1,
+      "to": [
+        3.15,
+        0,
+        0.55
+      ],
+      "faceTo": "susana"
+    },
+    {
+      "id": "abre-2",
+      "type": "propJoint",
+      "prop": "puerta",
+      "joint": "leaf",
+      "with": "marga-entra",
+      "offset": -0.3,
+      "toDeg": -95,
+      "durationSec": 0.6,
+      "sound": "door-creak"
+    },
+    {
+      "id": "cierra-2",
+      "type": "propJoint",
+      "prop": "puerta",
+      "joint": "leaf",
+      "with": "marga-entra",
+      "offset": 2.2,
+      "toDeg": 0,
+      "durationSec": 0.7,
+      "sound": "click"
+    },
+    {
+      "id": "marga-ve",
+      "type": "lookAt",
+      "actor": "marga",
+      "with": "m1",
+      "offset": 1.4,
+      "target": "oscar",
+      "durationSec": 3
+    },
+    {
+      "id": "marga-deja",
+      "type": "place",
+      "actor": "marga",
+      "after": "m3",
+      "offset": 0.1,
+      "prop": "tarta",
+      "on": [
+        1.55,
+        0.76,
+        -0.12
+      ],
+      "durationSec": 1
+    },
+    {
+      "id": "lucia-graba",
+      "type": "play",
+      "actor": "lucia",
+      "with": "l7",
+      "clip": "present",
+      "durationSec": 1.4
+    },
+    {
+      "id": "susana-no",
+      "type": "play",
+      "actor": "susana",
+      "with": "v5",
+      "clip": "dismiss",
+      "durationSec": 1.1
+    },
+    {
+      "id": "todos-dani-v",
+      "type": "lookAt",
+      "actor": "susana",
+      "with": "l8",
+      "offset": 1.5,
+      "target": "dani",
+      "durationSec": 3
+    },
+    {
+      "id": "todos-dani-m",
+      "type": "lookAt",
+      "actor": "marga",
+      "with": "l8",
+      "offset": 1.6,
+      "target": "dani",
+      "durationSec": 3
+    },
+    {
+      "id": "todos-dani-o",
+      "type": "lookAt",
+      "actor": "oscar",
+      "with": "l8",
+      "offset": 1.7,
+      "target": "dani",
+      "durationSec": 3
+    },
+    {
+      "id": "salen-lucia",
+      "type": "walk",
+      "actor": "lucia",
+      "after": "l10c",
+      "offset": 1.6,
+      "to": [
+        4.8,
+        0,
+        1.2
+      ]
+    },
+    {
+      "id": "abre-3",
+      "type": "propJoint",
+      "prop": "puerta",
+      "joint": "leaf",
+      "with": "salen-lucia",
+      "offset": 0.8,
+      "toDeg": -95,
+      "durationSec": 0.6,
+      "sound": "door-creak"
+    },
+    {
+      "id": "cierra-3",
+      "type": "propJoint",
+      "prop": "puerta",
+      "joint": "leaf",
+      "with": "salen-lucia",
+      "offset": 2.8,
+      "toDeg": 0,
+      "durationSec": 0.6,
+      "sound": "click"
+    },
+    {
+      "id": "abre-4",
+      "type": "propJoint",
+      "prop": "puerta",
+      "joint": "leaf",
+      "with": "oscar-tras",
+      "offset": 0.9,
+      "toDeg": -95,
+      "durationSec": 0.6,
+      "sound": "door-creak"
+    },
+    {
+      "id": "oscar-tras",
+      "type": "walk",
+      "actor": "oscar",
+      "after": "m7",
+      "offset": 0.1,
+      "to": [
+        4.9,
+        0,
+        1.5
+      ]
+    },
+    {
+      "id": "marga-tras",
+      "type": "walk",
+      "actor": "marga",
+      "after": "oscar-tras",
+      "offset": -1.6,
+      "to": [
+        5.3,
+        0,
+        1.2
+      ]
+    },
+    {
+      "id": "cierra",
+      "type": "propJoint",
+      "prop": "puerta",
+      "joint": "leaf",
+      "after": "marga-tras",
+      "offset": -0.2,
+      "toDeg": 0,
+      "durationSec": 0.8,
+      "sound": "click"
+    }
+  ],
+  "dialogue": [
+    {
+      "id": "d0",
+      "actor": "dani",
+      "to": "susana",
+      "text": "Será el vecino. El de verdad.",
+      "emotion": "nervous",
+      "at": 0.5
+    },
+    {
+      "id": "s0",
+      "actor": "susana",
+      "to": "dani",
+      "text": "¿El de las paredes finas? Dile que pase, que ya nos conocemos.",
+      "emotion": "smirk"
+    },
+    {
+      "id": "l1",
+      "actor": "lucia",
+      "to": "dani",
+      "text": "¡Dani! ¡Sorpresa! Pasaba por aquí con unos planos y una botella de champán.",
+      "emotion": "joy",
+      "with": "lucia-entra",
+      "offset": 0.9
+    },
+    {
+      "id": "d1",
+      "actor": "dani",
+      "to": "lucia",
+      "text": "Lucía. Estoy... cenando.",
+      "emotion": "fear"
+    },
+    {
+      "id": "l2",
+      "actor": "lucia",
+      "to": "susana",
+      "text": "Ah, hola. ¿Tú no eres la del bar?",
+      "emotion": "smirk"
+    },
+    {
+      "id": "v1",
+      "actor": "susana",
+      "to": "lucia",
+      "text": "Y tú la del yate.",
+      "emotion": "smirk",
+      "intensity": 1.3
+    },
+    {
+      "id": "l3",
+      "actor": "lucia",
+      "to": "dani",
+      "text": "¡Me encanta! Dani, cariño, he venido por trabajo. Mi tienda. Tú y yo. Como en los viejos tiempos.",
+      "emotion": "laugh"
+    },
+    {
+      "id": "d2",
+      "actor": "dani",
+      "to": "lucia",
+      "text": "En los viejos tiempos me dejaste por un DJ.",
+      "emotion": "sad"
+    },
+    {
+      "id": "l4",
+      "actor": "lucia",
+      "to": "dani",
+      "text": "Y he aprendido mucho. Por ejemplo, que la música electrónica no se baila agarrados.",
+      "emotion": "thinking"
+    },
+    {
+      "id": "v2",
+      "actor": "susana",
+      "to": "lucia",
+      "text": "Qué profundo.",
+      "emotion": "smirk"
+    },
+    {
+      "id": "l5",
+      "actor": "lucia",
+      "to": "susana",
+      "text": "Lo sé. Tengo medio millón de seguidores que lo confirman.",
+      "emotion": "smirk"
+    },
+    {
+      "id": "o1",
+      "actor": "oscar",
+      "text": "¡Achís! Vale, vale, me rindo. Hola a todos. Soy el vecino.",
+      "emotion": "nervous",
+      "with": "oscar-sale",
+      "offset": 0.4
+    },
+    {
+      "id": "v3",
+      "actor": "susana",
+      "to": "oscar",
+      "text": "El de las paredes finas.",
+      "emotion": "smirk"
+    },
+    {
+      "id": "l6",
+      "actor": "lucia",
+      "to": "oscar",
+      "text": "¡Óscar! ¡El de «hola, Lucía»!",
+      "emotion": "joy"
+    },
+    {
+      "id": "o2",
+      "actor": "oscar",
+      "to": "lucia",
+      "text": "Hola, Lucía. Hola, novia de Dani. Hola... risotto.",
+      "emotion": "nervous"
+    },
+    {
+      "id": "m1",
+      "actor": "marga",
+      "to": "susana",
+      "text": "¡Traigo la tarta y la testigo! ¿Llego tarde al desast...?",
+      "emotion": "joy",
+      "with": "marga-entra",
+      "offset": 1
+    },
+    {
+      "id": "m2",
+      "actor": "marga",
+      "to": "oscar",
+      "text": "¿Óscar?",
+      "emotion": "surprise",
+      "intensity": 1.4
+    },
+    {
+      "id": "o3",
+      "actor": "oscar",
+      "to": "marga",
+      "text": "¿Marga?",
+      "emotion": "fear",
+      "intensity": 1.3
+    },
+    {
+      "id": "v4",
+      "actor": "susana",
+      "to": "marga",
+      "text": "¿Os conocéis?",
+      "emotion": "surprise"
+    },
+    {
+      "id": "m3",
+      "actor": "marga",
+      "to": "susana",
+      "text": "Cinco años casados. Lo justo para saber que esa colonia se llama Tormenta salvaje y que se compra en una gasolinera.",
+      "emotion": "angry"
+    },
+    {
+      "id": "o4",
+      "actor": "oscar",
+      "to": "marga",
+      "text": "En una gasolinera muy buena.",
+      "emotion": "sad"
+    },
+    {
+      "id": "d3",
+      "actor": "dani",
+      "to": "oscar",
+      "text": "¿Tu exmujer es Marga? ¿La Marga de la uno y la dos?",
+      "emotion": "surprise"
+    },
+    {
+      "id": "o5",
+      "actor": "oscar",
+      "to": "dani",
+      "text": "Por algo las quemé.",
+      "emotion": "nervous"
+    },
+    {
+      "id": "l7",
+      "actor": "lucia",
+      "to": "dani",
+      "text": "¡Esto es mejor que un reality! Lo voy a grabar.",
+      "emotion": "joy"
+    },
+    {
+      "id": "v5",
+      "actor": "susana",
+      "to": "lucia",
+      "text": "Ni se te ocurra.",
+      "emotion": "angry",
+      "intensity": 1.1
+    },
+    {
+      "id": "m4",
+      "actor": "marga",
+      "to": "susana",
+      "text": "Me debes veinte euros. Son las diez menos cuarto y esto ya es un desastre.",
+      "emotion": "smirk"
+    },
+    {
+      "id": "v6",
+      "actor": "susana",
+      "to": "marga",
+      "text": "Y tú acabas de hablar de tu ex. Estamos en paz.",
+      "emotion": "smirk"
+    },
+    {
+      "id": "l8",
+      "actor": "lucia",
+      "to": "dani",
+      "text": "Dani, decide. La tienda, el champán y yo... o esa cena carbonizada.",
+      "emotion": "smirk",
+      "intensity": 1.2
+    },
+    {
+      "id": "d4",
+      "actor": "dani",
+      "to": "lucia",
+      "text": "Lucía. Tú y yo ya tuvimos nuestra cena. Duró tres años y la pagué yo.",
+      "emotion": "thinking",
+      "after": "l8",
+      "offset": 1.2
+    },
+    {
+      "id": "l9",
+      "actor": "lucia",
+      "to": "dani",
+      "text": "¿Perdona?",
+      "emotion": "surprise"
+    },
+    {
+      "id": "d5",
+      "actor": "dani",
+      "to": "lucia",
+      "text": "Te diseño la tienda, si quieres. Con factura. Pero esta noche ceno con Susana. Aunque sea carbón.",
+      "emotion": "determined"
+    },
+    {
+      "id": "v7",
+      "actor": "susana",
+      "to": "dani",
+      "text": "Sobre todo si es carbón.",
+      "emotion": "smile"
+    },
+    {
+      "id": "l10",
+      "actor": "lucia",
+      "to": "dani",
+      "text": "Vaya. Al de la lámpara se le ha encendido la bombilla.",
+      "emotion": "smirk"
+    },
+    {
+      "id": "l10b",
+      "actor": "lucia",
+      "to": "dani",
+      "text": "Me alegro por ti, Dani. De verdad. Aunque me fastidie un montón.",
+      "emotion": "sad",
+      "intensity": 0.7
+    },
+    {
+      "id": "l10c",
+      "actor": "lucia",
+      "to": "oscar",
+      "text": "Me voy, que tengo un directo a las once. Óscar, ¿me llevas?",
+      "emotion": "smile"
+    },
+    {
+      "id": "o6",
+      "actor": "oscar",
+      "to": "lucia",
+      "text": "¡Claro!",
+      "emotion": "joy"
+    },
+    {
+      "id": "m5",
+      "actor": "marga",
+      "to": "oscar",
+      "text": "¿Claro?",
+      "emotion": "angry",
+      "intensity": 1.2
+    },
+    {
+      "id": "o7",
+      "actor": "oscar",
+      "to": "marga",
+      "text": "Claro... que no. Tengo el coche en el taller. Desde hace un año.",
+      "emotion": "fear"
+    },
+    {
+      "id": "m6",
+      "actor": "marga",
+      "to": "oscar",
+      "text": "Buena respuesta. Y ahora vete tú también, que me tienes que devolver la colonia. Es mía. Te la regalé yo.",
+      "emotion": "smirk"
+    },
+    {
+      "id": "o8",
+      "actor": "oscar",
+      "to": "marga",
+      "text": "¿Me la regalaste tú?",
+      "emotion": "surprise"
+    },
+    {
+      "id": "m7",
+      "actor": "marga",
+      "to": "oscar",
+      "text": "En una gasolinera muy buena.",
+      "emotion": "smile",
+      "pauseAfter": 0.2
+    },
+    {
+      "id": "o9",
+      "actor": "oscar",
+      "to": "marga",
+      "text": "Te la devuelvo mañana. Palabra.",
+      "emotion": "smile",
+      "with": "oscar-tras",
+      "offset": 0.3
+    },
+    {
+      "id": "m8",
+      "actor": "marga",
+      "to": "oscar",
+      "text": "Mañana estará vacía. Te conozco, Óscar.",
+      "emotion": "smirk"
+    },
+    {
+      "id": "d6",
+      "actor": "dani",
+      "to": "susana",
+      "text": "¿Y la tarta?",
+      "emotion": "surprise",
+      "with": "marga-tras",
+      "offset": 0.9
+    },
+    {
+      "id": "v8",
+      "actor": "susana",
+      "to": "dani",
+      "text": "La tarta se queda. Las testigos se van.",
+      "emotion": "smirk",
+      "pauseAfter": 0.3
+    }
+  ],
+  "sound": [
+    {
+      "id": "ambiente",
+      "kind": "ambience",
+      "sound": "room-tone",
+      "at": 0,
+      "gainDb": -29,
+      "fadeIn": 0.3,
+      "fadeOut": 0.3
+    },
+    {
+      "id": "remate",
+      "kind": "music",
+      "sound": "sirena-remate",
+      "after": "v8",
+      "offset": 0.05,
+      "durationSec": 1.8,
+      "gainDb": -9,
+      "duck": false
+    }
+  ]
+}

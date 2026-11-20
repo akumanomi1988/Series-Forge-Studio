@@ -1,0 +1,435 @@
+{
+  "schemaVersion": 2,
+  "id": "sc-003",
+  "name": "La de las lentejuelas",
+  "synopsis": "Susana se despide de Marga para ir a la cita; entra Lucía, la ex de Dani, decidida a recuperarlo.",
+  "environmentId": "sirena",
+  "durationSec": "auto",
+  "tailSec": 0.6,
+  "autoLook": true,
+  "autoActing": 1,
+  "coverage": "auto",
+  "actors": [
+    {
+      "id": "susana",
+      "characterId": "susana",
+      "position": [
+        0.25,
+        0,
+        0.75
+      ],
+      "yawDeg": -110,
+      "expression": "joy",
+      "idle": "idle-relaxed"
+    },
+    {
+      "id": "marga",
+      "characterId": "marga",
+      "position": [
+        -1.8,
+        0,
+        -0.35
+      ],
+      "yawDeg": 80,
+      "expression": "smile",
+      "idle": "idle"
+    },
+    {
+      "id": "lucia",
+      "characterId": "lucia",
+      "position": [
+        5,
+        0,
+        -1.2
+      ],
+      "yawDeg": -90,
+      "expression": "joy",
+      "idle": "idle-relaxed"
+    }
+  ],
+  "props": [
+    {
+      "id": "vela-barra",
+      "propId": "vela",
+      "position": [
+        -1.2,
+        1.06,
+        -0.12
+      ]
+    }
+  ],
+  "shots": [
+    {
+      "id": "i-situacion",
+      "at": 0,
+      "durationSec": 2.4,
+      "camera": {
+        "type": "static",
+        "position": [
+          2.7,
+          1.95,
+          3.5
+        ],
+        "target": [
+          -1,
+          1.1,
+          -0.3
+        ],
+        "fov": 40
+      }
+    },
+    {
+      "id": "i-puerta",
+      "with": "abre",
+      "offset": -0.1,
+      "durationSec": 2.8,
+      "camera": {
+        "type": "static",
+        "position": [
+          -0.6,
+          1.62,
+          1.4
+        ],
+        "target": [
+          3.9,
+          1.25,
+          -1.2
+        ],
+        "fov": 38
+      }
+    },
+    {
+      "id": "i-sale",
+      "with": "lucia-sale",
+      "offset": 0.6,
+      "durationSec": 2.4,
+      "camera": {
+        "type": "static",
+        "position": [
+          2.7,
+          1.95,
+          3.5
+        ],
+        "target": [
+          -1,
+          1.1,
+          -0.3
+        ],
+        "fov": 40
+      }
+    }
+  ],
+  "actions": [
+    {
+      "id": "abre",
+      "type": "propJoint",
+      "prop": "puerta",
+      "joint": "leaf",
+      "after": "v0",
+      "offset": 0.1,
+      "toDeg": -95,
+      "durationSec": 0.8,
+      "sound": "door-creak"
+    },
+    {
+      "id": "lucia-entra",
+      "type": "walk",
+      "actor": "lucia",
+      "with": "abre",
+      "offset": 0.3,
+      "to": [
+        0.75,
+        0,
+        -0.55
+      ],
+      "faceTo": "marga"
+    },
+    {
+      "id": "cierra",
+      "type": "propJoint",
+      "prop": "puerta",
+      "joint": "leaf",
+      "with": "lucia-entra",
+      "offset": 2.2,
+      "toDeg": 0,
+      "durationSec": 0.8,
+      "sound": "click"
+    },
+    {
+      "id": "susana-gira",
+      "type": "turn",
+      "actor": "susana",
+      "with": "l1",
+      "offset": 0.2,
+      "towards": "lucia",
+      "durationSec": 0.8
+    },
+    {
+      "id": "susana-frena",
+      "type": "play",
+      "actor": "susana",
+      "with": "v3",
+      "clip": "dismiss",
+      "durationSec": 1.1
+    },
+    {
+      "id": "marga-brazos",
+      "type": "play",
+      "actor": "marga",
+      "with": "m4",
+      "clip": "hands-on-hips",
+      "durationSec": 2.2
+    },
+    {
+      "id": "lucia-sale",
+      "type": "walk",
+      "actor": "lucia",
+      "after": "l8",
+      "offset": 0.1,
+      "to": [
+        5,
+        0,
+        -1.2
+      ]
+    },
+    {
+      "id": "abre-2",
+      "type": "propJoint",
+      "prop": "puerta",
+      "joint": "leaf",
+      "with": "lucia-sale",
+      "offset": 1.4,
+      "toDeg": -95,
+      "durationSec": 0.6,
+      "sound": "door-creak"
+    },
+    {
+      "id": "cierra-2",
+      "type": "propJoint",
+      "prop": "puerta",
+      "joint": "leaf",
+      "with": "lucia-sale",
+      "offset": 3.4,
+      "toDeg": 0,
+      "durationSec": 0.6,
+      "sound": "click"
+    },
+    {
+      "id": "susana-vuelve",
+      "type": "turn",
+      "actor": "susana",
+      "after": "l8",
+      "offset": 1,
+      "towards": "marga",
+      "durationSec": 0.8
+    }
+  ],
+  "dialogue": [
+    {
+      "id": "v0",
+      "actor": "susana",
+      "to": "marga",
+      "text": "¿Qué tal estoy?",
+      "emotion": "smile",
+      "at": 1.2
+    },
+    {
+      "id": "m0",
+      "actor": "marga",
+      "to": "susana",
+      "text": "Para una cena con risotto, demasiado guapa. Para un incendio, perfecta.",
+      "emotion": "smirk"
+    },
+    {
+      "id": "l1",
+      "actor": "lucia",
+      "to": "marga",
+      "text": "¡Hola! Qué sitio tan... íntimo. ¿Hacéis cócteles sin azúcar, sin alcohol y sin gluten?",
+      "emotion": "joy",
+      "with": "lucia-entra",
+      "offset": 1.4
+    },
+    {
+      "id": "m1",
+      "actor": "marga",
+      "to": "lucia",
+      "text": "Eso se llama agua. Son tres euros.",
+      "emotion": "smirk"
+    },
+    {
+      "id": "l2",
+      "actor": "lucia",
+      "to": "marga",
+      "text": "¡Me encanta! Busco a alguien: Dani Ferrer. Arquitecto, gafas, habla del tiempo cuando se pone nervioso.",
+      "emotion": "laugh"
+    },
+    {
+      "id": "v1",
+      "actor": "susana",
+      "to": "lucia",
+      "text": "¿Y tú eres...?",
+      "emotion": "surprise",
+      "intensity": 0.7
+    },
+    {
+      "id": "l3",
+      "actor": "lucia",
+      "to": "susana",
+      "text": "Lucía. Su ex. Bueno, su ex de momento.",
+      "emotion": "smirk"
+    },
+    {
+      "id": "m2",
+      "actor": "marga",
+      "to": "susana",
+      "text": "La del DJ de Ibiza.",
+      "emotion": "disgust",
+      "direction": "en voz baja"
+    },
+    {
+      "id": "l4",
+      "actor": "lucia",
+      "to": "susana",
+      "text": "Lo del DJ duró lo que dura una canción de DJ: cuatro minutos, y luego todo el rato lo mismo.",
+      "emotion": "smirk"
+    },
+    {
+      "id": "v2",
+      "actor": "susana",
+      "to": "lucia",
+      "text": "¿Y qué quieres de Dani?",
+      "emotion": "determined"
+    },
+    {
+      "id": "l5",
+      "actor": "lucia",
+      "to": "susana",
+      "text": "Voy a abrir una tienda aquí al lado y necesito un arquitecto. Y ya que estoy, recuperar al arquitecto.",
+      "emotion": "joy"
+    },
+    {
+      "id": "m3",
+      "actor": "marga",
+      "to": "lucia",
+      "text": "Mira, guapa...",
+      "emotion": "angry",
+      "pauseAfter": 0.05
+    },
+    {
+      "id": "v3",
+      "actor": "susana",
+      "to": "marga",
+      "text": "Marga.",
+      "emotion": "determined"
+    },
+    {
+      "id": "v3b",
+      "actor": "susana",
+      "to": "lucia",
+      "text": "Dani tiene planes esta noche.",
+      "emotion": "smirk"
+    },
+    {
+      "id": "l6",
+      "actor": "lucia",
+      "to": "susana",
+      "text": "¿Dani? ¿Planes? Dani escribe los planes en una servilleta y luego no los hace.",
+      "emotion": "laugh"
+    },
+    {
+      "id": "v4",
+      "actor": "susana",
+      "to": "lucia",
+      "text": "Esta vez los ha hecho.",
+      "emotion": "smirk",
+      "intensity": 1.2
+    },
+    {
+      "id": "l7",
+      "actor": "lucia",
+      "to": "susana",
+      "text": "Pues habrá que cambiárselos. ¿Sabéis dónde vive ahora?",
+      "emotion": "smirk"
+    },
+    {
+      "id": "v5",
+      "actor": "susana",
+      "to": "lucia",
+      "text": "Ni idea.",
+      "emotion": "smirk"
+    },
+    {
+      "id": "m4",
+      "actor": "marga",
+      "to": "lucia",
+      "text": "En la otra punta. En otra ciudad. En otro planeta.",
+      "emotion": "angry"
+    },
+    {
+      "id": "l8",
+      "actor": "lucia",
+      "to": "marga",
+      "text": "¡Qué graciosa! Da igual, tengo su número. Las ex somos como los impuestos: siempre volvemos.",
+      "emotion": "laugh"
+    },
+    {
+      "id": "m5",
+      "actor": "marga",
+      "to": "susana",
+      "text": "Vete ya a esa cena. Y si aparece esa, la tarta que te llevo luego va directa a su cara.",
+      "emotion": "angry",
+      "with": "lucia-sale",
+      "offset": 1
+    },
+    {
+      "id": "v6",
+      "actor": "susana",
+      "to": "marga",
+      "text": "¿Qué tarta?",
+      "emotion": "surprise"
+    },
+    {
+      "id": "m6",
+      "actor": "marga",
+      "to": "susana",
+      "text": "La del postre. Una primera cita necesita una tarta y una testigo.",
+      "emotion": "smile"
+    },
+    {
+      "id": "v7",
+      "actor": "susana",
+      "to": "marga",
+      "text": "Tú lo que quieres es cotillear.",
+      "emotion": "smirk"
+    },
+    {
+      "id": "m7",
+      "actor": "marga",
+      "to": "susana",
+      "text": "Yo lo que quiero es ganar veinte euros. Que no es lo mismo.",
+      "emotion": "smirk",
+      "pauseAfter": 0.3
+    }
+  ],
+  "sound": [
+    {
+      "id": "ambiente",
+      "kind": "ambience",
+      "sound": "room-tone",
+      "at": 0,
+      "gainDb": -27,
+      "fadeIn": 0.3,
+      "fadeOut": 0.3
+    },
+    {
+      "id": "tension",
+      "kind": "music",
+      "sound": "sirena-alarma",
+      "with": "l3",
+      "offset": 1.2,
+      "durationSec": 2.6,
+      "gainDb": -11,
+      "duck": false
+    }
+  ]
+}

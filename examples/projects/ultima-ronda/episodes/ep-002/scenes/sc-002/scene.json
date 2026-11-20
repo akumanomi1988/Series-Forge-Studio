@@ -1,0 +1,490 @@
+{
+  "schemaVersion": 2,
+  "id": "sc-002",
+  "name": "La técnica del espejo",
+  "synopsis": "Dani cocina el risotto de su abuela; Óscar llega con colonia, una lista de reproducción y malos consejos.",
+  "environmentId": "piso-dani",
+  "durationSec": "auto",
+  "tailSec": 0.6,
+  "autoLook": true,
+  "autoActing": 1,
+  "coverage": "auto",
+  "actors": [
+    {
+      "id": "dani",
+      "characterId": "dani",
+      "position": [
+        -1.6,
+        0,
+        -2.25
+      ],
+      "yawDeg": 0,
+      "expression": "nervous",
+      "idle": "idle"
+    },
+    {
+      "id": "oscar",
+      "characterId": "oscar",
+      "position": [
+        4.6,
+        0,
+        1.2
+      ],
+      "yawDeg": -90,
+      "expression": "joy",
+      "idle": "idle-relaxed"
+    }
+  ],
+  "props": [
+    {
+      "id": "olla",
+      "propId": "olla",
+      "position": [
+        -2.25,
+        0.91,
+        -1.6
+      ]
+    },
+    {
+      "id": "colonia",
+      "propId": "colonia",
+      "heldBy": {
+        "actor": "oscar",
+        "hand": "right"
+      }
+    },
+    {
+      "id": "movil",
+      "propId": "movil",
+      "position": [
+        -0.85,
+        0.91,
+        -1.45
+      ]
+    }
+  ],
+  "shots": [
+    {
+      "id": "i-cocina",
+      "at": 0,
+      "durationSec": 3,
+      "camera": {
+        "type": "static",
+        "position": [
+          -0.9,
+          1.55,
+          0.5
+        ],
+        "target": [
+          -1.8,
+          1,
+          -1.7
+        ],
+        "fov": 34,
+        "move": {
+          "type": "push-in",
+          "amount": 0.1
+        }
+      }
+    },
+    {
+      "id": "i-puerta",
+      "with": "abre",
+      "offset": -0.1,
+      "durationSec": 2.6,
+      "camera": {
+        "type": "static",
+        "position": [
+          1,
+          1.6,
+          2.9
+        ],
+        "target": [
+          3.7,
+          1.25,
+          1.2
+        ],
+        "fov": 40
+      }
+    },
+    {
+      "id": "i-olla",
+      "with": "d4",
+      "offset": 0.2,
+      "durationSec": 2.4,
+      "camera": {
+        "type": "static",
+        "position": [
+          -1.6,
+          1.45,
+          -0.5
+        ],
+        "target": [
+          -2.25,
+          0.98,
+          -1.6
+        ],
+        "fov": 28
+      }
+    }
+  ],
+  "actions": [
+    {
+      "id": "remueve-1",
+      "type": "play",
+      "actor": "dani",
+      "at": 0.3,
+      "clip": "point",
+      "target": "olla",
+      "durationSec": 1.6
+    },
+    {
+      "id": "mira-olla",
+      "type": "lookAt",
+      "actor": "dani",
+      "at": 0.2,
+      "target": "olla",
+      "durationSec": 2.6
+    },
+    {
+      "id": "abre",
+      "type": "propJoint",
+      "prop": "puerta",
+      "joint": "leaf",
+      "at": 1.6,
+      "toDeg": -95,
+      "durationSec": 0.8,
+      "sound": "door-creak"
+    },
+    {
+      "id": "oscar-entra",
+      "type": "walk",
+      "actor": "oscar",
+      "with": "abre",
+      "offset": 0.3,
+      "to": [
+        -0.45,
+        0,
+        -2.2
+      ],
+      "faceTo": "dani"
+    },
+    {
+      "id": "cierra",
+      "type": "propJoint",
+      "prop": "puerta",
+      "joint": "leaf",
+      "with": "oscar-entra",
+      "offset": 1.8,
+      "toDeg": 0,
+      "durationSec": 0.8,
+      "sound": "click"
+    },
+    {
+      "id": "da-colonia",
+      "type": "give",
+      "actor": "oscar",
+      "after": "o3",
+      "offset": -1.6,
+      "prop": "colonia",
+      "to": "dani",
+      "durationSec": 1.4
+    },
+    {
+      "id": "dani-lee",
+      "type": "hold",
+      "actor": "dani",
+      "after": "da-colonia",
+      "hand": "right",
+      "pose": "show",
+      "durationSec": 0.6
+    },
+    {
+      "id": "dani-mira-frasco",
+      "type": "lookAt",
+      "actor": "dani",
+      "with": "dani-lee",
+      "target": "colonia",
+      "mode": "head",
+      "durationSec": 2.2
+    },
+    {
+      "id": "deja-colonia",
+      "type": "place",
+      "actor": "dani",
+      "after": "d3",
+      "offset": 0.1,
+      "prop": "colonia",
+      "on": [
+        -1.2,
+        0.91,
+        -1.5
+      ],
+      "hand": "right",
+      "durationSec": 0.9
+    },
+    {
+      "id": "remueve-2",
+      "type": "play",
+      "actor": "dani",
+      "with": "d4",
+      "offset": 0.6,
+      "clip": "point",
+      "target": "olla",
+      "durationSec": 1.4
+    },
+    {
+      "id": "oscar-espejo",
+      "type": "play",
+      "actor": "oscar",
+      "with": "o8",
+      "offset": 0.5,
+      "clip": "present",
+      "durationSec": 1.5
+    },
+    {
+      "id": "dani-tapa",
+      "type": "play",
+      "actor": "dani",
+      "with": "d9",
+      "clip": "facepalm",
+      "durationSec": 1.6
+    },
+    {
+      "id": "dani-senala",
+      "type": "play",
+      "actor": "dani",
+      "with": "d14",
+      "clip": "point",
+      "target": "puerta",
+      "durationSec": 1.5
+    }
+  ],
+  "dialogue": [
+    {
+      "id": "o1",
+      "actor": "oscar",
+      "to": "dani",
+      "text": "¡Ha llegado la caballería! ¿Dónde está el enfermo de amor?",
+      "emotion": "joy",
+      "with": "abre",
+      "offset": 0.5
+    },
+    {
+      "id": "d1",
+      "actor": "dani",
+      "to": "oscar",
+      "text": "Óscar, te di la llave para emergencias.",
+      "emotion": "nervous"
+    },
+    {
+      "id": "o2",
+      "actor": "oscar",
+      "to": "dani",
+      "text": "Esto es una emergencia. Tienes una cita a las nueve y hueles a cebolla.",
+      "emotion": "smirk"
+    },
+    {
+      "id": "d2",
+      "actor": "dani",
+      "to": "oscar",
+      "text": "Es un sofrito. Es la base del risotto.",
+      "emotion": "thinking"
+    },
+    {
+      "id": "o3",
+      "actor": "oscar",
+      "to": "dani",
+      "text": "La base de una cita es el olor. Toma. «Tormenta salvaje». Dos gotas y te tienen que sujetar.",
+      "emotion": "smirk",
+      "after": "oscar-entra",
+      "offset": -0.3
+    },
+    {
+      "id": "d3",
+      "actor": "dani",
+      "to": "oscar",
+      "text": "Aquí pone «no aplicar cerca de una llama».",
+      "emotion": "thinking",
+      "after": "dani-lee"
+    },
+    {
+      "id": "o4",
+      "actor": "oscar",
+      "to": "dani",
+      "text": "Por eso funciona. Es peligrosa.",
+      "emotion": "smirk"
+    },
+    {
+      "id": "d4",
+      "actor": "dani",
+      "to": "oscar",
+      "text": "No necesito colonia. Necesito que no se pegue el arroz. Mi abuela decía: el risotto no se abandona nunca.",
+      "emotion": "nervous"
+    },
+    {
+      "id": "o5",
+      "actor": "oscar",
+      "to": "dani",
+      "text": "Tu abuela era una sabia. Como yo. Por eso te he preparado una lista de reproducción.",
+      "emotion": "joy"
+    },
+    {
+      "id": "d5",
+      "actor": "dani",
+      "to": "oscar",
+      "text": "¿Qué lista?",
+      "emotion": "worried"
+    },
+    {
+      "id": "o6",
+      "actor": "oscar",
+      "to": "dani",
+      "text": "«Noches de pasión, volumen tres». La uno y la dos las quemé con Marga.",
+      "emotion": "smirk"
+    },
+    {
+      "id": "d6",
+      "actor": "dani",
+      "to": "oscar",
+      "text": "¿Quién es Marga?",
+      "emotion": "surprise"
+    },
+    {
+      "id": "o7",
+      "actor": "oscar",
+      "to": "dani",
+      "text": "Nadie. Una exmujer. Cultura general.",
+      "emotion": "sad",
+      "intensity": 0.7
+    },
+    {
+      "id": "d7",
+      "actor": "dani",
+      "to": "oscar",
+      "text": "Tampoco necesito música. Susana tiene un bar: escucha música doce horas al día.",
+      "emotion": "thinking"
+    },
+    {
+      "id": "o8",
+      "actor": "oscar",
+      "to": "dani",
+      "text": "Precisamente. Hay que sorprenderla. Atiende: la técnica del espejo. Tú haces lo que hace ella. Ella bebe, tú bebes. Ella se ríe, tú te ríes.",
+      "emotion": "smirk"
+    },
+    {
+      "id": "d8",
+      "actor": "dani",
+      "to": "oscar",
+      "text": "¿Y si ella se va?",
+      "emotion": "worried"
+    },
+    {
+      "id": "o9",
+      "actor": "oscar",
+      "to": "dani",
+      "text": "Tú también te vas. Pero detrás.",
+      "emotion": "thinking"
+    },
+    {
+      "id": "d9",
+      "actor": "dani",
+      "to": "oscar",
+      "text": "Eso no es una técnica, Óscar. Eso es una orden de alejamiento.",
+      "emotion": "angry",
+      "intensity": 0.7
+    },
+    {
+      "id": "o10",
+      "actor": "oscar",
+      "to": "dani",
+      "text": "¡Ja! ¿Ves? Ya estás gracioso. Eso es la colonia.",
+      "emotion": "laugh"
+    },
+    {
+      "id": "d10",
+      "actor": "dani",
+      "to": "oscar",
+      "text": "No me he puesto colonia.",
+      "emotion": "thinking"
+    },
+    {
+      "id": "o11",
+      "actor": "oscar",
+      "to": "dani",
+      "text": "Te la he echado yo al entrar. Cuando te has dado la vuelta.",
+      "emotion": "smirk"
+    },
+    {
+      "id": "d11",
+      "actor": "dani",
+      "to": "oscar",
+      "text": "Por eso me pican los ojos.",
+      "emotion": "disgust"
+    },
+    {
+      "id": "o12",
+      "actor": "oscar",
+      "to": "dani",
+      "text": "Eso es la pasión.",
+      "emotion": "joy"
+    },
+    {
+      "id": "d12",
+      "actor": "dani",
+      "to": "oscar",
+      "text": "Vale. Escúchame. Esta noche, nada de técnicas. Hago la cena, hablamos y soy yo mismo.",
+      "emotion": "determined"
+    },
+    {
+      "id": "o13",
+      "actor": "oscar",
+      "to": "dani",
+      "text": "¿Tú mismo? ¿El de la lámpara?",
+      "emotion": "worried"
+    },
+    {
+      "id": "d13",
+      "actor": "dani",
+      "to": "oscar",
+      "text": "Al de la lámpara le ha dicho que sí.",
+      "emotion": "determined"
+    },
+    {
+      "id": "o14",
+      "actor": "oscar",
+      "to": "dani",
+      "text": "Ya. Al de la lámpara le dijo que sí a una cena. A ver qué le dice al del risotto.",
+      "emotion": "smirk"
+    },
+    {
+      "id": "d14",
+      "actor": "dani",
+      "to": "oscar",
+      "text": "Fuera de mi cocina.",
+      "emotion": "angry",
+      "pauseAfter": 0.3
+    }
+  ],
+  "sound": [
+    {
+      "id": "ambiente",
+      "kind": "ambience",
+      "sound": "room-tone",
+      "at": 0,
+      "gainDb": -29,
+      "fadeIn": 0.3,
+      "fadeOut": 0.3
+    },
+    {
+      "id": "remate",
+      "kind": "music",
+      "sound": "sirena-remate",
+      "after": "d14",
+      "offset": 0.05,
+      "durationSec": 1.8,
+      "gainDb": -9,
+      "duck": false
+    }
+  ]
+}

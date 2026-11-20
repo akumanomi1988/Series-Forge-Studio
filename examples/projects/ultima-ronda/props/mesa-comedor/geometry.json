@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 2,
+  "generator": "table",
+  "params": {
+    "width": 1.3,
+    "depth": 0.85,
+    "height": 0.76,
+    "topColor": "#7a5234",
+    "legColor": "#2a2a2a"
+  },
+  "material": "wood"
+}

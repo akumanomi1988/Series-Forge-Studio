@@ -1,0 +1,50 @@
+{
+  "schemaVersion": 2,
+  "generator": "parts",
+  "material": "plastic",
+  "restHeight": 0.004,
+  "parts": [
+    {
+      "id": "cuerpo",
+      "primitive": "roundedBox",
+      "size": [
+        0.075,
+        0.008,
+        0.15
+      ],
+      "position": [
+        0,
+        0.004,
+        0
+      ],
+      "color": "#1a1a1e"
+    },
+    {
+      "id": "pantalla",
+      "primitive": "box",
+      "size": [
+        0.066,
+        0.002,
+        0.135
+      ],
+      "position": [
+        0,
+        0.009,
+        0
+      ],
+      "color": "#5ab0ff",
+      "emissive": "#5ab0ff",
+      "emissiveIntensity": 0.8,
+      "outline": false
+    }
+  ],
+  "anchors": {
+    "grip": {
+      "position": [
+        0,
+        0.004,
+        0
+      ]
+    }
+  }
+}

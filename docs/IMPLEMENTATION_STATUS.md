@@ -23,9 +23,13 @@ Leyenda: ✅ hecho y probado (test automático y/o inspección de fotogramas/aud
 
 ## «Última ronda» ep. 1 «Punto dos» (proyecto nuevo)
 
-Comedia romántica para adultos en un bar de cócteles: Vera (dueña, vestido rojo de satén con escote, piel y pelo con brillo) y Dani (arquitecto tímido). Biblia de la serie, sinopsis, tres actos, siembras/pagos y guion en `examples/projects/ultima-ronda`. Voces **Kokoro** (Vera: mezcla `ef_dora` + `af_nicole`, más grave y lenta; Dani: `em_santa`), cobertura y actuación automáticas, banda sonora automática (tema lounge, cama de bossa, cortinillas, música romántica y remate) y un apagón con vela.
+Comedia romántica para adultos en un bar de cócteles: Susana (dueña, vestido rojo de satén con escote, piel y pelo con brillo) y Dani (arquitecto tímido). Biblia de la serie, sinopsis, tres actos, siembras/pagos y guion en `examples/projects/ultima-ronda`. Voces **Kokoro** (Susana: mezcla `ef_dora` + `af_nicole`, más grave y lenta; Dani: `em_santa`), cobertura y actuación automáticas, banda sonora automática (tema lounge, cama de bossa, cortinillas, música romántica y remate) y un apagón con vela.
 
 `npm run studio -- produce ultima-ronda ep-001` → **1920×1080, 24 fps, 121,9 s (2926 fotogramas), 38 planos (26 de cobertura automática y 12 insertos escritos), 38 líneas, 40 rótulos**; render 7,4 min en la GTX 660 Ti. Validación **superada**: diálogo −16,1 LUFS, mezcla −16,4 LUFS, pico −0,9 dBTP, líneas colocadas a 0 ms, paridad editor/exportación PSNR ≥ 44,1 dB, lip-sync global −20 ms con arranques de boca entre 50 y 10 ms antes del sonido, cierres ≤ 160 ms, boca abierta en silencios 0 %, ningún hueco sin diálogo fuera de la música (máx. 3,98 s cubierto por la cortinilla), diálogo en el 82 % del metraje. Revisado con fotogramas reales del MP4.
+
+## «Última ronda» ep. 2 «Tormenta salvaje» (capítulo completo)
+
+Cinco personajes (Susana, Dani y los nuevos Marga, Óscar y Lucía), dos decorados (bar Sirena y piso de Dani), teaser, tres actos y etiqueta, tramas A/B/C, 212 líneas. Guion generado desde los archivos de escena (`episodes/ep-002/guion.md`). `npm run studio -- produce ultima-ronda ep-002` → **1920×1080, 24 fps, 10 min 30 s (15 120 fotogramas), 196 planos, 234 rótulos**; render 32 min en la GTX 660 Ti. Validación **superada**: diálogo −16,0 LUFS, mezcla −16,2 LUFS, pico −0,6 dBTP, **ningún solape de voces**, **racord sin errores** entre escenas continuas, ningún hueco sin diálogo > 2,7 s (diálogo en el 88 % del metraje), lip-sync global −20 ms, paridad editor/exportación PSNR ≥ 42,3 dB. Comprobado además con un barrido automático de todos los planos (ninguna cámara dentro de un personaje ni pegada al sujeto) y fotogramas del MP4.
 
 ## Piloto «El último turno»
 

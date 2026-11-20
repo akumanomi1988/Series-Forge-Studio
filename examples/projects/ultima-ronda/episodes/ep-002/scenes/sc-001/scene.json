@@ -1,0 +1,255 @@
+{
+  "schemaVersion": 2,
+  "id": "sc-001",
+  "name": "Apuestas",
+  "synopsis": "El Sirena antes de abrir: Marga y Susana apuestan sobre la cita y sobre el ex de Marga.",
+  "environmentId": "sirena",
+  "durationSec": "auto",
+  "tailSec": 0.6,
+  "autoLook": true,
+  "autoActing": 1,
+  "coverage": "auto",
+  "actors": [
+    {
+      "id": "susana",
+      "characterId": "susana",
+      "position": [
+        -1.8,
+        0,
+        0.35
+      ],
+      "yawDeg": 140,
+      "expression": "smile",
+      "idle": "idle-relaxed"
+    },
+    {
+      "id": "marga",
+      "characterId": "marga",
+      "position": [
+        -1.85,
+        0,
+        -0.85
+      ],
+      "yawDeg": 45,
+      "expression": "smirk",
+      "idle": "idle"
+    }
+  ],
+  "props": [
+    {
+      "id": "copa",
+      "propId": "copa",
+      "heldBy": {
+        "actor": "marga",
+        "hand": "right"
+      }
+    },
+    {
+      "id": "coctelera",
+      "propId": "coctelera",
+      "position": [
+        -1.36,
+        1.06,
+        1
+      ]
+    },
+    {
+      "id": "vela-barra",
+      "propId": "vela",
+      "position": [
+        -1.2,
+        1.06,
+        -0.12
+      ]
+    }
+  ],
+  "shots": [
+    {
+      "id": "i-apertura",
+      "at": 0,
+      "durationSec": 3.4,
+      "camera": {
+        "type": "static",
+        "position": [
+          2.7,
+          1.95,
+          3.5
+        ],
+        "target": [
+          -1,
+          1.1,
+          -0.3
+        ],
+        "fov": 40,
+        "move": {
+          "type": "push-in",
+          "amount": 0.12
+        }
+      },
+      "transitionIn": {
+        "type": "fade",
+        "durationSec": 0.8
+      }
+    }
+  ],
+  "actions": [
+    {
+      "id": "seca",
+      "type": "hold",
+      "actor": "marga",
+      "at": 0.2,
+      "hand": "right",
+      "pose": "show",
+      "durationSec": 0.8
+    },
+    {
+      "id": "deja-copa",
+      "type": "place",
+      "actor": "marga",
+      "after": "m4",
+      "offset": 0.1,
+      "prop": "copa",
+      "on": [
+        -1.32,
+        1.06,
+        -0.6
+      ],
+      "durationSec": 1
+    },
+    {
+      "id": "marga-cruza",
+      "type": "play",
+      "actor": "marga",
+      "with": "m6",
+      "clip": "cross-arms",
+      "durationSec": 2.5
+    }
+  ],
+  "dialogue": [
+    {
+      "id": "m1",
+      "actor": "marga",
+      "to": "susana",
+      "text": "Así que el de las doce menos cinco por fin se atrevió.",
+      "emotion": "smirk",
+      "at": 1.4
+    },
+    {
+      "id": "v1",
+      "actor": "susana",
+      "to": "marga",
+      "text": "Me ha invitado a cenar. Solo es una cena.",
+      "emotion": "smile"
+    },
+    {
+      "id": "m2",
+      "actor": "marga",
+      "to": "susana",
+      "text": "«Solo es una cena». Eso mismo dijo el Titanic del iceberg: «solo es un cubito».",
+      "emotion": "smirk",
+      "intensity": 1.2
+    },
+    {
+      "id": "v2",
+      "actor": "susana",
+      "to": "marga",
+      "text": "Cocina él. En su casa.",
+      "emotion": "joy"
+    },
+    {
+      "id": "m3",
+      "actor": "marga",
+      "to": "susana",
+      "text": "¿Un arquitecto cocinando? Eso es como un cirujano haciendo malabares. Puede salir bien, pero yo no miraría.",
+      "emotion": "surprise"
+    },
+    {
+      "id": "v3",
+      "actor": "susana",
+      "to": "marga",
+      "text": "Dice que es el risotto de su abuela.",
+      "emotion": "smirk"
+    },
+    {
+      "id": "m4",
+      "actor": "marga",
+      "to": "susana",
+      "text": "Las recetas de abuela son como los fantasmas: todo el mundo dice que tiene una y nadie las ha visto funcionar.",
+      "emotion": "smirk"
+    },
+    {
+      "id": "v4",
+      "actor": "susana",
+      "to": "marga",
+      "text": "Marga, por una vez, alégrate por mí.",
+      "emotion": "sad",
+      "intensity": 0.6
+    },
+    {
+      "id": "m5",
+      "actor": "marga",
+      "to": "susana",
+      "text": "Me alegro. Y te apuesto veinte euros a que a las diez estás aquí comiendo cacahuetes.",
+      "emotion": "smile"
+    },
+    {
+      "id": "v5",
+      "actor": "susana",
+      "to": "marga",
+      "text": "Hecho. Y otros veinte a que tú esta noche no aguantas sin hablar de tu ex.",
+      "emotion": "smirk",
+      "intensity": 1.2
+    },
+    {
+      "id": "m6",
+      "actor": "marga",
+      "to": "susana",
+      "text": "¿De quién? ¿Del fisioterapeuta que me dejó por un congreso en Benidorm? Ni me acuerdo de él.",
+      "emotion": "angry"
+    },
+    {
+      "id": "v6",
+      "actor": "susana",
+      "to": "marga",
+      "text": "Acabas de decir dónde era el congreso.",
+      "emotion": "smirk"
+    },
+    {
+      "id": "m7",
+      "actor": "marga",
+      "to": "susana",
+      "text": "Benidorm es... cultura general.",
+      "emotion": "nervous"
+    },
+    {
+      "id": "s7",
+      "actor": "susana",
+      "to": "marga",
+      "text": "Veinte euros, Marga. Y todavía no hemos abierto.",
+      "emotion": "smirk",
+      "intensity": 1.2,
+      "pauseAfter": 0.3
+    }
+  ],
+  "sound": [
+    {
+      "id": "ambiente",
+      "kind": "ambience",
+      "sound": "room-tone",
+      "at": 0,
+      "gainDb": -27,
+      "fadeIn": 0.3,
+      "fadeOut": 0.3
+    },
+    {
+      "id": "remate",
+      "kind": "music",
+      "sound": "sirena-remate",
+      "after": "s7",
+      "offset": 0.05,
+      "durationSec": 1.8,
+      "gainDb": -9,
+      "duck": false
+    }
+  ]
+}

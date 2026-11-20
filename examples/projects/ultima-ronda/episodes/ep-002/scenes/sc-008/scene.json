@@ -1,0 +1,393 @@
+{
+  "schemaVersion": 2,
+  "id": "sc-008",
+  "name": "Veinte euros",
+  "synopsis": "A las dos menos cinco, Óscar vuelve al Sirena con la colonia vacía; Susana paga la apuesta.",
+  "environmentId": "sirena",
+  "durationSec": "auto",
+  "tailSec": 0.6,
+  "autoLook": true,
+  "autoActing": 1,
+  "coverage": "auto",
+  "actors": [
+    {
+      "id": "oscar",
+      "characterId": "oscar",
+      "position": [
+        0.2,
+        0,
+        -0.75
+      ],
+      "yawDeg": -90,
+      "expression": "smile",
+      "idle": "idle"
+    },
+    {
+      "id": "marga",
+      "characterId": "marga",
+      "position": [
+        -1.8,
+        0,
+        -0.75
+      ],
+      "yawDeg": 90,
+      "expression": "smirk",
+      "idle": "idle"
+    },
+    {
+      "id": "susana",
+      "characterId": "susana",
+      "position": [
+        5,
+        0,
+        -1.2
+      ],
+      "yawDeg": -90,
+      "expression": "joy",
+      "idle": "idle-relaxed"
+    },
+    {
+      "id": "dani",
+      "characterId": "dani",
+      "position": [
+        5.6,
+        0,
+        -1.2
+      ],
+      "yawDeg": -90,
+      "expression": "joy",
+      "idle": "idle"
+    }
+  ],
+  "props": [
+    {
+      "id": "colonia",
+      "propId": "colonia",
+      "position": [
+        -1,
+        1.06,
+        -0.65
+      ]
+    },
+    {
+      "id": "vela-barra",
+      "propId": "vela",
+      "position": [
+        -1.2,
+        1.06,
+        -0.12
+      ]
+    }
+  ],
+  "shots": [
+    {
+      "id": "i-situacion",
+      "at": 0,
+      "durationSec": 2.6,
+      "camera": {
+        "type": "static",
+        "position": [
+          2.7,
+          1.95,
+          3.5
+        ],
+        "target": [
+          -1,
+          1.1,
+          -0.3
+        ],
+        "fov": 40
+      }
+    },
+    {
+      "id": "i-puerta",
+      "with": "abre",
+      "offset": -0.1,
+      "durationSec": 2.6,
+      "camera": {
+        "type": "static",
+        "position": [
+          -0.6,
+          1.62,
+          1.4
+        ],
+        "target": [
+          3.9,
+          1.25,
+          -1.2
+        ],
+        "fov": 38
+      }
+    },
+    {
+      "id": "i-final",
+      "with": "d2",
+      "offset": -0.2,
+      "durationSec": 8,
+      "camera": {
+        "type": "static",
+        "position": [
+          -0.9,
+          1.5,
+          2.9
+        ],
+        "target": [
+          -1,
+          1.22,
+          -0.2
+        ],
+        "fov": 38,
+        "move": {
+          "type": "pull-out",
+          "amount": 0.3
+        }
+      }
+    }
+  ],
+  "actions": [
+    {
+      "id": "oscar-sienta",
+      "type": "sit",
+      "actor": "oscar",
+      "at": 0,
+      "prop": "taburete-2",
+      "durationSec": 0.3
+    },
+    {
+      "id": "marga-coge",
+      "type": "pickUp",
+      "actor": "marga",
+      "after": "o1",
+      "offset": 0.1,
+      "prop": "colonia",
+      "hand": "right",
+      "durationSec": 1
+    },
+    {
+      "id": "marga-mira",
+      "type": "hold",
+      "actor": "marga",
+      "after": "marga-coge",
+      "hand": "right",
+      "pose": "show",
+      "durationSec": 0.5
+    },
+    {
+      "id": "abre",
+      "type": "propJoint",
+      "prop": "puerta",
+      "joint": "leaf",
+      "after": "o5",
+      "offset": 0.1,
+      "toDeg": -95,
+      "durationSec": 0.8,
+      "sound": "door-creak"
+    },
+    {
+      "id": "susana-entra",
+      "type": "walk",
+      "actor": "susana",
+      "with": "abre",
+      "offset": 0.3,
+      "to": [
+        0.35,
+        0,
+        0.55
+      ],
+      "faceTo": "marga"
+    },
+    {
+      "id": "dani-entra",
+      "type": "walk",
+      "actor": "dani",
+      "with": "abre",
+      "offset": 0.9,
+      "to": [
+        1.05,
+        0,
+        0.35
+      ],
+      "faceTo": "marga"
+    },
+    {
+      "id": "cierra",
+      "type": "propJoint",
+      "prop": "puerta",
+      "joint": "leaf",
+      "with": "dani-entra",
+      "offset": 2.6,
+      "toDeg": 0,
+      "durationSec": 0.8,
+      "sound": "click"
+    }
+  ],
+  "dialogue": [
+    {
+      "id": "m1",
+      "actor": "marga",
+      "to": "oscar",
+      "text": "Son las dos menos cinco. ¿Tú qué haces aquí?",
+      "emotion": "smirk",
+      "at": 1.2
+    },
+    {
+      "id": "o1",
+      "actor": "oscar",
+      "to": "marga",
+      "text": "He venido a devolverte la colonia.",
+      "emotion": "smile"
+    },
+    {
+      "id": "m2",
+      "actor": "marga",
+      "to": "oscar",
+      "text": "Está vacía.",
+      "emotion": "angry",
+      "after": "marga-mira"
+    },
+    {
+      "id": "o2",
+      "actor": "oscar",
+      "to": "marga",
+      "text": "Por eso he tardado. Me la he ido echando por el camino.",
+      "emotion": "smirk"
+    },
+    {
+      "id": "m3",
+      "actor": "marga",
+      "to": "oscar",
+      "text": "Eres idiota.",
+      "emotion": "laugh"
+    },
+    {
+      "id": "o3",
+      "actor": "oscar",
+      "to": "marga",
+      "text": "Pero huelo bien.",
+      "emotion": "joy"
+    },
+    {
+      "id": "m4",
+      "actor": "marga",
+      "to": "oscar",
+      "text": "Hueles a gasolinera.",
+      "emotion": "smirk"
+    },
+    {
+      "id": "o4",
+      "actor": "oscar",
+      "to": "marga",
+      "text": "A una muy buena.",
+      "emotion": "smile"
+    },
+    {
+      "id": "o5",
+      "actor": "oscar",
+      "to": "marga",
+      "text": "¿Me pones algo?",
+      "emotion": "smile"
+    },
+    {
+      "id": "m5",
+      "actor": "marga",
+      "to": "oscar",
+      "text": "Agua. Son tres euros.",
+      "emotion": "smirk"
+    },
+    {
+      "id": "v1",
+      "actor": "susana",
+      "to": "marga",
+      "text": "Marga. Te debo veinte euros.",
+      "emotion": "joy",
+      "with": "susana-entra",
+      "offset": 1.4
+    },
+    {
+      "id": "m6",
+      "actor": "marga",
+      "to": "susana",
+      "text": "¿Ha sido un desastre?",
+      "emotion": "surprise"
+    },
+    {
+      "id": "v2",
+      "actor": "susana",
+      "to": "marga",
+      "text": "El mejor desastre de mi vida.",
+      "emotion": "smile"
+    },
+    {
+      "id": "d1",
+      "actor": "dani",
+      "to": "marga",
+      "text": "Y a las diez estaba comiendo tarta, no cacahuetes. Técnicamente has perdido.",
+      "emotion": "smirk"
+    },
+    {
+      "id": "m7",
+      "actor": "marga",
+      "to": "dani",
+      "text": "Técnicamente, la tarta la pagué yo.",
+      "emotion": "smirk"
+    },
+    {
+      "id": "o6",
+      "actor": "oscar",
+      "to": "marga",
+      "text": "¿Otra apuesta? A que estos dos llegan al punto cuatro.",
+      "emotion": "joy"
+    },
+    {
+      "id": "m8",
+      "actor": "marga",
+      "to": "oscar",
+      "text": "Cuarenta a que no.",
+      "emotion": "smirk"
+    },
+    {
+      "id": "v3",
+      "actor": "susana",
+      "to": "marga",
+      "text": "Que nadie me pregunte cuál es el punto cuatro.",
+      "emotion": "smirk"
+    },
+    {
+      "id": "d2",
+      "actor": "dani",
+      "to": "susana",
+      "text": "Mañana va a hacer mucho calor.",
+      "emotion": "smirk",
+      "intensity": 1.3
+    },
+    {
+      "id": "v4",
+      "actor": "susana",
+      "to": "dani",
+      "text": "Eso no estaba en la lista.",
+      "emotion": "laugh",
+      "pauseAfter": 0.3
+    }
+  ],
+  "sound": [
+    {
+      "id": "ambiente",
+      "kind": "ambience",
+      "sound": "room-tone",
+      "at": 0,
+      "gainDb": -27,
+      "fadeIn": 0.3,
+      "fadeOut": 0.3
+    },
+    {
+      "id": "remate",
+      "kind": "music",
+      "sound": "sirena-remate",
+      "after": "v4",
+      "offset": 0.05,
+      "durationSec": 1.8,
+      "gainDb": -9,
+      "duck": false
+    }
+  ]
+}

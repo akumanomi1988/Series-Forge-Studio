@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 2,
+  "relations": [
+    {
+      "characterId": "dani",
+      "type": "exnovio",
+      "feeling": "nostalgia interesada",
+      "trust": 0.4,
+      "history": [
+        "Lo dejó por un DJ de Ibiza."
+      ]
+    }
+  ]
+}

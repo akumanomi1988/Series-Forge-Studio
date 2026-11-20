@@ -1,0 +1,13 @@
+{
+  "schemaVersion": 2,
+  "id": "marga",
+  "type": "character",
+  "name": "Marga Ruiz",
+  "rigType": "humanoid",
+  "age": 41,
+  "tags": [
+    "secundaria",
+    "camarera del Sirena",
+    "amiga de Susana"
+  ]
+}

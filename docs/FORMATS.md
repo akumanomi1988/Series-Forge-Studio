@@ -47,7 +47,7 @@ Herencia de animaciones y expresiones: `library/humanoid/` → `<proyecto>/anima
   "eq": { "lowDb": 1.5, "midDb": 0, "highDb": -1 }, "emotionProsody": true,
   "instruct": "Warm, low, slightly husky female voice; confident and teasing",
   "alternatives": {
-    "voicebox": { "voice": "Vera", "engine": "qwen", "license": { "id": "…", "commercialUse": "unknown" } },
+    "voicebox": { "voice": "Susana", "engine": "qwen", "license": { "id": "…", "commercialUse": "unknown" } },
     "windows-onecore": { "voice": "Microsoft Laura", "rate": 0.98 } },
   "emotions": { "smirk": { "voice": "ef_dora:0.72+af_nicole:0.28", "rate": 0.9, "instruct": "teasing, half-smiling" } },
   "license": { "id": "Apache-2.0", "commercialUse": "allowed", "notes": "Kokoro-82M" } }
@@ -109,11 +109,15 @@ Generadores: `parts, robot, workbench, chair, stool, door, shelf, toolbox, crate
 ## Escena (`episodes/<ep>/scenes/sc-NNN/scene.json`)
 
 ```json
-{ "schemaVersion": 2, "id": "sc-001", "name": "…", "environmentId": "taller", "durationSec": "auto", "tailSec": 0.8, "autoLook": true, "autoActing": 1, "coverage": "manual",
+{ "schemaVersion": 2, "id": "sc-001", "name": "…", "environmentId": "taller", "durationSec": "auto", "tailSec": 0.8, "autoLook": true, "autoActing": 1, "coverage": "manual", "continuous": false,
   "actors":  [ { "id": "bruno", "characterId": "bruno", "position": [-0.55,0,-0.5], "yawDeg": 72, "expression": "worried", "idle": "idle" } ],
   "props":   [ { "id": "fusible", "propId": "fusible-nucleo", "heldBy": { "actor": "bruno", "hand": "right" } } ],
   "actions": [ … ], "dialogue": [ … ], "shots": [ … ], "sound": [ … ], "transitionOut": { "type": "fade", "durationSec": 0.6 } }
 ```
+
+**Racord** (`"continuous": true`): la escena sigue a la anterior sin salto de tiempo; al compilar se compara dónde terminó cada personaje (posición, orientación, sentado o de pie, objetos en la mano) con cómo empieza esta escena, y cualquier diferencia es un error de QA (`continuity.racord`). Quien entra o sale de la habitación entre escenas no cuenta.
+
+**Voces**: dos diálogos nunca se solapan. Si un tiempo forzado (`at`, `with`…) haría empezar una frase antes de que acabe la anterior, el director la retrasa hasta 0,12 s después; la QA comprueba que no haya solapes (`dialogue.noOverlap`).
 
 **Tiempo relativo** (en acciones, diálogos, planos y sonidos): `at` (absoluto) | `after: "<id>"` (al terminar) | `with: "<id>"` (al empezar), más `offset`. Un diálogo sin tiempo va detrás del anterior (+ su `pauseAfter`, 0,25 s por defecto: ritmo de conversación); una acción sin tiempo va detrás de la acción anterior del mismo actor. Las duraciones reales de voz salen del TTS, así que el montaje se ajusta solo.
 
@@ -134,7 +138,7 @@ Diálogo: `{ "id", "actor", "text", "to", "emotion", "intensity", "direction", "
 
 **Cobertura automática** (`"coverage": "auto"`): el director corta solo — plano de situación, contraplanos por encima del hombro, planos medios y primeros planos (más cerrados en emociones fuertes), planos de dos cada pocos intercambios, plano con seguimiento si quien habla camina—, respeta la regla de los 180° (la cámara se queda en el lado del público), anticipa el corte 0,12 s a la voz (J-cut), no corta en menos de 1,4 s, evita los *jump cuts* y no deja planos de menos de 0,7 s. Los planos escritos pasan a ser **insertos** con `durationSec` y la cobertura se reanuda después.
 
-Planos: `{ "id", "at|after|with", "durationSec", "camera": {…}, "transitionIn": { "type": "cut|dissolve|fade|iris|wipe", "durationSec" } }`. Cámara `static` (`position`, `target`, `fov`) o por encuadre: `framing` = establishing/wide/full/medium/medium-close/close/extreme-close/two-shot/over-shoulder/insert con `subject`/`subjects`/`over`, `azimuthDeg`, `elevationDeg`, `side`, `track`, `move` (`push-in`, `pull-out`, `orbit`, `truck`, `crane`, `dolly` + `amount`), `handheld` 0–1, `compose` (`thirds` por defecto: en planos individuales el sujeto queda en el tercio opuesto a su mirada, con aire delante; `center`). El encuadre usa la dirección real de la cara durante el plano, evita que otro actor o un objeto grande tape al sujeto y no atraviesa paredes.
+Planos: `{ "id", "at|after|with", "durationSec", "camera": {…}, "transitionIn": { "type": "cut|dissolve|fade|iris|wipe", "durationSec" } }`. Cámara `static` (`position`, `target`, `fov`) o por encuadre: `framing` = establishing/wide/full/medium/medium-close/close/extreme-close/two-shot/over-shoulder/insert con `subject`/`subjects`/`over`, `azimuthDeg`, `elevationDeg`, `side`, `track`, `move` (`push-in`, `pull-out`, `orbit`, `truck`, `crane`, `dolly` + `amount`), `handheld` 0–1 (un plano con `track` decide su orientación al empezar y luego solo se desplaza con el personaje: nunca gira a su alrededor), `compose` (`thirds` por defecto: en planos individuales el sujeto queda en el tercio opuesto a su mirada, con aire delante; `center`). El encuadre usa la dirección real de la cara durante el plano, evita que otro actor o un objeto grande tape al sujeto y no atraviesa paredes.
 
 Sonido: `{ "kind": "sfx|ambience|music", "sound": "<id>", "at|after|with", "durationSec", "gainDb", "fadeIn", "fadeOut", "pan" }`. Los pasos, agarres, impactos y crujidos se generan solos (foley automático).
 

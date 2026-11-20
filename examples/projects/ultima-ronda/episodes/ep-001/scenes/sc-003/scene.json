@@ -1,8 +1,9 @@
 {
+  "continuous": true,
   "schemaVersion": 2,
   "id": "sc-003",
   "name": "Punto dos",
-  "synopsis": "Dani se va, Vera le frena; la invitación, la confesión, vuelve la luz y el nombre del cóctel.",
+  "synopsis": "Dani se va, Susana le frena; la invitación, la confesión, vuelve la luz y el nombre del cóctel.",
   "environmentId": "sirena",
   "durationSec": "auto",
   "tailSec": 0.6,
@@ -11,8 +12,8 @@
   "coverage": "auto",
   "actors": [
     {
-      "id": "vera",
-      "characterId": "vera",
+      "id": "susana",
+      "characterId": "susana",
       "position": [
         -1.62,
         0,
@@ -39,9 +40,9 @@
     {
       "id": "copa",
       "propId": "copa",
-      "on": {
-        "prop": "barra",
-        "anchor": "cliente"
+      "heldBy": {
+        "actor": "dani",
+        "hand": "right"
       }
     },
     {
@@ -265,6 +266,18 @@
       "until": "luz-vuelve"
     },
     {
+      "id": "dani-deja-copa",
+      "type": "place",
+      "actor": "dani",
+      "at": 0.15,
+      "prop": "copa",
+      "on": {
+        "prop": "barra",
+        "anchor": "cliente"
+      },
+      "durationSec": 0.9
+    },
+    {
       "id": "dani-se-levanta",
       "type": "stand",
       "actor": "dani",
@@ -289,7 +302,7 @@
       "actor": "dani",
       "after": "v15",
       "offset": -0.4,
-      "towards": "vera",
+      "towards": "susana",
       "durationSec": 0.8
     },
     {
@@ -303,12 +316,12 @@
         0,
         0.45
       ],
-      "faceTo": "vera"
+      "faceTo": "susana"
     },
     {
-      "id": "vera-sonrie",
+      "id": "susana-sonrie",
       "type": "expression",
-      "actor": "vera",
+      "actor": "susana",
       "with": "d16",
       "offset": 0.8,
       "expression": "smile",
@@ -333,9 +346,9 @@
       "durationSec": 2.5
     },
     {
-      "id": "vera-guino",
+      "id": "susana-guino",
       "type": "expression",
-      "actor": "vera",
+      "actor": "susana",
       "with": "v19",
       "offset": 0.6,
       "expression": "smirk",
@@ -348,12 +361,12 @@
       "actor": "dani",
       "text": "Debería irme. Es tarde.",
       "emotion": "sad",
-      "to": "vera",
+      "to": "susana",
       "at": 0.5
     },
     {
       "id": "v15",
-      "actor": "vera",
+      "actor": "susana",
       "text": "Dani. La lista. Punto dos.",
       "emotion": "determined",
       "to": "dani",
@@ -366,13 +379,13 @@
       "actor": "dani",
       "text": "¿Cenarías conmigo? Mañana. Sin lámparas.",
       "emotion": "determined",
-      "to": "vera",
+      "to": "susana",
       "after": "dani-vuelve",
       "offset": -0.3
     },
     {
       "id": "v16",
-      "actor": "vera",
+      "actor": "susana",
       "text": "Llevo tres meses poniéndote poco hielo para que te quedes más rato.",
       "emotion": "smirk",
       "to": "dani",
@@ -383,11 +396,11 @@
       "actor": "dani",
       "text": "¿Y por qué no me lo preguntaste tú?",
       "emotion": "surprise",
-      "to": "vera"
+      "to": "susana"
     },
     {
       "id": "v17",
-      "actor": "vera",
+      "actor": "susana",
       "text": "Porque el cóctel no tenía nombre. Le faltaba alguien que se atreviera a pedirlo.",
       "emotion": "smirk",
       "to": "dani",
@@ -398,13 +411,13 @@
       "actor": "dani",
       "text": "¿Y cómo se llama?",
       "emotion": "joy",
-      "to": "vera",
+      "to": "susana",
       "after": "luz-vuelve",
       "offset": 0.5
     },
     {
       "id": "v18",
-      "actor": "vera",
+      "actor": "susana",
       "text": "Punto dos.",
       "emotion": "smirk",
       "to": "dani",
@@ -415,11 +428,11 @@
       "actor": "dani",
       "text": "¿Y el punto tres? No hablar del tiempo.",
       "emotion": "laugh",
-      "to": "vera"
+      "to": "susana"
     },
     {
       "id": "v19",
-      "actor": "vera",
+      "actor": "susana",
       "text": "Pues mañana... va a hacer mucho calor.",
       "emotion": "smirk",
       "to": "dani",

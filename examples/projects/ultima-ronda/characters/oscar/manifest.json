@@ -1,0 +1,13 @@
+{
+  "schemaVersion": 2,
+  "id": "oscar",
+  "type": "character",
+  "name": "Óscar Benítez",
+  "rigType": "humanoid",
+  "age": 39,
+  "tags": [
+    "secundario",
+    "fisioterapeuta",
+    "mejor amigo de Dani"
+  ]
+}
