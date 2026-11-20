@@ -436,7 +436,9 @@ export function compileScene(scene: SceneV2, lib: AssetLibrary, opts: DirectorOp
 
   // ---------------- scene duration and open intervals
   let end = 0;
-  for (const it of items) if (it.kind !== 'sound' || (it.data as SoundEvent).kind === 'sfx') end = Math.max(end, it.end ?? 0);
+  // persistent states ("off" effects: a device stays switched off) do not stretch an automatic scene length
+  const persistent = (it: { kind: string; data: unknown }) => it.kind === 'action' && (it.data as { type: string; effect?: string }).type === 'effect' && (it.data as { effect?: string }).effect === 'off';
+  for (const it of items) if ((it.kind !== 'sound' || (it.data as SoundEvent).kind === 'sfx') && !persistent(it)) end = Math.max(end, it.end ?? 0);
   for (const a of actors) for (const st of a.steps) end = Math.max(end, st.end);
   for (const c of audio) if (c.kind === 'sfx' && c.auto) end = Math.max(end, c.start + 0.3);
   const duration = scene.durationSec === 'auto' ? Math.ceil((end + scene.tailSec) * 100) / 100 : scene.durationSec;
@@ -476,7 +478,7 @@ export function compileScene(scene: SceneV2, lib: AssetLibrary, opts: DirectorOp
   for (const sh of resolved.shots) for (const ref of [sh.camera.subject, sh.camera.over, ...(sh.camera.subjects ?? [])]) if (ref && !actors.some(a => a.id === ref) && !props.some(p => p.id === ref)) throw new Error(`Plano ${sh.id}: sujeto desconocido ${ref}`);
   // ---------------- subtitles (max 2 lines x 42 chars per cue)
   for (const a of actors) for (const sp of a.speech) {
-    const chunks = splitSubtitle(sp.text);
+    const chunks = splitSubtitle(sp.text.replace(/\s*\[pausa\s+[0-9.]+\]\s*/gi, ' ').replace(/\s{2,}/g, ' ').trim());
     const total = chunks.reduce((n, c) => n + c.length, 0);
     let t = sp.start;
     for (const c of chunks) { const d = (sp.end - sp.start) * c.length / total; resolved.subtitles.push({ start: t, end: Math.min(duration, t + d + 0.15), actor: a.id, text: c, lineId: sp.lineId }); t += d; }

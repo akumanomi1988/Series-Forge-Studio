@@ -121,7 +121,7 @@ test('timing relativo after/with y escena de duración automática', async () =>
     dialogue: [{ id: 'd1', actor: 'bruno', text: 'Hola Lara.' }, { id: 'd2', actor: 'lara', text: '¿Qué has roto esta vez?', emotion: 'enfado' }],
     actions: [{ id: 'w', type: 'walk', actor: 'lara', after: 'd1', to: { actor: 'bruno', distance: 1 } }] }), L, { speech: { d1: { duration: 1.2, visemes: [] }, d2: { duration: 2, visemes: [] } } });
   const d1 = sc.audio.find(a => a.id === 'd1')!, d2 = sc.audio.find(a => a.id === 'd2')!;
-  assert.equal(d1.start, 0.6); assert.ok(Math.abs(d2.start - (0.6 + 1.2 + 0.35)) < 1e-9);
+  assert.equal(d1.start, 0.6); assert.ok(Math.abs(d2.start - (0.6 + 1.2 + 0.25)) < 1e-9, 'pauseAfter por defecto 0,25 s');
   const lara = sc.actors.find(a => a.id === 'lara')!;
   assert.ok(lara.root.some(s => (s.kind === 'walk' || s.kind === 'turn') && Math.abs(s.start - 1.8) < 0.01));
   assert.ok(lara.root.some(s => s.kind === 'walk'));

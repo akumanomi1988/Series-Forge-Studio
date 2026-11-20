@@ -260,7 +260,7 @@ export const ActionSchema = z.discriminatedUnion('type', [
   z.object({ type: z.literal('sit'), id: z.string().max(60).optional(), actor: z.string(), ...timeRef, prop: z.string(), anchor: z.string().default('seat'), durationSec: num(0.3, 10).default(1.0) }).strict(),
   z.object({ type: z.literal('stand'), id: z.string().max(60).optional(), actor: z.string(), ...timeRef, durationSec: num(0.3, 10).default(1.0) }).strict(),
   z.object({ type: z.literal('propJoint'), id: z.string().max(60).optional(), prop: z.string(), joint: z.string(), ...timeRef, toDeg: num(-360, 360), fromDeg: num(-360, 360).optional(), durationSec: num(0.05, 60).default(0.8), ease: z.string().max(20).optional(), sound: z.string().max(60).optional() }).strict(),
-  z.object({ type: z.literal('effect'), id: z.string().max(60).optional(), effect: z.enum(['sparks', 'smoke', 'flicker', 'glow']), ...timeRef, prop: z.string().optional(), part: z.string().optional(), position: vec3.optional(), durationSec: num(0.05, 600).default(1), intensity: num(0, 5).default(1), sound: z.string().max(60).optional() }).strict()
+  z.object({ type: z.literal('effect'), id: z.string().max(60).optional(), effect: z.enum(['sparks', 'smoke', 'flicker', 'glow', 'off']), ...timeRef, prop: z.string().optional(), part: z.string().optional(), position: vec3.optional(), durationSec: num(0.05, 600).default(1), intensity: num(0, 5).default(1), sound: z.string().max(60).optional() }).strict()
 ]);
 export type Action = z.infer<typeof ActionSchema>;
 export const DialogueLineSchema = z.object({
@@ -276,7 +276,7 @@ export const DialogueLineSchema = z.object({
   reveals: z.array(z.string().max(80)).default([]),
   rate: num(0.5, 2).optional(),
   pitchSemitones: num(-6, 6).optional(),
-  pauseAfter: num(0, 10).default(0.35),
+  pauseAfter: num(0, 10).default(0.25),
   ...timeRef
 }).strict();
 export type DialogueLine = z.infer<typeof DialogueLineSchema>;
@@ -322,7 +322,7 @@ export const SceneSchemaV2 = z.object({
   synopsis: z.string().max(4000).optional(),
   environmentId: slug.nullable(),
   durationSec: z.union([num(0.5, 3600), z.literal('auto')]).default('auto'),
-  tailSec: num(0, 30).default(1.2),
+  tailSec: num(0, 30).default(0.8),
   autoLook: z.boolean().default(true),
   actors: z.array(z.object({ id: slug, characterId: slug, position: vec3, yawDeg: num(-3600, 3600).default(0), expression: slug.default('neutral'), idle: slug.default('idle') }).strict()).max(20),
   props: z.array(z.object({ id: slug, propId: slug, position: vec3.optional(), yawDeg: num(-3600, 3600).default(0), on: z.object({ prop: z.string(), anchor: z.string().default('top') }).strict().optional(), heldBy: z.object({ actor: z.string(), hand: z.enum(['left', 'right']).default('right') }).strict().optional(), scale: num(0.05, 20).default(1) }).strict()).max(100).default([]),

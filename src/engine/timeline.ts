@@ -38,7 +38,7 @@ export type PropSegment =
   | { kind: 'fall'; start: number; end: number; actor: string; hand: 'left' | 'right'; floorY: number; seed: number; impacts: number[]; rest: Vec3; restRotationDeg: Vec3; restYaw: number };
 export interface PropJointAnim { joint: string; start: number; end: number; fromDeg: number; toDeg: number; ease?: string }
 export interface PropTimeline { id: string; propId: string; scale: number; segments: PropSegment[]; joints: PropJointAnim[] }
-export interface EffectInstance { effect: 'sparks' | 'smoke' | 'flicker' | 'glow'; start: number; end: number; prop?: string; part?: string; position?: Vec3; intensity: number; seed: number }
+export interface EffectInstance { effect: 'sparks' | 'smoke' | 'flicker' | 'glow' | 'off'; start: number; end: number; prop?: string; part?: string; position?: Vec3; intensity: number; seed: number }
 export interface ResolvedShot { id: string; start: number; end: number; camera: CameraSpec; transitionIn?: { type: 'cut' | 'dissolve' | 'fade' | 'iris' | 'wipe'; durationSec: number } }
 export interface AudioCue { id: string; kind: 'dialogue' | 'sfx' | 'ambience' | 'music'; sound: string; start: number; duration: number; gainDb: number; fadeIn: number; fadeOut: number; pan: number; duck: boolean; file?: string; actor?: string; text?: string; auto?: boolean }
 

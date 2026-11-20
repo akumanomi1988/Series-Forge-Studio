@@ -142,6 +142,15 @@ export class Stage {
     if (part) { mat = (part.material as THREE.Material).clone() as THREE.MeshToonMaterial; part.material = mat; }
     const baseColor = mat ? mat.color.clone() : null;
     const baseEm = mat && 'emissiveIntensity' in mat ? mat.emissiveIntensity : 0;
+    if (def.effect === 'off') {
+      // switch a device off: its lights go dark and the given part (screen, bulb…) loses its glow
+      const lights = (pv?.lights ?? []).map(l => ({ l, base: l.intensity }));
+      return { def, obj: new THREE.Group(), update: t => {
+        const w = intervalWeight(t, def.start, def.end, 0.04, 0.08) * Math.min(1, def.intensity);
+        for (const { l, base } of lights) l.intensity = base * (1 - w);
+        if (mat && baseColor) { mat.color.copy(baseColor).multiplyScalar(1 - 0.85 * w); if ('emissiveIntensity' in mat) mat.emissiveIntensity = baseEm * (1 - w); }
+      } };
+    }
     return { def, obj: new THREE.Group(), update: t => {
       if (!mat || !baseColor) return;
       const w = intervalWeight(t, def.start, def.end, 0.05, 0.1);
