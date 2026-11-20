@@ -1,0 +1,47 @@
+{
+  "schemaVersion": 2,
+  "generator": "parts",
+  "params": {},
+  "parts": [
+    {
+      "id": "cuerpo",
+      "primitive": "roundedBox",
+      "size": [
+        0.08,
+        0.17,
+        0.012
+      ],
+      "position": [
+        0,
+        0.08,
+        0
+      ],
+      "color": "#222a34"
+    },
+    {
+      "id": "pantalla",
+      "primitive": "box",
+      "size": [
+        0.071,
+        0.14,
+        0.004
+      ],
+      "position": [
+        0,
+        0.08,
+        0.009
+      ],
+      "color": "#3b72bb"
+    }
+  ],
+  "material": "plastic",
+  "anchors": {
+    "grip": {
+      "position": [
+        0,
+        0.15,
+        0
+      ]
+    }
+  }
+}

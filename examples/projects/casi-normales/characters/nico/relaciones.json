@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 2,
+  "relations": [
+    {
+      "characterId": "vera",
+      "type": "desconocida que conoce por una aplicación",
+      "feeling": "curiosidad y nervios",
+      "trust": 0.1,
+      "history": []
+    }
+  ]
+}

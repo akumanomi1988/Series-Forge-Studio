@@ -1,0 +1,11 @@
+{
+  "schemaVersion": 2,
+  "id": "vera",
+  "type": "character",
+  "name": "Vera Montero",
+  "rigType": "humanoid",
+  "age": 29,
+  "tags": [
+    "protagonista"
+  ]
+}

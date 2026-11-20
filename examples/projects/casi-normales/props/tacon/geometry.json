@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 2,
+  "generator": "parts",
+  "params": {},
+  "parts": [
+    {
+      "id": "zapato",
+      "primitive": "roundedBox",
+      "size": [
+        0.12,
+        0.09,
+        0.24
+      ],
+      "position": [
+        0,
+        0.1,
+        0
+      ],
+      "color": "#a72d55"
+    }
+  ],
+  "material": "cloth",
+  "anchors": {
+    "grip": {
+      "position": [
+        0,
+        0.15,
+        0
+      ]
+    }
+  }
+}

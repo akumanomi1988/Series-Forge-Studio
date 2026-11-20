@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 2,
+  "relations": [
+    {
+      "characterId": "dani",
+      "type": "expareja",
+      "feeling": "cansancio y distancia",
+      "trust": -0.35,
+      "history": [
+        "Terminaron hace meses por el afán de Dani de controlarlo todo."
+      ]
+    }
+  ]
+}

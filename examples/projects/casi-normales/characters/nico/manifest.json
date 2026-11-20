@@ -1,0 +1,11 @@
+{
+  "schemaVersion": 2,
+  "id": "nico",
+  "type": "character",
+  "name": "Nico Salcedo",
+  "rigType": "humanoid",
+  "age": 31,
+  "tags": [
+    "protagonista"
+  ]
+}

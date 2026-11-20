@@ -1,0 +1,77 @@
+{
+  "schemaVersion": 1,
+  "facts": [
+    {
+      "id": "inicio",
+      "text": "Nico y Vera se conocieron en una aplicación de citas; esta historia es el primer encuentro.",
+      "since": "canon",
+      "status": "canon",
+      "amended": []
+    },
+    {
+      "id": "narrador",
+      "text": "Nico adulto cuenta en pasado sus aventuras; sus recuerdos pueden ser subjetivos.",
+      "since": "canon",
+      "status": "canon",
+      "amended": []
+    },
+    {
+      "id": "ex",
+      "text": "Dani fue pareja de Vera; la relación terminó meses antes de la primera cita.",
+      "since": "canon",
+      "status": "canon",
+      "amended": []
+    }
+  ],
+  "characters": {
+    "nico": {
+      "knows": [
+        "inicio",
+        "narrador"
+      ],
+      "emotionalState": "nervioso antes de la cita",
+      "goals": [
+        "Gustarle a Vera sin hacer el ridículo"
+      ],
+      "arc": []
+    },
+    "vera": {
+      "knows": [
+        "inicio",
+        "ex"
+      ],
+      "emotionalState": "escéptica con las citas",
+      "goals": [
+        "Conocer a alguien auténtico"
+      ],
+      "arc": []
+    },
+    "dani": {
+      "knows": [
+        "ex"
+      ],
+      "emotionalState": "orgullo herido",
+      "goals": [
+        "Dejar claro que él es mejor"
+      ],
+      "arc": []
+    }
+  },
+  "relationships": [
+    {
+      "a": "vera",
+      "b": "dani",
+      "type": "expareja",
+      "trust": -0.3,
+      "history": []
+    },
+    {
+      "a": "nico",
+      "b": "vera",
+      "type": "desconocidos por Tinder",
+      "trust": 0.1,
+      "history": []
+    }
+  ],
+  "confirmedEpisodes": []
+}

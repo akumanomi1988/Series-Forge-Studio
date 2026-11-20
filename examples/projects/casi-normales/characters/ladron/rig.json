@@ -1,0 +1,6 @@
+{
+  "schemaVersion": 2,
+  "type": "humanoid",
+  "template": "humanoid-v2",
+  "boneOffsets": {}
+}

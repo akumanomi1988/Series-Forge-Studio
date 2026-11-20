@@ -1,0 +1,11 @@
+{
+  "schemaVersion": 2,
+  "id": "dani",
+  "type": "character",
+  "name": "Dani Rojas",
+  "rigType": "humanoid",
+  "age": 33,
+  "tags": [
+    "secundario"
+  ]
+}

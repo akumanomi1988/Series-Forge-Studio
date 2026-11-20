@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 2,
+  "generator": "parts",
+  "params": {},
+  "parts": [
+    {
+      "id": "bandeja",
+      "primitive": "cylinder",
+      "size": [
+        0.3,
+        0.025,
+        0.23
+      ],
+      "position": [
+        0,
+        0.02,
+        0
+      ],
+      "color": "#9ca5ad"
+    }
+  ],
+  "material": "metal",
+  "anchors": {
+    "grip": {
+      "position": [
+        0,
+        0.15,
+        0
+      ]
+    }
+  }
+}

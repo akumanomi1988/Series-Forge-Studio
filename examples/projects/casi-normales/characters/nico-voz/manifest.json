@@ -1,0 +1,13 @@
+{
+  "schemaVersion": 2,
+  "id": "nico-voz",
+  "type": "character",
+  "name": "Nico, voz en off",
+  "rigType": "humanoid",
+  "age": 31,
+  "tags": [
+    "technical",
+    "narrator",
+    "offscreen"
+  ]
+}

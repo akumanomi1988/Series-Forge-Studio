@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 2,
+  "generator": "parts",
+  "params": {},
+  "parts": [
+    {
+      "id": "plato",
+      "primitive": "cylinder",
+      "size": [
+        0.27,
+        0.016,
+        0.27
+      ],
+      "position": [
+        0,
+        0.01,
+        0
+      ],
+      "color": "#eee9e5"
+    }
+  ],
+  "material": "glass",
+  "anchors": {
+    "grip": {
+      "position": [
+        0,
+        0.15,
+        0
+      ]
+    }
+  }
+}

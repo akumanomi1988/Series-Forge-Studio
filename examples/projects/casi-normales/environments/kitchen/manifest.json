@@ -1,0 +1,6 @@
+{
+  "schemaVersion": 2,
+  "id": "kitchen",
+  "type": "environment",
+  "name": "Cocina del restaurante"
+}

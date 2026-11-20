@@ -1,0 +1,75 @@
+{
+  "schemaVersion": 2,
+  "generator": "humanoid-toon",
+  "body": {
+    "height": 1.72,
+    "headScale": 0.96,
+    "headWidth": 0.92,
+    "jaw": 0.25,
+    "shoulderWidth": 0.37,
+    "hipWidth": 0.37,
+    "torsoScale": 1,
+    "legScale": 1.06,
+    "armScale": 1,
+    "armThickness": 0.044,
+    "legThickness": 0.07,
+    "chestDepth": 0.23,
+    "belly": 0,
+    "chest": 0.62,
+    "neckLength": 0.085,
+    "handSize": 0.9,
+    "footSize": 0.88,
+    "skinColor": "#c99272",
+    "skinGloss": 0.4
+  },
+  "face": {
+    "eyeSize": 1.12,
+    "eyeSpacing": 1,
+    "eyeHeight": 0.04,
+    "irisColor": "#7a4a22",
+    "eyeShape": "almond",
+    "browThickness": 0.85,
+    "browColor": "#2a1712",
+    "noseShape": "button",
+    "noseSize": 0.8,
+    "mouthWidth": 1.02,
+    "lipColor": "#b3123a",
+    "earSize": 0.85,
+    "freckles": false,
+    "blush": 0.3
+  },
+  "hair": {
+    "style": "bun",
+    "color": "#3b1a12",
+    "volume": 1.25,
+    "shine": 0.75
+  },
+  "beard": {
+    "style": "none"
+  },
+  "outfit": {
+    "top": {
+      "type": "tshirt",
+      "color": "#4c648b",
+      "neckline": "crew",
+      "fabric": "matte"
+    },
+    "bottom": {
+      "type": "pants",
+      "color": "#34354a",
+      "fabric": "matte"
+    },
+    "shoes": {
+      "type": "shoes",
+      "color": "#141014"
+    }
+  },
+  "accessories": [
+    {
+      "type": "earrings",
+      "color": "#e8c25a"
+    }
+  ],
+  "parts": [],
+  "outlineWidth": 0.01
+}

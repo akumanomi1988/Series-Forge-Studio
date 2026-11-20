@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 2,
+  "relations": [
+    {
+      "characterId": "vera",
+      "type": "expareja",
+      "feeling": "orgullo herido",
+      "trust": 0.1,
+      "history": [
+        "Vera rompió la relación."
+      ]
+    }
+  ]
+}

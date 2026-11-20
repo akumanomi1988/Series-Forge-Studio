@@ -1,0 +1,9 @@
+{
+  "schemaVersion": 2,
+  "generator": "stool",
+  "params": {
+    "seatHeight": 0.76,
+    "color": "#8a1c2b"
+  },
+  "material": "cloth"
+}

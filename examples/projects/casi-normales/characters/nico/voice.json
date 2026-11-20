@@ -1,0 +1,46 @@
+{
+  "schemaVersion": 2,
+  "provider": "kokoro",
+  "voice": "em_alex",
+  "language": "es-ES",
+  "rate": 0.94,
+  "pitchSemitones": -1.1,
+  "formantPreserve": true,
+  "gainDb": 0,
+  "eq": {
+    "lowDb": 0,
+    "midDb": 0,
+    "highDb": 0
+  },
+  "emotionProsody": true,
+  "instruct": "Spanish male, intimate self-deprecating conversational tone",
+  "emotions": {
+    "nervous": {
+      "rate": 1.09,
+      "pitchSemitones": 0.8
+    },
+    "smirk": {
+      "rate": 0.94
+    },
+    "surprise": {
+      "rate": 1.05
+    }
+  },
+  "alternatives": {
+    "voicebox": {
+      "voice": "",
+      "engine": "qwen",
+      "instruct": "Spanish male, intimate self-deprecating conversational tone",
+      "license": {
+        "id": "voicebox-profile-not-configured",
+        "commercialUse": "unknown",
+        "notes": "Configurar con voz propia o autorizada antes de sustituir Kokoro"
+      }
+    }
+  },
+  "license": {
+    "id": "Apache-2.0",
+    "commercialUse": "allowed",
+    "notes": "Kokoro-82M; comprobar licencias de modelos de terceros mezclados antes de distribuir"
+  }
+}

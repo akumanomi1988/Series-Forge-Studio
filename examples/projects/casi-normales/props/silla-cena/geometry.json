@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 2,
+  "generator": "chair",
+  "params": {},
+  "parts": [],
+  "material": "wood",
+  "anchors": {
+    "grip": {
+      "position": [
+        0,
+        0.15,
+        0
+      ]
+    }
+  }
+}

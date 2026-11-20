@@ -1,0 +1,92 @@
+{
+  "schemaVersion": 2,
+  "kind": "exterior",
+  "size": [
+    18,
+    8,
+    14
+  ],
+  "floor": {
+    "color": "#35383e",
+    "pattern": "asphalt"
+  },
+  "walls": {
+    "color": "#2e3444",
+    "trimColor": "#202632",
+    "sides": [],
+    "panel": false
+  },
+  "openings": [],
+  "lights": [
+    {
+      "type": "key",
+      "position": [
+        2,
+        6,
+        3
+      ],
+      "target": [
+        0,
+        1.6,
+        0
+      ],
+      "color": "#f6dda9",
+      "intensity": 1.2
+    },
+    {
+      "type": "rim",
+      "position": [
+        -4,
+        3,
+        -3
+      ],
+      "target": [
+        0,
+        1,
+        0
+      ],
+      "color": "#7c8cdd",
+      "intensity": 0.9
+    }
+  ],
+  "ambient": {
+    "sky": "#dfd2d2",
+    "ground": "#3a3746",
+    "intensity": 1.25
+  },
+  "props": [
+    {
+      "id": "banco",
+      "propId": "mesa-baja",
+      "position": [
+        2.2,
+        0,
+        -1.5
+      ],
+      "yawDeg": 0,
+      "scale": 1
+    },
+    {
+      "id": "calle-puerta",
+      "propId": "puerta-bar",
+      "position": [
+        -5,
+        0,
+        -2
+      ],
+      "yawDeg": 0,
+      "scale": 1
+    }
+  ],
+  "decor": [],
+  "walkable": {
+    "min": [
+      -8.5,
+      -6.5
+    ],
+    "max": [
+      8.5,
+      6.5
+    ]
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 2,
+  "relations": [
+    {
+      "characterId": "vera",
+      "type": "amiga íntima",
+      "feeling": "lealtad",
+      "trust": 0.95,
+      "history": [
+        "Amigas desde la universidad."
+      ]
+    }
+  ]
+}

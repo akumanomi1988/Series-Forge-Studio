@@ -1,0 +1,48 @@
+{
+  "schemaVersion": 2,
+  "generator": "parts",
+  "material": "cloth",
+  "restHeight": 0.002,
+  "parts": [
+    {
+      "id": "papel",
+      "primitive": "box",
+      "size": [
+        0.13,
+        0.003,
+        0.13
+      ],
+      "position": [
+        0,
+        0.0015,
+        0
+      ],
+      "color": "#f4efe6"
+    },
+    {
+      "id": "tinta",
+      "primitive": "box",
+      "size": [
+        0.08,
+        0.001,
+        0.05
+      ],
+      "position": [
+        0,
+        0.0035,
+        0.01
+      ],
+      "color": "#2b3a6b",
+      "outline": false
+    }
+  ],
+  "anchors": {
+    "grip": {
+      "position": [
+        0,
+        0.002,
+        0
+      ]
+    }
+  }
+}

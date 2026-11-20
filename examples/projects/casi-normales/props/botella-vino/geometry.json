@@ -1,0 +1,47 @@
+{
+  "schemaVersion": 2,
+  "generator": "parts",
+  "params": {},
+  "parts": [
+    {
+      "id": "cristal",
+      "primitive": "cylinder",
+      "size": [
+        0.08,
+        0.3,
+        0.08
+      ],
+      "position": [
+        0,
+        0.18,
+        0
+      ],
+      "color": "#364735"
+    },
+    {
+      "id": "cuello",
+      "primitive": "cylinder",
+      "size": [
+        0.03,
+        0.13,
+        0.03
+      ],
+      "position": [
+        0,
+        0.37,
+        0
+      ],
+      "color": "#364735"
+    }
+  ],
+  "material": "glass",
+  "anchors": {
+    "grip": {
+      "position": [
+        0,
+        0.15,
+        0
+      ]
+    }
+  }
+}

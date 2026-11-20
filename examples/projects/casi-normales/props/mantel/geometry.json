@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 2,
+  "generator": "parts",
+  "params": {},
+  "parts": [
+    {
+      "id": "tela",
+      "primitive": "box",
+      "size": [
+        1.3,
+        0.012,
+        0.85
+      ],
+      "position": [
+        0,
+        0.04,
+        0
+      ],
+      "color": "#f3f0e8"
+    }
+  ],
+  "material": "cloth",
+  "anchors": {
+    "grip": {
+      "position": [
+        0,
+        0.15,
+        0
+      ]
+    }
+  }
+}

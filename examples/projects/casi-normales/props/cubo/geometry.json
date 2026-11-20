@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 2,
+  "generator": "parts",
+  "params": {},
+  "parts": [
+    {
+      "id": "cuerpo",
+      "primitive": "cylinder",
+      "size": [
+        0.19,
+        0.3,
+        0.19
+      ],
+      "position": [
+        0,
+        0.16,
+        0
+      ],
+      "color": "#365fa0"
+    }
+  ],
+  "material": "plastic",
+  "anchors": {
+    "grip": {
+      "position": [
+        0,
+        0.15,
+        0
+      ]
+    }
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "schemaVersion": 2,
+  "id": "sofia",
+  "type": "character",
+  "name": "Sofía",
+  "rigType": "humanoid",
+  "age": 30,
+  "tags": [
+    "secundario"
+  ]
+}

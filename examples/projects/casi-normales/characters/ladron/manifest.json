@@ -1,0 +1,11 @@
+{
+  "schemaVersion": 2,
+  "id": "ladron",
+  "type": "character",
+  "name": "El falso camarero",
+  "rigType": "humanoid",
+  "age": 28,
+  "tags": [
+    "secundario"
+  ]
+}

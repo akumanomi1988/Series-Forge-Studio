@@ -1,0 +1,47 @@
+{
+  "schemaVersion": 2,
+  "generator": "parts",
+  "material": "glass",
+  "restHeight": 0,
+  "params": {
+    "lightIntensity": 0.9,
+    "lightColor": "#ffb347",
+    "lightY": 0.14,
+    "lightDistance": 2.4
+  },
+  "parts": [
+    {
+      "id": "vaso",
+      "primitive": "cylinder",
+      "size": [
+        0.04,
+        0.08,
+        0.04
+      ],
+      "position": [
+        0,
+        0.04,
+        0
+      ],
+      "color": "#c96a3a"
+    },
+    {
+      "id": "llama",
+      "primitive": "sphere",
+      "size": [
+        0.012,
+        0.026,
+        0.012
+      ],
+      "position": [
+        0,
+        0.1,
+        0
+      ],
+      "color": "#ffd27a",
+      "emissive": "#ffb347",
+      "emissiveIntensity": 4,
+      "outline": false
+    }
+  ]
+}

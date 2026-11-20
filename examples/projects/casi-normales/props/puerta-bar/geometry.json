@@ -1,0 +1,10 @@
+{
+  "schemaVersion": 2,
+  "generator": "door",
+  "params": {
+    "width": 0.95,
+    "height": 2.1,
+    "color": "#2a140e"
+  },
+  "material": "wood"
+}

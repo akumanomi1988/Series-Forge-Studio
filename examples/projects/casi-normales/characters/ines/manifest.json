@@ -1,0 +1,11 @@
+{
+  "schemaVersion": 2,
+  "id": "ines",
+  "type": "character",
+  "name": "Agente Inés",
+  "rigType": "humanoid",
+  "age": 39,
+  "tags": [
+    "secundario"
+  ]
+}

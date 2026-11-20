@@ -1,0 +1,10 @@
+{
+  "schemaVersion": 2,
+  "id": "casi-normales",
+  "name": "Casi normales",
+  "genre": "comedia de desastres, amistad y humor adulto",
+  "language": "es-ES",
+  "fps": 24,
+  "voiceProvider": "kokoro",
+  "description": "Serie low-poly toon de humor retrospectivo. Piloto: La peor cita del mundo. Universo aislado del proyecto Ultima ronda."
+}
