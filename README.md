@@ -9,9 +9,10 @@ Estudio audiovisual **local y basado en archivos** para producir series de anima
 - **Personajes procedurales** con esqueleto humanoide, skinning, ropa, pelo, barba, accesorios y rig facial (ojos con párpados y mirada, cejas, boca dinámica). Giro libre de cuerpo y cabeza en 3D.
 - **Motor de animación determinista**: keyframes con curvas, capas y máscaras, aditivos, locomoción paramétrica con pasos planificados y pies apoyados (IK), IK de brazos, mirada repartida en columna/cuello/cabeza/ojos, coger/soltar/dar/sentarse, objetos que caen con física balística. `pose(t)` es pura.
 - **Escenarios y objetos** generados (taller, robot, puertas que se abren, mobiliario, exteriores) con anclajes y articulaciones.
-- **Dirección**: acciones y diálogos con tiempos relativos, cámaras por encuadre (plano general, medio, primer plano, plano/contraplano, dos personajes…), movimientos, transiciones (fundido, encadenado, iris, cortinilla), miradas automáticas.
-- **Audio**: voces offline en español por personaje (Windows OneCore/SAPI o Piper), caché, prosodia por emoción, alineación fonética → visemas (lip-sync), foley automático, ambientes y música procedurales, mezcla con ducking, −16 LUFS.
+- **Dirección**: acciones y diálogos con tiempos relativos, cámaras por encuadre con regla de tercios, **cobertura automática** (plano/contraplano con regla de 180°, J-cuts, sin *jump cuts*), movimientos, transiciones, miradas automáticas y **actuación automática** (gestos según el texto y la emoción, reacciones de quien escucha).
+- **Audio**: voces neuronales offline en español con **Kokoro** (local, Apache-2.0) o **Voicebox** (app local), seleccionables por proyecto, con mezclas de voz y entrega por emoción; también Windows OneCore/SAPI y Piper. Caché, prosodia por emoción, alineación fonética → visemas (lip-sync), foley automático, ambientes y música procedural con estilos (lounge, bossa, sitcom), melodía, cortinillas y remates, **banda sonora automática por episodio**, mezcla con ducking, −16 LUFS.
 - **Producción**: render por fragmentos de plano en GPU (Chrome/Edge headless) → FFmpeg, caché por huella de estado (solo se re-renderiza lo que cambia), reanudación tras fallo, MP4 H.264/AAC con subtítulos, WAV maestro, SRT, metadata, storyboard y **informe de QA** (ffprobe, negros, sonoridad, sincronía de diálogo, lip-sync en cada arranque de voz, ritmo sin tiempos muertos, paridad editor/exportación).
+- **Publicación**: conexión OAuth con tu canal de **YouTube** y subida reanudable (privada por defecto) desde la CLI o la web.
 - **Historia**: canon, conocimiento por personaje, relaciones y cronología con propuestas por episodio y confirmación explícita.
 - **Editor web** (React): explorador, visor 3D, inspector paramétrico, timeline multipista, guion con escucha de voz, historia y render. Se actualiza solo cuando un agente cambia archivos.
 
@@ -39,7 +40,9 @@ npm run studio -- render episode <proyecto> <ep> [--draft] [--max-seconds 10] [-
 npm run studio -- validate episode <proyecto> <ep>
 npm run studio -- produce <proyecto> <ep>
 npm run studio -- story status|confirm|amend|revert <proyecto> …
-npm test            # 50 pruebas (unitarias, integración con render real, navegador, TTS)
+npm run setup:kokoro                                 # voces Kokoro locales (una vez)
+npm run studio -- youtube connect|upload <proyecto> <ep>
+npm test            # pruebas (unitarias, integración con render real, navegador, TTS)
 npm run typecheck
 ```
 

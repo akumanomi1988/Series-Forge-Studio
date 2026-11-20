@@ -29,11 +29,11 @@ Herencia de animaciones y expresiones: `library/humanoid/` → `<proyecto>/anima
 
 | bloque | campos |
 |---|---|
-| `body` | `height` (m), `headScale`, `headWidth`, `jaw` 0–1, `shoulderWidth`, `hipWidth`, `torsoScale`, `legScale`, `armScale`, `armThickness`, `legThickness`, `chestDepth`, `belly` 0–1, `chest` 0–1, `neckLength`, `footSize`, `handSize`, `skinColor` |
+| `body` | `height` (m), `headScale`, `headWidth`, `jaw` 0–1, `shoulderWidth`, `hipWidth`, `torsoScale`, `legScale`, `armScale`, `armThickness`, `legThickness`, `chestDepth`, `belly` 0–1, `chest` 0–1, `neckLength`, `footSize`, `handSize`, `skinColor`, `skinGloss` 0–1 (brillo especular toon y reflejo de contraluz en la piel) |
 | `face` | `eyeSize`, `eyeSpacing`, `eyeHeight`, `irisColor`, `eyeShape` (round/almond/narrow), `browThickness`, `browColor`, `noseShape` (button/round/pointy/long/wide), `noseSize`, `mouthWidth`, `lipColor`, `earSize`, `blush` |
-| `hair` | `style` (short, spiky, bob, ponytail, bun, long, curly, mohawk, bald, buzz, sidepart), `color`, `volume` |
+| `hair` | `style` (short, spiky, bob, ponytail, bun, long, curly, mohawk, bald, buzz, sidepart), `color`, `volume`, `shine` 0–1 (banda de brillo) |
 | `beard` | `style` (none, stubble, full, goatee, mustache, chinstrap), `color` |
-| `outfit` | `top.type` (tshirt, longsleeve, jacket, hoodie, vest, overalls, labcoat, tanktop, dress) + `color`/`secondaryColor`; `bottom.type` (pants, shorts, skirt) + `color`; `shoes.type` (sneakers, boots, shoes, sandals) + `color`/`soleColor`; `gloves.color` |
+| `outfit` | `top.type` (tshirt, longsleeve, jacket, hoodie, vest, overalls, labcoat, tanktop, dress) + `color`/`secondaryColor` + `neckline` (crew, v, scoop, plunge, off-shoulder; el escote se dibuja por píxel con borde limpio y sombra de escote si `chest` ≥ 0,35) + `fabric` (matte, satin, silk, leather, sequin: brillo de la tela); `bottom.type` (pants, shorts, skirt) + `color` + `fabric`; `shoes.type` (sneakers, boots, shoes, sandals) + `color`/`soleColor`; `gloves.color` |
 | `accessories[]` | `type` (goggles, glasses, toolbelt, cap, beanie, headset, scarf, badge, apron, watch, earrings, bandana, backpack), `color`, `secondaryColor`, `position` |
 | `parts[]` | primitivas extra (`box/sphere/capsule/cylinder/cone/torus/roundedBox`) pegadas a un hueso (`bone`) o a `headGroup` |
 | `outlineWidth` | grosor del contorno toon (m) |
@@ -42,12 +42,22 @@ Herencia de animaciones y expresiones: `library/humanoid/` → `<proyecto>/anima
 
 `voice.json`:
 ```json
-{ "schemaVersion": 2, "provider": "windows-onecore", "voice": "Microsoft Pablo", "language": "es-ES",
-  "rate": 0.96, "pitchSemitones": -2.5, "formantPreserve": true, "gainDb": 0,
-  "eq": { "lowDb": 2.5, "midDb": 0, "highDb": -1.5 }, "emotionProsody": true,
-  "license": { "id": "windows-onecore-voices", "commercialUse": "unknown", "notes": "…" } }
+{ "schemaVersion": 2, "provider": "kokoro", "voice": "ef_dora:0.8+af_nicole:0.2", "language": "es-ES",
+  "rate": 0.95, "pitchSemitones": -0.8, "formantPreserve": true, "gainDb": 0,
+  "eq": { "lowDb": 1.5, "midDb": 0, "highDb": -1 }, "emotionProsody": true,
+  "instruct": "Warm, low, slightly husky female voice; confident and teasing",
+  "alternatives": {
+    "voicebox": { "voice": "Vera", "engine": "qwen", "license": { "id": "…", "commercialUse": "unknown" } },
+    "windows-onecore": { "voice": "Microsoft Laura", "rate": 0.98 } },
+  "emotions": { "smirk": { "voice": "ef_dora:0.72+af_nicole:0.28", "rate": 0.9, "instruct": "teasing, half-smiling" } },
+  "license": { "id": "Apache-2.0", "commercialUse": "allowed", "notes": "Kokoro-82M" } }
 ```
-Proveedores: `windows-onecore` (voces OneCore instaladas: `npm run studio -- voices`), `windows-sapi`, `piper` (binario local en `tools/piper` o `SERIES_FORGE_PIPER`, `voice` = ruta o nombre del `.onnx`), `silent` (solo pruebas). `commercialUse: "restricted"` bloquea la síntesis.
+Motores (`provider`):
+- `kokoro` — Kokoro-82M (Apache-2.0), local en CPU. Se instala dentro del proyecto con `npm run setup:kokoro` (entorno Python en `tools/kokoro`, paquetes fijados, modelos verificados por SHA-256). Voces españolas: `ef_dora` (mujer), `em_alex`, `em_santa` (hombre). `voice` admite mezclas ponderadas con cualquier voz del modelo (`npm run studio -- voices kokoro`) para dar timbre propio a cada personaje.
+- `voicebox` — la app Voicebox del usuario (https://github.com/jamiepine/voicebox) por su API local (`http://127.0.0.1:17493`, o `SERIES_FORGE_VOICEBOX_URL`, solo direcciones locales). `voice` = nombre o id del perfil; `engine` = motor de Voicebox (`qwen`, `qwen_custom_voice`, `chatterbox`, `kokoro`…); la emoción y `direction` se envían como `instruct`. La licencia depende del motor y de la muestra de voz: decláralo en `license`.
+- `windows-onecore`, `windows-sapi` (voces de Windows), `piper` (binario en `tools/piper` o `SERIES_FORGE_PIPER`), `silent` (solo pruebas).
+
+`alternatives` describe al mismo personaje en otros motores; `voiceProvider` en `project.json` o `episode.json` (o `--voice-provider` en compile/render/produce/say, o el selector «Voces» de la pestaña Render) elige el motor de todo el reparto; `auto` usa el `provider` de cada voz. `emotions` ajusta la entrega por emoción (`voice` para Kokoro, `instruct` para Voicebox, `rate`, `pitchSemitones`, `gainDb`) encima de la prosodia emocional por defecto. `commercialUse: "restricted"` bloquea la síntesis.
 
 ## Animaciones
 
@@ -88,6 +98,8 @@ Parámetros faciales: `browRaiseL/R`, `browAngleL/R` (+ interior arriba / − in
 { "schemaVersion": 2, "generator": "robot", "params": { "height": 1.1, "damaged": true, "color": "#c8ccd2" },
   "anchors": { "grip": { "position": [0, 0.03, 0] } }, "joints": {}, "material": "metal", "restHeight": 0.03 }
 ```
+Cualquier objeto puede emitir luz con `params.lightIntensity`, `lightColor`, `lightY`, `lightDistance` (velas, neones, apliques); `effect: "off"` la apaga.
+
 Generadores: `parts, robot, workbench, chair, stool, door, shelf, toolbox, crate, lamp, mug, wrench, component, monitor, console, barrel, plant, table, sofa, bed, pipe, tree, building, streetlamp, bench, fence, car`. Cada generador aporta anclajes (`grip`, `seat`, `top`, `handle`, `panel`, `eye`…) y articulaciones (`robot`: `head`, `armL`, `armR`, `panel`; `door`: `leaf`; `toolbox`: `lid`) que el archivo puede sobrescribir. `material` elige el foley de impacto (`impact-metal`, `impact-wood`…). Con `generator: "parts"` se construye cualquier objeto con primitivas; una parte con `pivot` gira con esa articulación.
 
 ## Escenario
@@ -97,7 +109,7 @@ Generadores: `parts, robot, workbench, chair, stool, door, shelf, toolbox, crate
 ## Escena (`episodes/<ep>/scenes/sc-NNN/scene.json`)
 
 ```json
-{ "schemaVersion": 2, "id": "sc-001", "name": "…", "environmentId": "taller", "durationSec": "auto", "tailSec": 0.8, "autoLook": true,
+{ "schemaVersion": 2, "id": "sc-001", "name": "…", "environmentId": "taller", "durationSec": "auto", "tailSec": 0.8, "autoLook": true, "autoActing": 1, "coverage": "manual",
   "actors":  [ { "id": "bruno", "characterId": "bruno", "position": [-0.55,0,-0.5], "yawDeg": 72, "expression": "worried", "idle": "idle" } ],
   "props":   [ { "id": "fusible", "propId": "fusible-nucleo", "heldBy": { "actor": "bruno", "hand": "right" } } ],
   "actions": [ … ], "dialogue": [ … ], "shots": [ … ], "sound": [ … ], "transitionOut": { "type": "fade", "durationSec": 0.6 } }
@@ -116,19 +128,23 @@ Acciones (`type`):
 | `pickUp` / `drop` / `place` / `give` / `hold` | `prop`, `hand`; `hold.pose`: front/behind/raised/show/side; `place.on`; `give.to`. `drop` simula caída con rebotes y genera foley de impacto. |
 | `sit` / `stand` | `prop` con anclaje `seat` |
 | `propJoint` | `prop`, `joint`, `toDeg`, `fromDeg`, `durationSec`, `sound` (abrir puertas, cabeza del robot…) |
-| `effect` | `effect`: sparks/smoke/flicker/glow/off; `prop`+`part` o `position`; `sound`. `off` apaga un aparato (sus luces y el brillo de la parte indicada, p. ej. `screen`) mientras dura; no alarga la escena, así que admite duraciones largas |
+| `effect` | `effect`: sparks/smoke/flicker/glow/off; `prop`+`part` o `position`; `sound`. `off` apaga un aparato (sus luces y el brillo de la parte indicada, p. ej. `screen`) mientras dura; sin `prop` ni `part` es un **apagón** del decorado (luces del escenario y ambiente; las luces prácticas como velas siguen encendidas). No alarga la escena. `until: "<id>"` termina el efecto cuando empieza esa línea o acción |
 
-Diálogo: `{ "id", "actor", "text", "to", "emotion", "intensity", "direction", "gesture", "pauseAfter", "rate", "pitchSemitones", "knowledge": [hechos que debe conocer], "reveals": [hechos que revela] }`. `emotion` acepta ids o sinónimos españoles (enfado, alegría, ironía…). `direction` con «susurrando/en voz baja» o «gritando» modifica la prosodia. `[pausa 0.8]` dentro del texto inserta un silencio intencionado (no aparece en subtítulos); el resto de silencios internos de la voz se acortan a ≤ 0,36 s (0,5 s con «...»). Con `autoLook` el que escucha mira al que habla.
+Diálogo: `{ "id", "actor", "text", "to", "emotion", "intensity", "direction", "gesture", "pauseAfter", "rate", "pitchSemitones", "knowledge": [hechos que debe conocer], "reveals": [hechos que revela] }`. `emotion` acepta ids o sinónimos españoles (enfado, alegría, ironía…). `direction` con «susurrando/en voz baja» o «gritando» modifica la prosodia. `[pausa 0.8]` dentro del texto inserta un silencio intencionado (no aparece en subtítulos); el resto de silencios internos de la voz se acortan a ≤ 0,36 s (0,5 s con «...»). Con `autoLook` el que escucha mira al que habla. Con `autoActing` (0 apagado, 1 normal, 1,5 teatral) el que habla gesticula según el texto y la emoción («no…» niega, «sí/vale» asiente, preguntas con encogimiento o palmas, enfado, nervios, risa, «mira/toma» presenta, frases largas con manos) y el que escucha asiente en frases largas; nunca pisa un `gesture`, un `play`, un paseo ni a quien está sentado (solo brazos y cabeza).
 
-Planos: `{ "id", "at|after|with", "camera": {…}, "transitionIn": { "type": "cut|dissolve|fade|iris|wipe", "durationSec" } }`. Cámara `static` (`position`, `target`, `fov`) o por encuadre: `framing` = establishing/wide/full/medium/medium-close/close/extreme-close/two-shot/over-shoulder/insert con `subject`/`subjects`/`over`, `azimuthDeg`, `elevationDeg`, `side`, `track`, `move` (`push-in`, `pull-out`, `orbit`, `truck`, `crane`, `dolly` + `amount`), `handheld` 0–1. El encuadre usa la dirección real de la cara durante el plano, evita que otro actor o un objeto grande tape al sujeto y no atraviesa paredes.
+**Cobertura automática** (`"coverage": "auto"`): el director corta solo — plano de situación, contraplanos por encima del hombro, planos medios y primeros planos (más cerrados en emociones fuertes), planos de dos cada pocos intercambios, plano con seguimiento si quien habla camina—, respeta la regla de los 180° (la cámara se queda en el lado del público), anticipa el corte 0,12 s a la voz (J-cut), no corta en menos de 1,4 s, evita los *jump cuts* y no deja planos de menos de 0,7 s. Los planos escritos pasan a ser **insertos** con `durationSec` y la cobertura se reanuda después.
+
+Planos: `{ "id", "at|after|with", "durationSec", "camera": {…}, "transitionIn": { "type": "cut|dissolve|fade|iris|wipe", "durationSec" } }`. Cámara `static` (`position`, `target`, `fov`) o por encuadre: `framing` = establishing/wide/full/medium/medium-close/close/extreme-close/two-shot/over-shoulder/insert con `subject`/`subjects`/`over`, `azimuthDeg`, `elevationDeg`, `side`, `track`, `move` (`push-in`, `pull-out`, `orbit`, `truck`, `crane`, `dolly` + `amount`), `handheld` 0–1, `compose` (`thirds` por defecto: en planos individuales el sujeto queda en el tercio opuesto a su mirada, con aire delante; `center`). El encuadre usa la dirección real de la cara durante el plano, evita que otro actor o un objeto grande tape al sujeto y no atraviesa paredes.
 
 Sonido: `{ "kind": "sfx|ambience|music", "sound": "<id>", "at|after|with", "durationSec", "gainDb", "fadeIn", "fadeOut", "pan" }`. Los pasos, agarres, impactos y crujidos se generan solos (foley automático).
 
 ## Episodio y sonido
 
-`episode.json`: `{ "schemaVersion":2, "id", "type":"episode", "name", "number", "scenes": ["sc-001",…], "music": [SoundEvent con at global o with:"sc-002"], "render": { "width":1920, "height":1080, "fps":24, "sampleRate":48000, "loudnessLufs":-16 }, "status" }`.
+`episode.json`: `{ "schemaVersion":2, "id", "type":"episode", "name", "number", "scenes": ["sc-001",…], "music": [SoundEvent con at global o with:"sc-002"], "score": { "theme": { "music", "gainDb", "durationSec", "fadeOut" }, "underscore": { "music", "gainDb" }, "bumpers": { "music", "gainDb", "durationSec", "leadSec", "scenes" }, "ending": { "music", "gainDb", "durationSec" } }, "voiceProvider", "render": { "width":1920, "height":1080, "fps":24, "sampleRate":48000, "loudnessLufs":-16 }, "status" }`.
 
-`audio/sfx/<id>.json`: `{ "schemaVersion":2, "id", "kind":"sfx|ambience", "generator": metal-impact|footstep|door-creak|robot-beep|servo|sparks|workshop-hum|whoosh|click|thud|room-tone|rain|wind|birds|traffic|file, "params":{…}, "durationSec", "seed", "file", "license" }`. `audio/music/<id>.json`: compositor procedural (`tempo`, `key`, `mode`, `progression` en grados romanos, `instruments`: pad/bass/arp/pluck/drums/bell/lead) o `generator: "file"` con licencia declarada.
+`audio/sfx/<id>.json`: `{ "schemaVersion":2, "id", "kind":"sfx|ambience", "generator": metal-impact|footstep|door-creak|robot-beep|servo|sparks|workshop-hum|whoosh|click|thud|room-tone|rain|wind|birds|traffic|file, "params":{…}, "durationSec", "seed", "file", "license" }`. `audio/music/<id>.json`: compositor procedural (`tempo`, `key`, `mode`, `progression` en grados romanos, `instruments`: pad/bass/arp/pluck/drums/bell/lead/keys/guitar/strings/brushes/snaps/sub, `style`: ambient/sitcom/lounge/bossa, `swing` 0–0,6, `sevenths`, `form`: loop/sting/button) o `generator: "file"` con licencia declarada. `style` distinto de ambient arregla con melodía compuesta (motivo A A' B A), piano eléctrico FM, guitarra de cuerda pulsada, cuerdas, escobillas y chasquidos; `form: "sting"` es una cadencia corta que resuena (cortinilla entre escenas) y `button` dos golpes V→I (remate cómico).
+
+`score` coloca la música del episodio sola: tema de entrada, cama bajo los diálogos (con ducking), cortinilla en cada cambio de escena y tema final. La música en primer plano (tema, cortinilla o un `music` de escena a ≥ −18 dB) no cuenta como tiempo muerto en la QA de ritmo.
 
 ## Historia (Story Studio)
 

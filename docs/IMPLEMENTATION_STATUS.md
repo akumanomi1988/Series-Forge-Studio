@@ -1,4 +1,4 @@
-# Estado verificado de la implementación — v0.5 (19/11/2026)
+# Estado verificado de la implementación — v0.5 (20/11/2026)
 
 Equipo de verificación: Windows 10 Pro, NVIDIA GeForce GTX 660 Ti **2 GB** (el objetivo era 8 GB; se ha medido en un equipo más modesto), Chrome 142 (ANGLE/Direct3D11, WebGL2), Node 24.15, FFmpeg 8 (libx264, rubberband, ebur128), voces OneCore es-ES (Pablo, Laura, Helena).
 
@@ -6,7 +6,7 @@ Leyenda: ✅ hecho y probado (test automático y/o inspección de fotogramas/aud
 
 ## Pruebas automáticas
 
-`npm test`: **53 pruebas, 52 superadas, 1 omitida** (crear un enlace simbólico requiere privilegios en este equipo); `npm run typecheck` sin errores. Suites:
+`npm test`: **68 pruebas, 67 superadas, 1 omitida** (crear un enlace simbólico requiere privilegios en este equipo); `npm run typecheck` sin errores. Suites:
 
 | Suite | Cubre |
 |---|---|
@@ -16,7 +16,16 @@ Leyenda: ✅ hecho y probado (test automático y/o inspección de fotogramas/aud
 | `story.test.ts` | conocimiento no recibido → error, confirmación al canon (hechos, conocimiento, relaciones), protección retroactiva, amend y revert |
 | `pipeline.test.ts` | **render real Chromium/WebGL + FFmpeg** (MP4 H.264/AAC/mov_text, WAV, SRT, metadata, storyboard) y **caché incremental** (re-render sin cambios = 0 fragmentos; cambiar las chispas invalida solo su plano) |
 | `ui.test.ts` | **navegador real**: un agente edita `geometry.json` y el visor se actualiza sin recargar; escritura inválida → aviso y se conserva el último estado válido; personaje nuevo aparece en el explorador; guardado del editor con 409 por conflicto; historial de versiones y reversión |
+| `providers.test.ts` | selección de motor por `alternatives`, entrega por emoción, protocolo Voicebox contra un servidor local (solo loopback), **síntesis Kokoro real en español** |
+| `youtube.test.ts` | OAuth bucle local + PKCE (state falsificado rechazado), renovación del token, subida reanudable (reanuda desde el byte que dice el servidor), metadatos (privado, contenido sintético, no infantil) — contra un servidor local con el protocolo de Google |
+| `direction.test.ts` | cobertura automática (plano en t=0, regla de 180°, sin *jump cuts* ni destellos, insertos), actuación automática, `until`, arreglista (determinista, cortinilla y remate), ritmo con música en primer plano |
 | legado (`*.test.mjs`) | v0.1–v0.4 conservados (corregidas rutas Windows) |
+
+## «Última ronda» ep. 1 «Punto dos» (proyecto nuevo)
+
+Comedia romántica para adultos en un bar de cócteles: Vera (dueña, vestido rojo de satén con escote, piel y pelo con brillo) y Dani (arquitecto tímido). Biblia de la serie, sinopsis, tres actos, siembras/pagos y guion en `examples/projects/ultima-ronda`. Voces **Kokoro** (Vera: mezcla `ef_dora` + `af_nicole`, más grave y lenta; Dani: `em_santa`), cobertura y actuación automáticas, banda sonora automática (tema lounge, cama de bossa, cortinillas, música romántica y remate) y un apagón con vela.
+
+`npm run studio -- produce ultima-ronda ep-001` → **1920×1080, 24 fps, 121,9 s (2926 fotogramas), 38 planos (26 de cobertura automática y 12 insertos escritos), 38 líneas, 40 rótulos**; render 7,4 min en la GTX 660 Ti. Validación **superada**: diálogo −16,1 LUFS, mezcla −16,4 LUFS, pico −0,9 dBTP, líneas colocadas a 0 ms, paridad editor/exportación PSNR ≥ 44,1 dB, lip-sync global −20 ms con arranques de boca entre 50 y 10 ms antes del sonido, cierres ≤ 160 ms, boca abierta en silencios 0 %, ningún hueco sin diálogo fuera de la música (máx. 3,98 s cubierto por la cortinilla), diálogo en el 82 % del metraje. Revisado con fotogramas reales del MP4.
 
 ## Piloto «El último turno»
 
@@ -29,6 +38,8 @@ Guion en tres actos y cuatro escenas continuas (planteamiento con detonante, nud
 - diálogo −16,2 LUFS (anclado al diálogo), mezcla −15,0 LUFS, pico −1,0 dBTP; 41 líneas colocadas con desfase **0 ms** (correlación de forma de onda);
 - ritmo (`pacing.deadAir`): ningún hueco sin diálogo > 2,35 s (media 0,63 s), diálogo en el 79 % del metraje;
 - lip-sync: desfase global **−10 ms** (todas las líneas encadenadas); en cada arranque de voz la boca se abre entre **70 y 30 ms antes** del sonido (tolerancia: 87 ms tarde / 167 ms antes, ITU-R BT.1359 + 1 fotograma); cierres ≤ 240 ms; boca abierta en silencios largos 5,4 % del tiempo.
+
+**Con voces Kokoro** (20/11/2026, las voces del piloto pasan a Kokoro; OneCore queda como alternativa): 122,9 s, 46 planos, validación superada (diálogo −16,0 LUFS, mezcla −15,3 LUFS, ningún hueco > 2,35 s, diálogo en el 77 % del metraje), con actuación automática y encuadre en tercios activos. Las cifras de arriba son del render con OneCore.
 
 Voz: los motores de Windows insertan ~1 s entre frases; el TTS acorta los silencios internos a ≤ 0,36 s (0,5 s con «...», respeta `[pausa N]`) y reajusta las marcas de tiempo. El alineador a veces estiraba una palabra dentro de la pausa siguiente (boca moviéndose en silencio): `snapToSpeech` devuelve esos visemas a su palabra. Medido en 6 frases con pausas: desacuerdo voz/boca del 44,6 % al 27,7 %. La correlación de actividad por frase (`lagMs`) se conserva en el informe solo como dato: en frases cortas su curva es casi plana (p. ej. 0,51 en 0 ms frente a 0,56 en −250 ms) y no distingue desfases.
 
@@ -89,6 +100,10 @@ Hallazgos corregidos gracias a esta prueba: bloqueos de Chromium tras ~1 000 fot
 
 - En algún plano con cámara de seguimiento baja un objeto grande puede tapar parcialmente la acción (piloto: Lara recoge el fusible tras el robot); el agente debe revisar el storyboard y ajustar el plano.
 - El adaptador Piper está implementado pero no probado (no hay binario ni modelo de licencia verificada instalados).
+- **Voicebox**: el cliente sigue la API documentada en el código de Voicebox (`GET /profiles`, `POST /generate/stream` con `instruct`) y está probado contra un servidor local que la imita, **no contra la app real** (no está instalada en el equipo de verificación; sus motores Qwen3-TTS necesitan GPU con CUDA moderno para ir a velocidad útil, esta GTX 660 Ti no sirve).
+- **YouTube**: OAuth (bucle local + PKCE) y la subida reanudable están probados contra un servidor local con el mismo protocolo (incluido reanudar un fragmento a medias y renovar el token), **no contra Google**: no hay credenciales en el equipo. Los proyectos de API sin verificar por Google solo pueden subir vídeos privados.
+- Kokoro en español tiene tres voces (una femenina); para más personajes se mezclan estilos (`ef_dora:0.8+af_nicole:0.2`) y se ajusta el tono. Kokoro no tiene control explícito de emoción: la emoción se aproxima con velocidad, tono, ganancia y mezcla de voz por emoción; Voicebox (Qwen) sí admite instrucciones de entrega.
+- El borde del escote se calcula por píxel en el sombreador; las prendas siguen siendo regiones de color del mismo tubo (sin tela separada ni simulación).
 
 - Estética «toon procedural»: personajes de cartón piedra estilizados, sin deformaciones faciales, sin pelo/tela con simulación secundaria, sin dedos animados individualmente (solo cierre de mano).
 - La navegación de personajes evita a otros personajes, pero no a muebles (las rutas las decide el autor de la escena).

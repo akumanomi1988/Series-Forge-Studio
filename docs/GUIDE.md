@@ -10,9 +10,30 @@ npm run build        # bundles del editor y del capturador
 npm test             # unitarias + integración (render real, TTS, navegador)
 ```
 
-Requisitos: Node.js ≥ 24, FFmpeg con `libx264` en el PATH, Chrome o Edge (o `SERIES_FORGE_CHROMIUM=<ruta>`), voces españolas de Windows (Configuración → Hora e idioma → Voz; `npm run studio -- voices`). No hace falta Docker, cuentas, claves ni Internet después de instalar.
+Requisitos: Node.js ≥ 24, FFmpeg con `libx264` en el PATH, Chrome o Edge (o `SERIES_FORGE_CHROMIUM=<ruta>`). No hace falta Docker, cuentas, claves ni Internet después de instalar.
 
-## 2. Producir el piloto
+**Voces.** Recomendado: Kokoro (neuronal, local, Apache-2.0):
+```powershell
+npm run setup:kokoro                 # entorno Python dentro de tools/kokoro + modelos (≈ 350 MB, verificados por SHA-256)
+npm run studio -- voices kokoro      # lista de voces; españolas: ef_dora, em_alex, em_santa
+npm run studio -- say ultima-ronda vera "¿Otra vez a las doce menos cinco?" --emotion smirk
+```
+Necesita Python 3.10+ solo para crear ese entorno (no se instala nada global). Alternativas: **Voicebox** (abre la app; crea un perfil de voz con el nombre que use `voice.json`, p. ej. «Vera»; `npm run studio -- voices voicebox`) o las voces de Windows (`npm run studio -- voices onecore`). El motor se elige por proyecto (`"voiceProvider"` en `project.json`), por episodio, con `--voice-provider` o en el selector «Voces» de la pestaña Render.
+
+**YouTube (opcional).** Para publicar desde el estudio necesitas tu propio cliente OAuth (gratis): en Google Cloud Console crea un proyecto, activa *YouTube Data API v3*, configura la pantalla de consentimiento (usuario de prueba: tu cuenta) y crea un «ID de cliente OAuth» de tipo **App de escritorio**; descarga el JSON. Después:
+```powershell
+npm run studio -- youtube client C:\ruta\client_secret.json   # se guarda en %USERPROFILE%\.series-forge\youtube (fuera del repo)
+npm run studio -- youtube connect                              # abre Google; vuelve a 127.0.0.1 al aceptar
+npm run studio -- youtube upload ultima-ronda ep-001           # muestra lo que subiría (título, descripción, privacidad)
+npm run studio -- youtube upload ultima-ronda ep-001 --privacy private --yes
+```
+O en la web: pestaña Render → «YouTube». Se sube **en privado** por defecto, marcado como contenido sintético y «no dirigido a niños» (cámbialo si procede); se niega a publicar un render que no superó la QA y anota cada subida en `output/youtube.json`. Aviso de Google: los proyectos de API sin verificar solo pueden subir vídeos privados hasta que Google audite el proyecto; puedes cambiar la visibilidad después en YouTube Studio. Una serie para adultos debe marcarse como no apta para niños y cumplir las políticas de contenido de YouTube.
+
+## 2. Producir los proyectos de ejemplo
+
+- **Última ronda** (comedia romántica para adultos, bar de cócteles): `Copy-Item -Recurse examples/projects/ultima-ronda workspace/` y `npm run studio -- produce ultima-ronda ep-001`. Usa Kokoro, cobertura automática, actuación automática, banda sonora automática y un apagón.
+
+### El último turno
 
 ```powershell
 npm run studio -- init pilot                       # copia examples/projects/el-ultimo-turno a workspace/
