@@ -28,9 +28,13 @@ export function numberToWords(n: number): string {
   const th = Math.floor(n / 1000), rest = n % 1000;
   return (th === 1 ? 'mil' : numberToWords(th) + ' mil') + (rest ? ' ' + numberToWords(rest) : '');
 }
+/** Text as shown/spoken: removes authoring marks such as "[pausa 0.8]". */
+export function displayText(text: string): string {
+  return text.replace(/\s*\[pausa\s+[0-9.]+\]\s*/gi, ' ').replace(/\s{2,}/g, ' ').trim();
+}
 /** Normalised words as spoken (numbers expanded, punctuation removed, lowercase). */
 export function speechWords(text: string): string[] {
-  return text.replace(/\d+/g, m => ' ' + numberToWords(Number(m)) + ' ').toLowerCase()
+  return displayText(text).replace(/\d+/g, m => ' ' + numberToWords(Number(m)) + ' ').toLowerCase()
     .replace(/[«»"“”¿?¡!.,;:()\[\]…—–\-]/g, ' ').split(/\s+/).filter(Boolean);
 }
 const strip = (s: string) => s.replace(/[áà]/g, 'a').replace(/[éè]/g, 'e').replace(/[íì]/g, 'i').replace(/[óò]/g, 'o').replace(/[úù]/g, 'u');

@@ -14,7 +14,7 @@ import type { Alignment, WordTiming } from './align.ts';
 import { estimateSpeech } from './phonetics-es.ts';
 import { REPO_ROOT } from '../pipeline/project.ts';
 
-export const TTS_VERSION = 8;
+export const TTS_VERSION = 10;
 export interface SpeechRequest { text: string; voice: VoiceProfile; emotion?: string; intensity?: number; direction?: string; rate?: number; pitchSemitones?: number }
 export interface SpeechResult { file: string; duration: number; alignment: Alignment; cached: boolean; provider: string; key: string; trimmedLead: number }
 
@@ -99,6 +99,65 @@ async function postProcess(src: string, dst: string, v: VoiceProfile, extraSemit
   await runProcess('ffmpeg', ['-nostdin', '-hide_banner', '-loglevel', 'error', '-y', '-i', src, '-af', filters.join(','), '-ac', '1', '-ar', '48000', '-c:a', 'pcm_f32le', dst], { timeoutMs: 120_000 });
 }
 
+/** Longest internal silence kept for a line: conversational by default, longer for "..." hesitations,
+ * and never shorter than an explicit "[pausa N]" written by the author. */
+export function maxPauseFor(text: string): number {
+  let m = /\.\.\.|…/.test(text) ? 0.5 : 0.36;
+  for (const g of text.matchAll(/\[pausa\s+([0-9.]+)\]/gi)) m = Math.max(m, Number(g[1]) + 0.1);
+  return m;
+}
+/** Shortens every internal silence (10 ms frames under -42 dBFS RMS) longer than `maxPause` to exactly `maxPause`,
+ * cutting from its middle so word onsets/decays stay intact. Returns a monotonic time map for word timings. */
+export function compressPauses(x: Float32Array, sr: number, maxPause: number, thrRms = 0.008): { samples: Float32Array; removed: number; map: (t: number) => number } {
+  const hop = Math.round(sr * 0.01), n = Math.floor(x.length / hop);
+  const silent: boolean[] = [];
+  for (let f = 0; f < n; f++) { let e = 0; for (let i = f * hop; i < (f + 1) * hop; i++) e += x[i] * x[i]; silent.push(Math.sqrt(e / hop) < thrRms); }
+  const cuts: [number, number][] = []; // sample ranges to remove
+  const keep = Math.round(maxPause * sr);
+  for (let f = 0; f < n;) {
+    if (!silent[f]) { f++; continue; }
+    let g = f; while (g < n && silent[g]) g++;
+    const s = f * hop, e = g * hop;
+    if (f > 0 && g < n && e - s > keep) { const mid = Math.round((s + e) / 2); cuts.push([mid - Math.floor((e - s - keep) / 2), mid + Math.ceil((e - s - keep) / 2)]); }
+    f = g;
+  }
+  if (!cuts.length) return { samples: x, removed: 0, map: t => t };
+  const total = cuts.reduce((a, [s, e]) => a + e - s, 0), out = new Float32Array(x.length - total);
+  let w = 0, r = 0;
+  for (const [s, e] of cuts) { out.set(x.subarray(r, s), w); w += s - r; r = e; }
+  out.set(x.subarray(r), w);
+  const map = (t: number) => { const p = t * sr; let shift = 0; for (const [s, e] of cuts) { if (p >= e) shift += e - s; else if (p > s) shift += p - s; } return Math.max(0, (p - shift) / sr); };
+  return { samples: out, removed: total / sr, map };
+}
+
+/** Silent runs (10 ms frames under the RMS threshold) strictly inside the clip, in seconds. */
+export function silentRuns(x: Float32Array, sr: number, minSec: number, thrRms = 0.008): [number, number][] {
+  const hop = Math.round(sr * 0.01), n = Math.floor(x.length / hop), runs: [number, number][] = [];
+  const silent = (f: number) => { let e = 0; for (let i = f * hop; i < (f + 1) * hop; i++) e += x[i] * x[i]; return Math.sqrt(e / hop) < thrRms; };
+  for (let f = 0; f < n;) { if (!silent(f)) { f++; continue; } let g = f; while (g < n && silent(g)) g++; if (f > 0 && g < n && (g - f) * 0.01 >= minSec) runs.push([f * 0.01, g * 0.01]); f = g; }
+  return runs;
+}
+/** The aligner sometimes stretches a word into the pause that follows it (mouth moving in silence). For every
+ * internal silence, mouth events that fell inside it are warped back: the first half into the preceding word,
+ * the second half into the following one, and the mouth closes during the silence. */
+export function snapToSpeech(al: Alignment, x: Float32Array, sr: number): Alignment {
+  let out = al;
+  for (const [s, e] of silentRuns(x, sr, 0.2)) {
+    const mid = (s + e) / 2, inside = out.visemes.filter(([t, v]) => t > s + 0.03 && t < e - 0.03 && v !== 'sil');
+    if (!inside.length) continue;
+    const left = inside.filter(([t]) => t <= mid);
+    const wordAt = (t: number) => out.words.find(w => w.start <= t && w.end >= t);
+    const aL = Math.min(s - 0.06, left.length ? (wordAt(left[0][0])?.start ?? left[0][0] - 0.3) : s - 0.06);
+    // left half: the stretched tail of the previous word is squeezed back before the silence;
+    // right half: early shapes of the next word move to its real onset (40 ms anticipation); later events stay put
+    const w = (t: number) => t <= aL || t >= e ? t : t <= mid ? aL + (t - aL) * (s - 0.03 - aL) / (mid - aL) : e - 0.04 + 0.04 * (t - mid) / (e - mid);
+    const vis = out.visemes.map(([t, v]) => [w(t), v] as [number, string]).filter(([t, v]) => !(v === 'sil' && t > s - 0.03 && t < e));
+    vis.push([s, 'sil']); vis.sort((p, q) => p[0] - q[0]);
+    out = { ...out, visemes: vis, words: out.words.map(x => ({ ...x, start: w(x.start), end: w(x.end) })), phonemes: out.phonemes.map(p => ({ ...p, start: w(p.start), end: w(p.end) })), method: out.method.includes('+snap') ? out.method : out.method + '+snap' };
+  }
+  return out;
+}
+
 export function speechKey(req: SpeechRequest, emotionId?: string): string {
   return createHash('sha256').update(JSON.stringify({ v: TTS_VERSION, text: req.text, voice: req.voice, emotion: emotionId ?? null, intensity: req.intensity ?? 1, direction: req.direction ?? '', rate: req.rate ?? null, pitch: req.pitchSemitones ?? 0 })).digest('hex').slice(0, 32);
 }
@@ -136,7 +195,17 @@ export async function synthesize(req: SpeechRequest, cacheDir: string, emotionId
       x = x.slice(lead, tail);
       const trimmedLead = lead / 48000;
       words = words.map(w => ({ ...w, start: Math.max(0, w.start - trimmedLead) }));
-      const alignment = req.voice.provider === 'silent' ? (() => { const est = estimateSpeech(req.text); return { words: [], phonemes: [], visemes: est.visemes, voicedEnd: est.duration, method: 'estimate(silent)' }; })() : alignSpeech(req.text, x, 48000, words);
+      let alignment: Alignment = req.voice.provider === 'silent' ? (() => { const est = estimateSpeech(req.text); return { words: [], phonemes: [], visemes: est.visemes, voicedEnd: est.duration, method: 'estimate(silent)' }; })() : alignSpeech(req.text, x, 48000, words);
+      // engines insert ~1 s between sentences: compress internal silences to a conversational length.
+      // Aligned on the original audio (engine anchors are exact there), then every timing is remapped.
+      if (req.voice.provider !== 'silent') {
+        alignment = snapToSpeech(alignment, x, 48000);
+        const cp = compressPauses(x, 48000, maxPauseFor(req.text));
+        if (cp.removed > 0) {
+          const m = cp.map; x = cp.samples;
+          alignment = { ...alignment, words: alignment.words.map(w => ({ ...w, start: m(w.start), end: m(w.end) })), phonemes: alignment.phonemes.map(p => ({ ...p, start: m(p.start), end: m(p.end) })), visemes: alignment.visemes.map(([t, v]) => [m(t), v] as [number, string]), voicedEnd: m(alignment.voicedEnd), method: alignment.method + '+pauses' };
+        }
+      }
       await writeWavAtomic(file + '.tmp.wav', { sampleRate: 48000, channels: [x] }, 32);
       await rename(file + '.tmp.wav', file);
       const result = { key, duration: x.length / 48000, alignment, provider: req.voice.provider, trimmedLead };

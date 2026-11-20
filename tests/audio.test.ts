@@ -60,6 +60,51 @@ test('mezcla: el diálogo hace ducking de la cama musical y se coloca en su mues
   assert.ok(rms(mix.L, Math.round(1.0 * SR), Math.round(1.5 * SR)) > 0, 'cama audible fuera del diálogo');
 });
 
+test('las pausas internas de la voz se acortan sin tocar las palabras y el mapa de tiempos es monótono', async () => {
+  const { compressPauses, maxPauseFor } = await import('../src/audio/tts.ts');
+  const { displayText } = await import('../src/audio/phonetics-es.ts');
+  // 0.5 s tone, 1.2 s silence, 0.5 s tone, 0.2 s silence (short pause kept), 0.5 s tone
+  const seg = (sec: number, on: boolean) => Float32Array.from({ length: Math.round(sec * SR) }, (_, i) => on ? 0.3 * Math.sin(2 * Math.PI * 200 * i / SR) : 0);
+  const parts = [seg(0.5, true), seg(1.2, false), seg(0.5, true), seg(0.2, false), seg(0.5, true)];
+  const x = new Float32Array(parts.reduce((n, p) => n + p.length, 0)); let o = 0; for (const p of parts) { x.set(p, o); o += p.length; }
+  const r = compressPauses(x, SR, 0.36);
+  assert.ok(Math.abs(r.removed - 0.84) < 0.02, `quita ~0.84 s (medido ${r.removed.toFixed(3)})`);
+  assert.ok(Math.abs(r.samples.length / SR - (2.9 - r.removed)) < 1e-6);
+  assert.ok(Math.abs(r.map(1.7) - 0.86) < 0.02, 'el inicio de la segunda palabra se desplaza lo eliminado');
+  assert.equal(r.map(0.2), 0.2, 'antes de la pausa no cambia');
+  for (let t = 0, prev = -1; t < 2.9; t += 0.01) { const m = r.map(t); assert.ok(m >= prev - 1e-9); prev = m; }
+  assert.equal(maxPauseFor('Lo sé. Lo sé.'), 0.36);
+  assert.equal(maxPauseFor('Eso... es largo.'), 0.5);
+  assert.ok(Math.abs(maxPauseFor('Vale. [pausa 1.2] Café.') - 1.3) < 1e-9, 'una pausa escrita se respeta');
+  assert.equal(displayText('Vale. [pausa 1.2] Café.'), 'Vale. Café.');
+});
+
+test('la boca no se mueve durante los silencios: los visemas que caen en una pausa vuelven a su palabra', async () => {
+  const { snapToSpeech } = await import('../src/audio/tts.ts');
+  // speech 0–0.5 s, silence 0.5–1.1 s, speech 1.1–1.6 s
+  const x = Float32Array.from({ length: Math.round(1.6 * SR) }, (_, i) => { const t = i / SR; return t < 0.5 || t >= 1.1 ? 0.3 * Math.sin(2 * Math.PI * 180 * t) : 0; });
+  const al = { method: 'test', voicedEnd: 1.6, phonemes: [],
+    words: [{ text: 'robot', start: 0, end: 0.75, phonemes: [] }, { text: 'que', start: 0.9, end: 1.3, phonemes: [] }],
+    visemes: [[0, 'R'], [0.2, 'O'], [0.6, 'MBP'], [0.7, 'O'], [0.95, 'KG'], [1.15, 'E'], [1.6, 'sil']] as [number, string][] };
+  const r = snapToSpeech(al, x, SR);
+  assert.ok(r.visemes.every(([t, v]) => v === 'sil' || t <= 0.5 || t >= 1.05), JSON.stringify(r.visemes));
+  assert.ok(r.visemes.some(([t, v]) => v === 'sil' && t >= 0.49 && t <= 0.52), 'la boca se cierra al empezar el silencio');
+  assert.deepEqual(r.visemes.map(v => v[1]).filter(v => v !== 'sil'), ['R', 'O', 'MBP', 'O', 'KG', 'E'], 'no se pierde ninguna forma');
+  for (let i = 1; i < r.visemes.length; i++) assert.ok(r.visemes[i][0] >= r.visemes[i - 1][0]);
+  assert.ok(Math.abs(r.visemes.find(v => v[1] === 'E')![0] - 1.15) < 1e-9, 'los visemas ya bien colocados no se mueven');
+});
+
+test('informe de ritmo: detecta tiempo muerto entre frases y al final', async () => {
+  const { pacingReport } = await import('../src/pipeline/validate.ts');
+  const d = (start: number, duration: number) => ({ kind: 'dialogue', start, duration });
+  const plan = { durationSec: 20, scenes: [{ id: 'sc-001', start: 0, duration: 20 }], audio: [d(0.5, 2), d(2.8, 2), d(9, 2), d(11.2, 3)] } as unknown as Parameters<typeof pacingReport>[0];
+  const r = pacingReport(plan);
+  assert.equal(r.deadAir.length, 2, JSON.stringify(r));
+  assert.equal(r.deadAir[0].gapSec, 4.2);
+  assert.equal(r.deadAir[1].scene, 'final');
+  assert.equal(r.longestGapSec, 4.2);
+});
+
 test('TTS offline en español (OneCore) con caché, alineación y lip-sync ≤ 60 ms', async t => {
   if (!hasOneCore() || !hasFfmpeg()) { t.skip('requiere Windows con voces OneCore es-ES y FFmpeg'); return; }
   const { synthesize } = await import('../src/audio/tts.ts');
