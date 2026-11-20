@@ -8,7 +8,7 @@ import { loadProject, WORKSPACE_ROOT, REPO_ROOT, SAFE_ID, loadLibrary } from '..
 import type { Issue } from '../pipeline/project.ts';
 import { compileEpisode, renderEpisode } from '../pipeline/episode.ts';
 import type { RenderSettings } from '../pipeline/episode.ts';
-import { validateEpisode } from '../pipeline/validate.ts';
+import { validateEpisode, pacingReport } from '../pipeline/validate.ts';
 import { validateStory, confirmEpisode, amendFact, revertStory, loadStory } from '../pipeline/story.ts';
 import { renderStills, turnaroundScene, expressionScene } from '../pipeline/preview.ts';
 import { contactSheet } from '../pipeline/media.ts';
@@ -116,7 +116,7 @@ async function main() {
       }
       throw new Error('Uso: studio preview character|scene ...');
     }
-    case 'compile': { const settings = renderSettings(); const r = await compileEpisode(a1, a2, settings, e => console.log(JSON.stringify(e))); return out({ durationSec: r.plan.durationSec, frames: r.plan.frames, scenes: r.plan.scenes.map(s => ({ id: s.id, duration: +s.duration.toFixed(2), warnings: s.warnings })), shots: r.plan.shots.length, plan: join(r.project.root, r.project.episodes[a2].dir, 'generated', 'episode-plan.json') }); }
+    case 'compile': { const settings = renderSettings(); const r = await compileEpisode(a1, a2, settings, e => console.log(JSON.stringify(e))); return out({ durationSec: r.plan.durationSec, frames: r.plan.frames, scenes: r.plan.scenes.map(s => ({ id: s.id, duration: +s.duration.toFixed(2), warnings: s.warnings })), shots: r.plan.shots.length, pacing: pacingReport(r.plan), plan: join(r.project.root, r.project.episodes[a2].dir, 'generated', 'episode-plan.json') }); }
     case 'render': { const r = await renderEpisode(a1, a2, renderSettings(), e => console.log(JSON.stringify(e))); return out({ video: r.video, audio: r.audio, srt: r.srt, metadata: r.metadata, storyboard: r.storyboard.length, stats: r.stats }); }
     case 'produce': {
       const p = await loadProject(sub);

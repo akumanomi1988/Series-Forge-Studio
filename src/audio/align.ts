@@ -169,16 +169,45 @@ export function alignSpeech(text: string, samples: Float32Array, sr: number, wor
 
 
 /** Lip-sync QA: cross-correlate mouth opening (from visemes) with the audio envelope; returns lag in seconds. */
-export function lipSyncLag(samples: Float32Array, sr: number, mouthOpen: (t: number) => number, maxLag = 0.25): { lagSec: number; correlation: number } {
-  const f = features(samples, sr);
-  const n = f.frames;
+/** Speech activity vs. mouth activity curves (10 ms frames) for one clip. */
+export function activityCurves(samples: Float32Array, sr: number, mouthOpen: (t: number) => number): { act: Float32Array; mouth: Float32Array } {
+  const f = features(samples, sr), n = f.frames;
   // activity-based comparison: mouth moving (any non-rest shape) vs. speech present; robust to /u/ (loud but small opening)
-  const m = new Float32Array(n); for (let i = 0; i < n; i++) { const o = mouthOpen(i * HOP + WIN / 2); m[i] = o > 0.06 ? 0.6 + 0.4 * Math.min(1, o) : 0; }
-  const act = Float32Array.from(f.e, v => Math.min(1, v * 1.6));
-  const norm = (x: Float32Array) => { let mu = 0; for (const v of x) mu += v; mu /= x.length; let sd = 0; for (const v of x) sd += (v - mu) ** 2; sd = Math.sqrt(sd / x.length) || 1; return Float32Array.from(x, v => (v - mu) / sd); };
-  const A = norm(act), B = norm(m);
-  let best = -Infinity, bestLag = 0;
+  const mouth = new Float32Array(n); for (let i = 0; i < n; i++) { const o = mouthOpen(i * HOP + WIN / 2); mouth[i] = o > 0.06 ? 0.6 + 0.4 * Math.min(1, o) : 0; }
+  return { act: Float32Array.from(f.e, v => Math.min(1, v * 1.6)), mouth };
+}
+/** Lag (s) that best aligns mouth activity with speech activity (positive = mouth late). `prominence` is how much
+ * better the best lag correlates than lag 0: with short lines the curve is often flat and the lag is not meaningful. */
+export function curvesLag(act: Float32Array, mouth: Float32Array, maxLag = 0.25): { lagSec: number; correlation: number; atZero: number; prominence: number } {
+  const n = Math.min(act.length, mouth.length);
+  const norm = (x: Float32Array) => { let mu = 0; for (let i = 0; i < n; i++) mu += x[i]; mu /= n; let sd = 0; for (let i = 0; i < n; i++) sd += (x[i] - mu) ** 2; sd = Math.sqrt(sd / n) || 1; return Float32Array.from(x.subarray(0, n), v => (v - mu) / sd); };
+  const A = norm(act), B = norm(mouth);
+  let best = -Infinity, bestLag = 0, atZero = 0;
   const L = Math.round(maxLag / HOP);
-  for (let lag = -L; lag <= L; lag++) { let s = 0, c = 0; for (let i = 0; i < n; i++) { const j = i + lag; if (j < 0 || j >= n) continue; s += A[i] * B[j]; c++; } const r = s / Math.max(1, c); if (r > best) { best = r; bestLag = lag; } }
-  return { lagSec: bestLag * HOP, correlation: best };
+  for (let lag = -L; lag <= L; lag++) { let s = 0, c = 0; for (let i = 0; i < n; i++) { const j = i + lag; if (j < 0 || j >= n) continue; s += A[i] * B[j]; c++; } const r = s / Math.max(1, c); if (lag === 0) atZero = r; if (r > best) { best = r; bestLag = lag; } }
+  return { lagSec: bestLag * HOP, correlation: best, atZero, prominence: best - atZero };
+}
+/** Perceptual lip-sync at speech boundaries: for every speech onset/offset (around silences >= 120 ms and the clip
+ * edges; gaps < 200 ms are not pauses) the nearest mouth open/close transition of the same kind; error = mouth time - sound time (s).
+ * Positive onset error = mouth opens late. Also returns how much of the long silences (>= 200 ms) has the mouth open. */
+export function boundarySync(samples: Float32Array, sr: number, mouthOpen: (t: number) => number): { boundaries: { kind: 'onset' | 'offset'; at: number; errSec: number | null }[]; mouthInSilence: number; silenceSec: number } {
+  const hop = Math.round(sr * 0.01), n = Math.floor(samples.length / hop);
+  const db = new Float32Array(n); for (let f = 0; f < n; f++) { let e = 0; for (let i = f * hop; i < (f + 1) * hop; i++) e += samples[i] * samples[i]; db[f] = 10 * Math.log10(e / hop + 1e-12); }
+  const peak = Math.max(...db), thr = Math.max(-45, peak - 35);
+  const sound = Array.from(db, v => v > thr), mouth = Array.from({ length: n }, (_, f) => mouthOpen(f * 0.01 + 0.005) > 0.06);
+  // close short gaps (< 200 ms) in the sound mask: stop closures and quiet fricatives are not pauses
+  for (let f = 0; f < n;) { if (sound[f]) { f++; continue; } let g = f; while (g < n && !sound[g]) g++; if (f > 0 && g < n && g - f < 20) for (let k = f; k < g; k++) sound[k] = true; f = g; }
+  const trans = (m: boolean[]) => { const on: number[] = [], off: number[] = []; if (m[0]) on.push(0); for (let f = 1; f < n; f++) { if (m[f] && !m[f - 1]) on.push(f * 0.01); if (!m[f] && m[f - 1]) off.push(f * 0.01); } if (m[n - 1]) off.push(n * 0.01); return { on, off }; };
+  const S = trans(sound), M = trans(mouth);
+  const near = (list: number[], t: number) => { let best: number | null = null; for (const x of list) if (Math.abs(x - t) <= 0.3 && (best === null || Math.abs(x - t) < Math.abs(best - t))) best = x; return best; };
+  const boundaries = [...S.on.map(t => ({ kind: 'onset' as const, at: t, m: near(M.on, t) })), ...S.off.map(t => ({ kind: 'offset' as const, at: t, m: near(M.off, t) }))]
+    .map(b => ({ kind: b.kind, at: +b.at.toFixed(2), errSec: b.m === null ? null : +(b.m - b.at).toFixed(3) })).sort((a, b) => a.at - b.at);
+  let sil = 0, open = 0;
+  for (let f = 0; f < n;) { if (sound[f]) { f++; continue; } let g = f; while (g < n && !sound[g]) g++; if (g - f >= 20) for (let k = f + 4; k < g - 4; k++) { sil++; if (mouth[k]) open++; } f = g; }
+  return { boundaries, mouthInSilence: sil ? open / sil : 0, silenceSec: sil * 0.01 };
+}
+export function lipSyncLag(samples: Float32Array, sr: number, mouthOpen: (t: number) => number, maxLag = 0.25): { lagSec: number; correlation: number; prominence: number } {
+  const { act, mouth } = activityCurves(samples, sr, mouthOpen);
+  const r = curvesLag(act, mouth, maxLag);
+  return { lagSec: r.lagSec, correlation: r.correlation, prominence: r.prominence };
 }

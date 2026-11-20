@@ -10,7 +10,7 @@ import { ffprobe, extractFrames } from './media.ts';
 import { runProcess } from '../audio/tts.ts';
 import { readWav, mono } from '../audio/wav.ts';
 import { blockPowers, loudnessFromPowers } from '../audio/mixer.ts';
-import { lipSyncLag, features } from '../audio/align.ts';
+import { activityCurves, curvesLag, boundarySync } from '../audio/align.ts';
 import { visemeAt } from '../engine/face.ts';
 import type { EpisodePlan } from './episode.ts';
 
@@ -20,6 +20,25 @@ function psnr(a: Buffer, b: Buffer): number { let mse = 0; const n = Math.min(a.
 async function rawGray(png: string, w: number, h: number): Promise<Buffer> {
   const { stdoutBuf } = await runProcess('ffmpeg', ['-nostdin', '-hide_banner', '-loglevel', 'error', '-i', png, '-vf', `scale=${w}:${h}:flags=area,format=gray`, '-f', 'rawvideo', '-'], { timeoutMs: 60_000 });
   return stdoutBuf;
+}
+
+/** Silences between dialogue lines (whole episode, across scene cuts). A gap longer than `maxGapSec` is "dead air":
+ * characters standing and staring. Intentional silent beats are fine but should be rare and short. */
+export function pacingReport(plan: Pick<EpisodePlan, 'audio' | 'durationSec' | 'scenes'>, maxGapSec = 2.5): { maxGapSec: number; longestGapSec: number; meanGapSec: number; deadAir: { from: number; to: number; gapSec: number; scene: string }[]; dialogueShare: number } {
+  const lines = plan.audio.filter(c => c.kind === 'dialogue').map(c => [c.start, c.start + c.duration] as const).sort((a, b) => a[0] - b[0]);
+  const gaps: { from: number; to: number; gapSec: number; scene: string }[] = [];
+  let cursor = 0, spoken = 0;
+  const sceneAt = (t: number) => plan.scenes.find(s => t >= s.start && t < s.start + s.duration)?.id ?? '';
+  for (const [a, b] of lines) { if (a > cursor) gaps.push({ from: +cursor.toFixed(2), to: +a.toFixed(2), gapSec: +(a - cursor).toFixed(2), scene: sceneAt(cursor) }); spoken += Math.max(0, b - Math.max(a, cursor)); cursor = Math.max(cursor, b); }
+  if (plan.durationSec > cursor) gaps.push({ from: +cursor.toFixed(2), to: +plan.durationSec.toFixed(2), gapSec: +(plan.durationSec - cursor).toFixed(2), scene: 'final' });
+  const inner = gaps.filter(g => g.from > 0 && g.scene !== 'final');
+  return {
+    maxGapSec,
+    longestGapSec: Math.max(0, ...inner.map(g => g.gapSec)),
+    meanGapSec: inner.length ? +(inner.reduce((s, g) => s + g.gapSec, 0) / inner.length).toFixed(2) : 0,
+    deadAir: gaps.filter(g => g.gapSec > (g.scene === 'final' ? maxGapSec + 1.5 : maxGapSec)),
+    dialogueShare: +(spoken / Math.max(1e-6, plan.durationSec)).toFixed(2)
+  };
 }
 
 export async function validateEpisode(project: string, episode: string): Promise<{ ok: boolean; checks: Check[]; report: string }> {
@@ -90,7 +109,12 @@ export async function validateEpisode(project: string, episode: string): Promise
   const mm = mono(mst);
   const lines = plan.audio.filter(c => c.kind === 'dialogue' && c.file);
   const placement: { line: string; expected: number; measuredOffsetMs: number; corr: number; rmsDb: number }[] = [];
-  const lags: { line: string; lagMs: number; corr: number }[] = [];
+  const lags: { line: string; lagMs: number; corr: number; worstOnsetMs: number; worstOffsetMs: number; unmatched: number }[] = [];
+  const allAct: number[] = [], allMouth: number[] = [];
+  let silenceSec = 0, openSec = 0;
+  // perceptual tolerance per boundary (ITU-R BT.1359 detectability: sound early 45 ms / late 125 ms) + one 24 fps frame
+  const LATE = 0.045 + 1 / 24, EARLY = 0.125 + 1 / 24;
+  const okErr = (e: number) => e <= LATE && e >= -EARLY;
   for (const c of lines) {
     const src = mono(await readWav(c.file!));
     const s0 = Math.round(c.start * 48000);
@@ -107,10 +131,29 @@ export async function validateEpisode(project: string, episode: string): Promise
     const sid = c.id.split('/')[0];
     const scene = JSON.parse(await readFile(plan.scenes.find(x => x.id === sid)!.resolvedFile, 'utf8'));
     const sp = scene.actors.flatMap((x: { speech: { lineId: string; start: number; visemes: [number, string][] }[] }) => x.speech).find((x: { lineId: string }) => `${sid}/${x.lineId}` === c.id);
-    if (sp) { const r = lipSyncLag(src, 48000, t => visemeAt(sp.visemes, t).open); lags.push({ line: c.id, lagMs: Math.round(r.lagSec * 1000), corr: +r.correlation.toFixed(2) }); }
+    if (sp) {
+      const open = (t: number) => visemeAt(sp.visemes, t).open;
+      const cur = activityCurves(src, 48000, open), r = curvesLag(cur.act, cur.mouth);
+      // a flat correlation curve (short line, one pause) cannot tell lags apart: reported, but not judged per line
+      const bs = boundarySync(src, 48000, open);
+      const on = bs.boundaries.filter(b => b.kind === 'onset' && b.errSec !== null), off = bs.boundaries.filter(b => b.kind === 'offset' && b.errSec !== null);
+      const worst = (l: typeof on) => l.reduce((w, b) => okErr(b.errSec!) && !okErr(w) ? w : (!okErr(b.errSec!) && okErr(w)) || Math.abs(b.errSec!) > Math.abs(w) ? b.errSec! : w, 0);
+      lags.push({ line: c.id, lagMs: Math.round(r.lagSec * 1000), corr: +r.correlation.toFixed(2), worstOnsetMs: Math.round(worst(on) * 1000), worstOffsetMs: Math.round(worst(off) * 1000), unmatched: bs.boundaries.filter(b => b.errSec === null).length });
+      silenceSec += bs.silenceSec; openSec += bs.mouthInSilence * bs.silenceSec;
+      allAct.push(...cur.act, ...new Array(50).fill(0)); allMouth.push(...cur.mouth, ...new Array(50).fill(0));
+    }
   }
   add('audio.dialoguePlacement', placement.every(x => Math.abs(x.measuredOffsetMs) <= 2 && x.corr > 0.3 && x.rmsDb > -45), placement);
-  add('lipsync.lag', lags.length > 0 && lags.every(x => Math.abs(x.lagMs) <= 60), { maxAbsLagMs: Math.max(0, ...lags.map(x => Math.abs(x.lagMs))), lines: lags });
+  // global lag over every line of the episode (many onsets: well conditioned) + every line whose lag is measurable
+  const global = curvesLag(Float32Array.from(allAct), Float32Array.from(allMouth));
+  // global lag over every line (many onsets: well conditioned) + every speech onset/offset within perceptual tolerance.
+  // Per-line correlation lags are informative only: on short lines the correlation curve is flat.
+  // onsets (mouth opening for a sound) are what viewers judge; offsets (closing during a decaying vowel) are looser
+  const bad = lags.filter(x => !okErr(x.worstOnsetMs / 1000));
+  const loose = lags.filter(x => Math.abs(x.worstOffsetMs) > 250);
+  add('lipsync.lag', lags.length > 0 && Math.abs(global.lagSec) <= 0.04 && bad.length === 0, { globalLagMs: Math.round(global.lagSec * 1000), globalCorr: +global.correlation.toFixed(2), toleranceMs: { mouthLate: Math.round(LATE * 1000), mouthEarly: Math.round(EARLY * 1000) }, outOfTolerance: bad.map(x => x.line), lines: lags });
+  add('lipsync.offsets', loose.length === 0, { maxAbsOffsetMs: Math.max(0, ...lags.map(x => Math.abs(x.worstOffsetMs))), over250ms: loose.map(x => x.line) }, 'warning');
+  add('lipsync.mouthInSilence', openSec <= 0.1 * silenceSec, { fraction: +(openSec / Math.max(1e-6, silenceSec)).toFixed(3), silenceSec: +silenceSec.toFixed(1) }, 'warning');
   add('lipsync.correlation', lags.every(x => x.corr > 0.35), { minCorr: Math.min(1, ...lags.map(x => x.corr)) }, 'warning');
   // ---------------------------------------------------------------- subtitles
   const srt = await readFile(srtFile, 'utf8');
@@ -118,6 +161,9 @@ export async function validateEpisode(project: string, episode: string): Promise
   const mono_ = cues.every((c, i) => c[1] > c[0] && (i === 0 || c[0] >= cues[i - 1][1] - 1e-3));
   add('subtitles.valid', cues.length > 0 && mono_ && cues[cues.length - 1][1] <= plan.durationSec + 0.01, { cues: cues.length, monotonic: mono_ });
   add('subtitles.coverDialogue', lines.every(l => cues.some(c => c[0] <= l.start + 0.2 && c[1] >= l.start)), { lines: lines.length });
+  // ---------------------------------------------------------------- pacing (dead air)
+  const pace = pacingReport(plan);
+  add('pacing.deadAir', pace.deadAir.length === 0, pace, 'warning');
   return finish();
   async function finish() {
     const ok = checks.filter(c => c.severity !== 'warning').every(c => c.ok);
