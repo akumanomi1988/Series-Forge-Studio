@@ -19,17 +19,7 @@
       "rate": 1.12
     }
   },
-  "alternatives": {
-    "voicebox": {
-      "engine": "qwen",
-      "instruct": "Spanish male, exhausted waiter, deadpan",
-      "license": {
-        "id": "voicebox-profile-not-configured",
-        "commercialUse": "unknown",
-        "notes": "Configurar con voz propia o autorizada antes de sustituir Kokoro"
-      }
-    }
-  },
+  "alternatives": {},
   "license": {
     "id": "Apache-2.0",
     "commercialUse": "allowed",

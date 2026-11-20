@@ -26,17 +26,7 @@
       "rate": 1.02
     }
   },
-  "alternatives": {
-    "voicebox": {
-      "engine": "qwen",
-      "instruct": "Spanish female, warm, dry humour, confident but guarded",
-      "license": {
-        "id": "voicebox-profile-not-configured",
-        "commercialUse": "unknown",
-        "notes": "Configurar con voz propia o autorizada antes de sustituir Kokoro"
-      }
-    }
-  },
+  "alternatives": {},
   "license": {
     "id": "Apache-2.0",
     "commercialUse": "allowed",

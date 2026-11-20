@@ -531,7 +531,7 @@
     {
       "id": "ambiente",
       "kind": "ambience",
-      "sound": "workshop-ambience",
+      "sound": "room-tone",
       "at": 0,
       "gainDb": -31,
       "fadeIn": 0.5,

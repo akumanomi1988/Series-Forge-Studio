@@ -1,0 +1,18 @@
+{
+  "schemaVersion": 2,
+  "generator": "bench",
+  "params": {
+    "width": 1.9,
+    "color": "#647c7b"
+  },
+  "material": "wood",
+  "anchors": {
+    "seat": {
+      "position": [
+        0,
+        0.48,
+        0
+      ]
+    }
+  }
+}

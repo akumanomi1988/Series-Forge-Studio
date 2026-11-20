@@ -25,17 +25,7 @@
       "rate": 1.06
     }
   },
-  "alternatives": {
-    "voicebox": {
-      "engine": "qwen",
-      "instruct": "Spanish male retrospective voiceover, ironic, intimate; same timbre as Nico",
-      "license": {
-        "id": "voicebox-profile-not-configured",
-        "commercialUse": "unknown",
-        "notes": "Configurar con voz propia o autorizada antes de sustituir Kokoro"
-      }
-    }
-  },
+  "alternatives": {},
   "license": {
     "id": "Apache-2.0",
     "commercialUse": "allowed",

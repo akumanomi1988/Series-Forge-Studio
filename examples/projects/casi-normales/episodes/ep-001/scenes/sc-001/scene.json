@@ -80,6 +80,14 @@
         0.6,
         -0.8
       ]
+    },
+    {
+      "id": "tacon",
+      "propId": "tacon",
+      "heldBy": {
+        "actor": "nico",
+        "hand": "left"
+      }
     }
   ],
   "shots": [
