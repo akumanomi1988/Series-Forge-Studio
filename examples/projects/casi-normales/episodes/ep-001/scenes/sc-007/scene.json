@@ -72,11 +72,11 @@
           "nico",
           "vera"
         ],
-        "azimuthDeg": -15,
+        "azimuthDeg": 12,
         "compose": "thirds",
         "fov": 34
       },
-      "notes": "Cobertura del momento: Vera descubre que su ex es dueño del local; sonrisa desaparece; Dani se sienta sin permiso."
+      "notes": "Cobertura: Vera descubre que su ex es dueño del local; sonrisa desaparece; Dani se sienta sin permiso."
     },
     {
       "id": "p002",
@@ -86,11 +86,11 @@
         "type": "framing",
         "framing": "wide",
         "subject": "vera",
-        "azimuthDeg": 18,
+        "azimuthDeg": -26,
         "compose": "thirds",
-        "fov": 36
+        "fov": 34
       },
-      "notes": "Corte dentro de escena. Interpretación natural, evitar primeros planos del narrador fuera de campo."
+      "notes": "Alternar reacciones y narración. Narrador fuera de plano."
     },
     {
       "id": "p003",
@@ -104,7 +104,7 @@
         "compose": "thirds",
         "fov": 34
       },
-      "notes": "Corte dentro de escena. Interpretación natural, evitar primeros planos del narrador fuera de campo."
+      "notes": "Alternar reacciones y narración. Narrador fuera de plano."
     },
     {
       "id": "p004",
@@ -118,7 +118,7 @@
         "compose": "thirds",
         "fov": 34
       },
-      "notes": "Corte dentro de escena. Interpretación natural, evitar primeros planos del narrador fuera de campo."
+      "notes": "Alternar reacciones y narración. Narrador fuera de plano."
     },
     {
       "id": "p005",
@@ -132,7 +132,7 @@
         "compose": "thirds",
         "fov": 34
       },
-      "notes": "Corte dentro de escena. Interpretación natural, evitar primeros planos del narrador fuera de campo."
+      "notes": "Alternar reacciones y narración. Narrador fuera de plano."
     },
     {
       "id": "p006",
@@ -150,7 +150,7 @@
           "amount": 0.08
         }
       },
-      "notes": "Corte dentro de escena. Interpretación natural, evitar primeros planos del narrador fuera de campo."
+      "notes": "Alternar reacciones y narración. Narrador fuera de plano."
     },
     {
       "id": "p007",
@@ -164,7 +164,7 @@
         "compose": "thirds",
         "fov": 34
       },
-      "notes": "Corte dentro de escena. Interpretación natural, evitar primeros planos del narrador fuera de campo."
+      "notes": "Alternar reacciones y narración. Narrador fuera de plano."
     },
     {
       "id": "p008",
@@ -177,11 +177,11 @@
           "nico",
           "vera"
         ],
-        "azimuthDeg": 15,
+        "azimuthDeg": 12,
         "compose": "thirds",
         "fov": 34
       },
-      "notes": "Corte dentro de escena. Interpretación natural, evitar primeros planos del narrador fuera de campo."
+      "notes": "Alternar reacciones y narración. Narrador fuera de plano."
     },
     {
       "id": "p009",
@@ -191,11 +191,11 @@
         "type": "framing",
         "framing": "wide",
         "subject": "dani",
-        "azimuthDeg": 18,
+        "azimuthDeg": 24,
         "compose": "thirds",
-        "fov": 36
+        "fov": 34
       },
-      "notes": "Corte dentro de escena. Interpretación natural, evitar primeros planos del narrador fuera de campo."
+      "notes": "Alternar reacciones y narración. Narrador fuera de plano."
     },
     {
       "id": "p010",
@@ -209,12 +209,12 @@
         "compose": "thirds",
         "fov": 34
       },
-      "notes": "Corte dentro de escena. Interpretación natural, evitar primeros planos del narrador fuera de campo."
+      "notes": "Alternar reacciones y narración. Narrador fuera de plano."
     },
     {
       "id": "p011",
       "at": 90,
-      "durationSec": 9,
+      "durationSec": 4,
       "camera": {
         "type": "framing",
         "framing": "medium-close",
@@ -227,122 +227,7 @@
           "amount": 0.08
         }
       },
-      "notes": "Corte dentro de escena. Interpretación natural, evitar primeros planos del narrador fuera de campo."
-    },
-    {
-      "id": "p012",
-      "at": 99,
-      "durationSec": 9,
-      "camera": {
-        "type": "framing",
-        "framing": "medium",
-        "subject": "dani",
-        "azimuthDeg": -26,
-        "compose": "thirds",
-        "fov": 34
-      },
-      "notes": "Corte dentro de escena. Interpretación natural, evitar primeros planos del narrador fuera de campo."
-    },
-    {
-      "id": "p013",
-      "at": 108,
-      "durationSec": 9,
-      "camera": {
-        "type": "framing",
-        "framing": "close",
-        "subject": "nico",
-        "azimuthDeg": 24,
-        "compose": "thirds",
-        "fov": 34
-      },
-      "notes": "Corte dentro de escena. Interpretación natural, evitar primeros planos del narrador fuera de campo."
-    },
-    {
-      "id": "p014",
-      "at": 117,
-      "durationSec": 9,
-      "camera": {
-        "type": "framing",
-        "framing": "medium-close",
-        "subject": "vera",
-        "azimuthDeg": -26,
-        "compose": "thirds",
-        "fov": 34
-      },
-      "notes": "Corte dentro de escena. Interpretación natural, evitar primeros planos del narrador fuera de campo."
-    },
-    {
-      "id": "p015",
-      "at": 126,
-      "durationSec": 9,
-      "camera": {
-        "type": "framing",
-        "framing": "two-shot",
-        "subjects": [
-          "nico",
-          "vera"
-        ],
-        "azimuthDeg": -15,
-        "compose": "thirds",
-        "fov": 34
-      },
-      "notes": "Corte dentro de escena. Interpretación natural, evitar primeros planos del narrador fuera de campo."
-    },
-    {
-      "id": "p016",
-      "at": 135,
-      "durationSec": 9,
-      "camera": {
-        "type": "framing",
-        "framing": "wide",
-        "subject": "nico",
-        "azimuthDeg": 18,
-        "compose": "thirds",
-        "fov": 36
-      },
-      "notes": "Corte dentro de escena. Interpretación natural, evitar primeros planos del narrador fuera de campo."
-    },
-    {
-      "id": "p017",
-      "at": 144,
-      "durationSec": 9,
-      "camera": {
-        "type": "framing",
-        "framing": "medium-close",
-        "subject": "vera",
-        "azimuthDeg": 24,
-        "compose": "thirds",
-        "fov": 34
-      },
-      "notes": "Corte dentro de escena. Interpretación natural, evitar primeros planos del narrador fuera de campo."
-    },
-    {
-      "id": "p018",
-      "at": 153,
-      "durationSec": 9,
-      "camera": {
-        "type": "framing",
-        "framing": "medium",
-        "subject": "dani",
-        "azimuthDeg": -26,
-        "compose": "thirds",
-        "fov": 34
-      },
-      "notes": "Corte dentro de escena. Interpretación natural, evitar primeros planos del narrador fuera de campo."
-    },
-    {
-      "id": "p019",
-      "at": 162,
-      "durationSec": 9,
-      "camera": {
-        "type": "framing",
-        "framing": "close",
-        "subject": "nico",
-        "azimuthDeg": 24,
-        "compose": "thirds",
-        "fov": 34
-      },
-      "notes": "Corte dentro de escena. Interpretación natural, evitar primeros planos del narrador fuera de campo."
+      "notes": "Alternar reacciones y narración. Narrador fuera de plano."
     }
   ],
   "actions": [
@@ -514,128 +399,104 @@
     },
     {
       "id": "l014",
-      "actor": "nico-voz",
-      "text": "Me gustaría decir que lo afronté con aplomo. En realidad me quedé quieto, sonriendo como una persona que acaba de ver un accidente y no sabe si tiene que llamar a alguien.",
-      "emotion": "smirk",
-      "direction": "voz en off; narración retrospectiva, confidencial, con ironía española",
-      "pauseAfter": 0.32
-    },
-    {
-      "id": "l015",
       "actor": "dani",
       "text": "¡Vera! ¡Pero bueno! Qué casualidad.",
       "emotion": "smirk",
       "pauseAfter": 0.38
     },
     {
-      "id": "l016",
+      "id": "l015",
       "actor": "vera",
       "text": "Dani.",
       "emotion": "smirk",
       "pauseAfter": 0.38
     },
     {
-      "id": "l017",
+      "id": "l016",
       "actor": "dani",
       "text": "¿Qué haces aquí?",
       "emotion": "smirk",
       "pauseAfter": 0.38
     },
     {
-      "id": "l018",
+      "id": "l017",
       "actor": "vera",
       "text": "Cenando. Se ve bastante bien desde ahí.",
       "emotion": "smirk",
       "pauseAfter": 0.38
     },
     {
-      "id": "l019",
-      "actor": "nico-voz",
-      "text": "Dani tenía una de esas sonrisas de anuncio de seguros que, en cualquier otro contexto, podrían resultar agradables. En aquel momento me apetecía apagarlo con un mando a distancia.",
-      "emotion": "smirk",
-      "direction": "voz en off; narración retrospectiva, confidencial, con ironía española",
-      "pauseAfter": 0.32
-    },
-    {
-      "id": "l020",
+      "id": "l018",
       "actor": "dani",
       "text": "¿Y este quién es?",
       "emotion": "smirk",
       "pauseAfter": 0.38
     },
     {
-      "id": "l021",
+      "id": "l019",
       "actor": "nico",
       "text": "Nico. Encantado.",
       "emotion": "nervous",
       "pauseAfter": 0.38
     },
     {
-      "id": "l022",
+      "id": "l020",
       "actor": "dani",
       "text": "Dani. El dueño. ¿Sabes que estás en mi restaurante?",
       "emotion": "smirk",
       "pauseAfter": 0.38
     },
     {
-      "id": "l023",
+      "id": "l021",
       "actor": "nico",
       "text": "Me lo han comentado varias veces en los últimos diez segundos.",
       "emotion": "nervous",
       "pauseAfter": 0.38
     },
     {
-      "id": "l024",
+      "id": "l022",
       "actor": "dani",
       "text": "Qué gracioso. ¿A qué te dedicas?",
       "emotion": "smirk",
       "pauseAfter": 0.38
     },
     {
-      "id": "l025",
+      "id": "l023",
       "actor": "nico",
       "text": "Trabajo con ordenadores.",
       "emotion": "nervous",
       "pauseAfter": 0.38
     },
     {
-      "id": "l026",
+      "id": "l024",
       "actor": "dani",
       "text": "Ah, informático. Mi sobrino también arregla ordenadores.",
       "emotion": "smirk",
       "pauseAfter": 0.38
     },
     {
-      "id": "l027",
-      "actor": "nico-voz",
-      "text": "Apreté la mandíbula. Quise decirle que no eran exactamente lo mismo, pero tenía la impresión de que cualquier explicación iba a terminar en una discusión sobre impresoras.",
-      "emotion": "smirk",
-      "direction": "voz en off; narración retrospectiva, confidencial, con ironía española",
-      "pauseAfter": 0.32
-    },
-    {
-      "id": "l028",
+      "id": "l025",
       "actor": "dani",
       "text": "Bueno, ¿qué tomáis? Aquí la especialidad es la carne.",
       "emotion": "smirk",
       "pauseAfter": 0.38
     },
     {
-      "id": "l029",
+      "id": "l026",
       "actor": "vera",
       "text": "Lo que hemos pedido, Dani. Gracias.",
       "emotion": "smirk",
       "pauseAfter": 0.38
     },
     {
-      "id": "l030",
+      "id": "l027",
       "actor": "dani",
       "text": "Me siento un momento.",
       "emotion": "smirk",
       "pauseAfter": 0.38
     },
     {
-      "id": "l031",
+      "id": "l028",
       "actor": "nico-voz",
       "text": "No lo preguntó. Se sentó. Y esa fue la primera vez en mi vida que vi a un hombre hacer una entrada triunfal en una conversación a la que nadie lo había invitado.",
       "emotion": "smirk",
@@ -643,26 +504,18 @@
       "pauseAfter": 0.32
     },
     {
-      "id": "l032",
+      "id": "l029",
       "actor": "vera",
       "text": "Dani, estamos en una cita.",
       "emotion": "smirk",
       "pauseAfter": 0.38
     },
     {
-      "id": "l033",
+      "id": "l030",
       "actor": "dani",
       "text": "Claro, claro. Si es un segundo.",
       "emotion": "smirk",
       "pauseAfter": 0.38
-    },
-    {
-      "id": "l034",
-      "actor": "nico-voz",
-      "text": "En su idioma, un segundo significaba todo el tiempo necesario para que alguien acabara queriendo huir por una ventana.",
-      "emotion": "smirk",
-      "direction": "voz en off; narración retrospectiva, confidencial, con ironía española",
-      "pauseAfter": 0.32
     }
   ],
   "sound": [

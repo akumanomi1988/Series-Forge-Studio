@@ -65,7 +65,7 @@
           "amount": 0.08
         }
       },
-      "notes": "Cobertura del momento: Vera se prepara y habla por teléfono con Sofía. Se justifica cómo lo sabe el narrador."
+      "notes": "Cobertura: Vera se prepara y habla por teléfono con Sofía. Se justifica cómo lo sabe el narrador."
     },
     {
       "id": "p002",
@@ -75,11 +75,11 @@
         "type": "framing",
         "framing": "wide",
         "subject": "vera",
-        "azimuthDeg": 18,
+        "azimuthDeg": -26,
         "compose": "thirds",
-        "fov": 36
+        "fov": 34
       },
-      "notes": "Corte dentro de escena. Interpretación natural, evitar primeros planos del narrador fuera de campo."
+      "notes": "Alternar reacciones y narración. Narrador fuera de plano."
     },
     {
       "id": "p003",
@@ -93,7 +93,7 @@
         "compose": "thirds",
         "fov": 34
       },
-      "notes": "Corte dentro de escena. Interpretación natural, evitar primeros planos del narrador fuera de campo."
+      "notes": "Alternar reacciones y narración. Narrador fuera de plano."
     },
     {
       "id": "p004",
@@ -107,7 +107,7 @@
         "compose": "thirds",
         "fov": 34
       },
-      "notes": "Corte dentro de escena. Interpretación natural, evitar primeros planos del narrador fuera de campo."
+      "notes": "Alternar reacciones y narración. Narrador fuera de plano."
     },
     {
       "id": "p005",
@@ -121,7 +121,7 @@
         "compose": "thirds",
         "fov": 34
       },
-      "notes": "Corte dentro de escena. Interpretación natural, evitar primeros planos del narrador fuera de campo."
+      "notes": "Alternar reacciones y narración. Narrador fuera de plano."
     },
     {
       "id": "p006",
@@ -139,7 +139,7 @@
           "amount": 0.08
         }
       },
-      "notes": "Corte dentro de escena. Interpretación natural, evitar primeros planos del narrador fuera de campo."
+      "notes": "Alternar reacciones y narración. Narrador fuera de plano."
     },
     {
       "id": "p007",
@@ -153,7 +153,7 @@
         "compose": "thirds",
         "fov": 34
       },
-      "notes": "Corte dentro de escena. Interpretación natural, evitar primeros planos del narrador fuera de campo."
+      "notes": "Alternar reacciones y narración. Narrador fuera de plano."
     },
     {
       "id": "p008",
@@ -167,7 +167,7 @@
         "compose": "thirds",
         "fov": 34
       },
-      "notes": "Corte dentro de escena. Interpretación natural, evitar primeros planos del narrador fuera de campo."
+      "notes": "Alternar reacciones y narración. Narrador fuera de plano."
     },
     {
       "id": "p009",
@@ -177,11 +177,11 @@
         "type": "framing",
         "framing": "wide",
         "subject": "vera",
-        "azimuthDeg": 18,
+        "azimuthDeg": 24,
         "compose": "thirds",
-        "fov": 36
+        "fov": 34
       },
-      "notes": "Corte dentro de escena. Interpretación natural, evitar primeros planos del narrador fuera de campo."
+      "notes": "Alternar reacciones y narración. Narrador fuera de plano."
     },
     {
       "id": "p010",
@@ -195,7 +195,7 @@
         "compose": "thirds",
         "fov": 34
       },
-      "notes": "Corte dentro de escena. Interpretación natural, evitar primeros planos del narrador fuera de campo."
+      "notes": "Alternar reacciones y narración. Narrador fuera de plano."
     },
     {
       "id": "p011",
@@ -213,91 +213,21 @@
           "amount": 0.08
         }
       },
-      "notes": "Corte dentro de escena. Interpretación natural, evitar primeros planos del narrador fuera de campo."
+      "notes": "Alternar reacciones y narración. Narrador fuera de plano."
     },
     {
       "id": "p012",
       "at": 99,
-      "durationSec": 9,
-      "camera": {
-        "type": "framing",
-        "framing": "medium",
-        "subject": "vera",
-        "azimuthDeg": -26,
-        "compose": "thirds",
-        "fov": 34
-      },
-      "notes": "Corte dentro de escena. Interpretación natural, evitar primeros planos del narrador fuera de campo."
-    },
-    {
-      "id": "p013",
-      "at": 108,
-      "durationSec": 9,
-      "camera": {
-        "type": "framing",
-        "framing": "close",
-        "subject": "vera",
-        "azimuthDeg": 24,
-        "compose": "thirds",
-        "fov": 34
-      },
-      "notes": "Corte dentro de escena. Interpretación natural, evitar primeros planos del narrador fuera de campo."
-    },
-    {
-      "id": "p014",
-      "at": 117,
-      "durationSec": 9,
-      "camera": {
-        "type": "framing",
-        "framing": "medium-close",
-        "subject": "vera",
-        "azimuthDeg": -26,
-        "compose": "thirds",
-        "fov": 34
-      },
-      "notes": "Corte dentro de escena. Interpretación natural, evitar primeros planos del narrador fuera de campo."
-    },
-    {
-      "id": "p015",
-      "at": 126,
-      "durationSec": 9,
-      "camera": {
-        "type": "framing",
-        "framing": "medium",
-        "subject": "vera",
-        "azimuthDeg": 24,
-        "compose": "thirds",
-        "fov": 34
-      },
-      "notes": "Corte dentro de escena. Interpretación natural, evitar primeros planos del narrador fuera de campo."
-    },
-    {
-      "id": "p016",
-      "at": 135,
-      "durationSec": 9,
-      "camera": {
-        "type": "framing",
-        "framing": "wide",
-        "subject": "vera",
-        "azimuthDeg": 18,
-        "compose": "thirds",
-        "fov": 36
-      },
-      "notes": "Corte dentro de escena. Interpretación natural, evitar primeros planos del narrador fuera de campo."
-    },
-    {
-      "id": "p017",
-      "at": 144,
       "durationSec": 4,
       "camera": {
         "type": "framing",
-        "framing": "medium-close",
+        "framing": "medium",
         "subject": "vera",
-        "azimuthDeg": 24,
+        "azimuthDeg": -26,
         "compose": "thirds",
         "fov": 34
       },
-      "notes": "Corte dentro de escena. Interpretación natural, evitar primeros planos del narrador fuera de campo."
+      "notes": "Alternar reacciones y narración. Narrador fuera de plano."
     }
   ],
   "actions": [
@@ -423,49 +353,41 @@
     },
     {
       "id": "l013",
-      "actor": "nico-voz",
-      "text": "También dijo que lo único que quería era conocer a alguien normal. En una aplicación de citas. Esa era la primera señal de que los dos vivíamos en un universo sin contacto con la realidad.",
-      "emotion": "smirk",
-      "direction": "voz en off; narración retrospectiva, confidencial, con ironía española",
-      "pauseAfter": 0.32
-    },
-    {
-      "id": "l014",
       "actor": "sofia",
       "text": "Hazme un favor. Si resulta ser un pesado, me escribes y te llamo con una emergencia inventada.",
       "emotion": "neutral",
       "pauseAfter": 0.38
     },
     {
-      "id": "l015",
+      "id": "l014",
       "actor": "vera",
       "text": "¿Qué emergencia?",
       "emotion": "smirk",
       "pauseAfter": 0.38
     },
     {
-      "id": "l016",
+      "id": "l015",
       "actor": "sofia",
       "text": "Que se me ha quedado un gato encerrado en el ascensor.",
       "emotion": "neutral",
       "pauseAfter": 0.38
     },
     {
-      "id": "l017",
+      "id": "l016",
       "actor": "vera",
       "text": "No tienes gato.",
       "emotion": "smirk",
       "pauseAfter": 0.38
     },
     {
-      "id": "l018",
+      "id": "l017",
       "actor": "sofia",
       "text": "Por eso es tan urgente.",
       "emotion": "neutral",
       "pauseAfter": 0.38
     },
     {
-      "id": "l019",
+      "id": "l018",
       "actor": "nico-voz",
       "text": "Vera se rió, cogió el bolso y salió. Años después, me contó que en ese momento pensaba que lo peor que podía pasar era una cena aburrida. Y me preguntó si recordaba que a mí me había pasado exactamente lo mismo.",
       "emotion": "smirk",

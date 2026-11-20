@@ -60,11 +60,11 @@
           "nico",
           "vera"
         ],
-        "azimuthDeg": -15,
+        "azimuthDeg": 12,
         "compose": "thirds",
         "fov": 34
       },
-      "notes": "Cobertura del momento: Final cálido: no hay romance, sí amistad; Nico valora cinco estrellas, promesa de serie."
+      "notes": "Cobertura: Final cálido: no hay romance, sí amistad; Nico valora cinco estrellas, promesa de serie."
     },
     {
       "id": "p002",
@@ -74,11 +74,11 @@
         "type": "framing",
         "framing": "wide",
         "subject": "vera",
-        "azimuthDeg": 18,
+        "azimuthDeg": -26,
         "compose": "thirds",
-        "fov": 36
+        "fov": 34
       },
-      "notes": "Corte dentro de escena. Interpretación natural, evitar primeros planos del narrador fuera de campo."
+      "notes": "Alternar reacciones y narración. Narrador fuera de plano."
     },
     {
       "id": "p003",
@@ -92,7 +92,7 @@
         "compose": "thirds",
         "fov": 34
       },
-      "notes": "Corte dentro de escena. Interpretación natural, evitar primeros planos del narrador fuera de campo."
+      "notes": "Alternar reacciones y narración. Narrador fuera de plano."
     },
     {
       "id": "p004",
@@ -106,7 +106,7 @@
         "compose": "thirds",
         "fov": 34
       },
-      "notes": "Corte dentro de escena. Interpretación natural, evitar primeros planos del narrador fuera de campo."
+      "notes": "Alternar reacciones y narración. Narrador fuera de plano."
     },
     {
       "id": "p005",
@@ -120,7 +120,7 @@
         "compose": "thirds",
         "fov": 34
       },
-      "notes": "Corte dentro de escena. Interpretación natural, evitar primeros planos del narrador fuera de campo."
+      "notes": "Alternar reacciones y narración. Narrador fuera de plano."
     },
     {
       "id": "p006",
@@ -138,7 +138,7 @@
           "amount": 0.08
         }
       },
-      "notes": "Corte dentro de escena. Interpretación natural, evitar primeros planos del narrador fuera de campo."
+      "notes": "Alternar reacciones y narración. Narrador fuera de plano."
     },
     {
       "id": "p007",
@@ -152,7 +152,7 @@
         "compose": "thirds",
         "fov": 34
       },
-      "notes": "Corte dentro de escena. Interpretación natural, evitar primeros planos del narrador fuera de campo."
+      "notes": "Alternar reacciones y narración. Narrador fuera de plano."
     },
     {
       "id": "p008",
@@ -165,11 +165,11 @@
           "nico",
           "vera"
         ],
-        "azimuthDeg": 15,
+        "azimuthDeg": 12,
         "compose": "thirds",
         "fov": 34
       },
-      "notes": "Corte dentro de escena. Interpretación natural, evitar primeros planos del narrador fuera de campo."
+      "notes": "Alternar reacciones y narración. Narrador fuera de plano."
     },
     {
       "id": "p009",
@@ -179,11 +179,11 @@
         "type": "framing",
         "framing": "wide",
         "subject": "nico",
-        "azimuthDeg": 18,
+        "azimuthDeg": 24,
         "compose": "thirds",
-        "fov": 36
+        "fov": 34
       },
-      "notes": "Corte dentro de escena. Interpretación natural, evitar primeros planos del narrador fuera de campo."
+      "notes": "Alternar reacciones y narración. Narrador fuera de plano."
     },
     {
       "id": "p010",
@@ -197,7 +197,7 @@
         "compose": "thirds",
         "fov": 34
       },
-      "notes": "Corte dentro de escena. Interpretación natural, evitar primeros planos del narrador fuera de campo."
+      "notes": "Alternar reacciones y narración. Narrador fuera de plano."
     },
     {
       "id": "p011",
@@ -215,7 +215,7 @@
           "amount": 0.08
         }
       },
-      "notes": "Corte dentro de escena. Interpretación natural, evitar primeros planos del narrador fuera de campo."
+      "notes": "Alternar reacciones y narración. Narrador fuera de plano."
     },
     {
       "id": "p012",
@@ -229,7 +229,7 @@
         "compose": "thirds",
         "fov": 34
       },
-      "notes": "Corte dentro de escena. Interpretación natural, evitar primeros planos del narrador fuera de campo."
+      "notes": "Alternar reacciones y narración. Narrador fuera de plano."
     },
     {
       "id": "p013",
@@ -243,7 +243,7 @@
         "compose": "thirds",
         "fov": 34
       },
-      "notes": "Corte dentro de escena. Interpretación natural, evitar primeros planos del narrador fuera de campo."
+      "notes": "Alternar reacciones y narración. Narrador fuera de plano."
     },
     {
       "id": "p014",
@@ -257,7 +257,7 @@
         "compose": "thirds",
         "fov": 34
       },
-      "notes": "Corte dentro de escena. Interpretación natural, evitar primeros planos del narrador fuera de campo."
+      "notes": "Alternar reacciones y narración. Narrador fuera de plano."
     },
     {
       "id": "p015",
@@ -270,11 +270,11 @@
           "nico",
           "vera"
         ],
-        "azimuthDeg": -15,
+        "azimuthDeg": 12,
         "compose": "thirds",
         "fov": 34
       },
-      "notes": "Corte dentro de escena. Interpretación natural, evitar primeros planos del narrador fuera de campo."
+      "notes": "Alternar reacciones y narración. Narrador fuera de plano."
     },
     {
       "id": "p016",
@@ -284,16 +284,20 @@
         "type": "framing",
         "framing": "wide",
         "subject": "vera",
-        "azimuthDeg": 18,
+        "azimuthDeg": -26,
         "compose": "thirds",
-        "fov": 36
+        "fov": 34,
+        "move": {
+          "type": "push-in",
+          "amount": 0.08
+        }
       },
-      "notes": "Corte dentro de escena. Interpretación natural, evitar primeros planos del narrador fuera de campo."
+      "notes": "Alternar reacciones y narración. Narrador fuera de plano."
     },
     {
       "id": "p017",
       "at": 144,
-      "durationSec": 9,
+      "durationSec": 1,
       "camera": {
         "type": "framing",
         "framing": "medium-close",
@@ -302,158 +306,7 @@
         "compose": "thirds",
         "fov": 34
       },
-      "notes": "Corte dentro de escena. Interpretación natural, evitar primeros planos del narrador fuera de campo."
-    },
-    {
-      "id": "p018",
-      "at": 153,
-      "durationSec": 9,
-      "camera": {
-        "type": "framing",
-        "framing": "medium",
-        "subject": "vera",
-        "azimuthDeg": -26,
-        "compose": "thirds",
-        "fov": 34
-      },
-      "notes": "Corte dentro de escena. Interpretación natural, evitar primeros planos del narrador fuera de campo."
-    },
-    {
-      "id": "p019",
-      "at": 162,
-      "durationSec": 9,
-      "camera": {
-        "type": "framing",
-        "framing": "close",
-        "subject": "nico",
-        "azimuthDeg": 24,
-        "compose": "thirds",
-        "fov": 34
-      },
-      "notes": "Corte dentro de escena. Interpretación natural, evitar primeros planos del narrador fuera de campo."
-    },
-    {
-      "id": "p020",
-      "at": 171,
-      "durationSec": 9,
-      "camera": {
-        "type": "framing",
-        "framing": "medium-close",
-        "subject": "vera",
-        "azimuthDeg": -26,
-        "compose": "thirds",
-        "fov": 34
-      },
-      "notes": "Corte dentro de escena. Interpretación natural, evitar primeros planos del narrador fuera de campo."
-    },
-    {
-      "id": "p021",
-      "at": 180,
-      "durationSec": 9,
-      "camera": {
-        "type": "framing",
-        "framing": "medium",
-        "subject": "nico",
-        "azimuthDeg": 24,
-        "compose": "thirds",
-        "fov": 34,
-        "move": {
-          "type": "push-in",
-          "amount": 0.08
-        }
-      },
-      "notes": "Corte dentro de escena. Interpretación natural, evitar primeros planos del narrador fuera de campo."
-    },
-    {
-      "id": "p022",
-      "at": 189,
-      "durationSec": 9,
-      "camera": {
-        "type": "framing",
-        "framing": "two-shot",
-        "subjects": [
-          "nico",
-          "vera"
-        ],
-        "azimuthDeg": 15,
-        "compose": "thirds",
-        "fov": 34
-      },
-      "notes": "Corte dentro de escena. Interpretación natural, evitar primeros planos del narrador fuera de campo."
-    },
-    {
-      "id": "p023",
-      "at": 198,
-      "durationSec": 9,
-      "camera": {
-        "type": "framing",
-        "framing": "wide",
-        "subject": "nico",
-        "azimuthDeg": 18,
-        "compose": "thirds",
-        "fov": 36
-      },
-      "notes": "Corte dentro de escena. Interpretación natural, evitar primeros planos del narrador fuera de campo."
-    },
-    {
-      "id": "p024",
-      "at": 207,
-      "durationSec": 9,
-      "camera": {
-        "type": "framing",
-        "framing": "medium",
-        "subject": "vera",
-        "azimuthDeg": -26,
-        "compose": "thirds",
-        "fov": 34
-      },
-      "notes": "Corte dentro de escena. Interpretación natural, evitar primeros planos del narrador fuera de campo."
-    },
-    {
-      "id": "p025",
-      "at": 216,
-      "durationSec": 9,
-      "camera": {
-        "type": "framing",
-        "framing": "close",
-        "subject": "nico",
-        "azimuthDeg": 24,
-        "compose": "thirds",
-        "fov": 34
-      },
-      "notes": "Corte dentro de escena. Interpretación natural, evitar primeros planos del narrador fuera de campo."
-    },
-    {
-      "id": "p026",
-      "at": 225,
-      "durationSec": 9,
-      "camera": {
-        "type": "framing",
-        "framing": "medium-close",
-        "subject": "vera",
-        "azimuthDeg": -26,
-        "compose": "thirds",
-        "fov": 34,
-        "move": {
-          "type": "push-in",
-          "amount": 0.08
-        }
-      },
-      "notes": "Corte dentro de escena. Interpretación natural, evitar primeros planos del narrador fuera de campo."
-    },
-    {
-      "id": "p027",
-      "at": 234,
-      "durationSec": 4,
-      "camera": {
-        "type": "framing",
-        "framing": "medium",
-        "subject": "nico",
-        "azimuthDeg": 24,
-        "compose": "thirds",
-        "fov": 34
-      },
-      "notes": "Corte dentro de escena. Interpretación natural, evitar primeros planos del narrador fuera de campo."
+      "notes": "Alternar reacciones y narración. Narrador fuera de plano."
     }
   ],
   "actions": [
@@ -576,49 +429,41 @@
     },
     {
       "id": "l004",
-      "actor": "nico-voz",
-      "text": "Lo dijo tan seria que durante un segundo pensé que todavía estaba enfadada. Entonces empezó a reírse. Primero poquito. Luego tanto que tuvo que agarrarse a un banco para no caerse.",
-      "emotion": "smirk",
-      "direction": "voz en off; narración retrospectiva, confidencial, con ironía española",
-      "pauseAfter": 0.32
-    },
-    {
-      "id": "l005",
       "actor": "nico",
       "text": "De verdad. Piensa en lo positivo.",
       "emotion": "nervous",
       "pauseAfter": 0.38
     },
     {
-      "id": "l006",
+      "id": "l005",
       "actor": "vera",
       "text": "¿Qué positivo?",
       "emotion": "smirk",
       "pauseAfter": 0.38
     },
     {
-      "id": "l007",
+      "id": "l006",
       "actor": "nico",
       "text": "Hemos conocido a la policía. Tenemos una historia que contar. Tú has recuperado el bolso.",
       "emotion": "nervous",
       "pauseAfter": 0.38
     },
     {
-      "id": "l008",
+      "id": "l007",
       "actor": "vera",
       "text": "Y tú has perdido la chaqueta, la cartera y las llaves del coche.",
       "emotion": "smirk",
       "pauseAfter": 0.38
     },
     {
-      "id": "l009",
+      "id": "l008",
       "actor": "nico",
       "text": "Pequeños detalles administrativos.",
       "emotion": "nervous",
       "pauseAfter": 0.38
     },
     {
-      "id": "l010",
+      "id": "l009",
       "actor": "nico-voz",
       "text": "Nos sentamos en un banco, exhaustos, y ocurrió algo que no había conseguido pasar en toda la cena. Pudimos hablar sin intentar impresionarnos.",
       "emotion": "smirk",
@@ -626,142 +471,126 @@
       "pauseAfter": 0.32
     },
     {
-      "id": "l011",
+      "id": "l010",
       "actor": "vera",
       "text": "¿En serio habías ensayado frases delante del espejo?",
       "emotion": "smirk",
       "pauseAfter": 0.38
     },
     {
-      "id": "l012",
+      "id": "l011",
       "actor": "nico",
       "text": "Veinte minutos.",
       "emotion": "nervous",
       "pauseAfter": 0.38
     },
     {
-      "id": "l013",
+      "id": "l012",
       "actor": "vera",
       "text": "Qué horror.",
       "emotion": "smirk",
       "pauseAfter": 0.38
     },
     {
-      "id": "l014",
+      "id": "l013",
       "actor": "nico",
       "text": "Gracias, lo sé.",
       "emotion": "nervous",
       "pauseAfter": 0.38
     },
     {
-      "id": "l015",
+      "id": "l014",
       "actor": "vera",
       "text": "Yo estuve a punto de cancelar tres veces.",
       "emotion": "smirk",
       "pauseAfter": 0.38
     },
     {
-      "id": "l016",
+      "id": "l015",
       "actor": "nico",
       "text": "¿Por mí?",
       "emotion": "nervous",
       "pauseAfter": 0.38
     },
     {
-      "id": "l017",
+      "id": "l016",
       "actor": "vera",
       "text": "Por todo. Por empezar otra vez con alguien, por volver a explicarme, por fingir que me interesan cosas que no me interesan.",
       "emotion": "smirk",
       "pauseAfter": 0.38
     },
     {
-      "id": "l018",
-      "actor": "nico-voz",
-      "text": "Ahí comprendí que ella también había venido con miedo, aunque el suyo no hiciera ruido al golpear una mesa.",
-      "emotion": "smirk",
-      "direction": "voz en off; narración retrospectiva, confidencial, con ironía española",
-      "pauseAfter": 0.32
-    },
-    {
-      "id": "l019",
+      "id": "l017",
       "actor": "nico",
       "text": "Pues para ser nuestra primera cita, no hemos fingido demasiado.",
       "emotion": "nervous",
       "pauseAfter": 0.38
     },
     {
-      "id": "l020",
+      "id": "l018",
       "actor": "vera",
       "text": "Tú sí. Al principio.",
       "emotion": "smirk",
       "pauseAfter": 0.38
     },
     {
-      "id": "l021",
+      "id": "l019",
       "actor": "nico",
       "text": "Bueno, sí.",
       "emotion": "nervous",
       "pauseAfter": 0.38
     },
     {
-      "id": "l022",
+      "id": "l020",
       "actor": "vera",
       "text": "Pero luego has sido tú. Y me has caído mejor.",
       "emotion": "smirk",
       "pauseAfter": 0.38
     },
     {
-      "id": "l023",
-      "actor": "nico-voz",
-      "text": "Me quedé mirándola y por primera vez no necesité preguntarme qué tenía que decir a continuación.",
-      "emotion": "smirk",
-      "direction": "voz en off; narración retrospectiva, confidencial, con ironía española",
-      "pauseAfter": 0.32
-    },
-    {
-      "id": "l024",
+      "id": "l021",
       "actor": "vera",
       "text": "Eres buen tío, Nico. Pero no creo que tú y yo funcionemos como pareja.",
       "emotion": "smirk",
       "pauseAfter": 0.38
     },
     {
-      "id": "l025",
+      "id": "l022",
       "actor": "nico",
       "text": "Lo sé.",
       "emotion": "nervous",
       "pauseAfter": 0.38
     },
     {
-      "id": "l026",
+      "id": "l023",
       "actor": "vera",
       "text": "¿Lo sabes?",
       "emotion": "smirk",
       "pauseAfter": 0.38
     },
     {
-      "id": "l027",
+      "id": "l024",
       "actor": "nico",
       "text": "Vera, nuestra primera cita ha terminado con tres policías y un hombre envuelto en un mantel. Creo que deberíamos tratarlo como una señal.",
       "emotion": "nervous",
       "pauseAfter": 0.38
     },
     {
-      "id": "l028",
+      "id": "l025",
       "actor": "vera",
       "text": "O como una advertencia.",
       "emotion": "smirk",
       "pauseAfter": 0.38
     },
     {
-      "id": "l029",
+      "id": "l026",
       "actor": "nico",
       "text": "Eso.",
       "emotion": "nervous",
       "pauseAfter": 0.38
     },
     {
-      "id": "l030",
+      "id": "l027",
       "actor": "nico-voz",
       "text": "Sonrió. Me dijo que podríamos seguir viéndonos como amigos. Y aquello, que unos años antes me habría parecido una derrota, esa noche me sonó a la mejor idea del mundo.",
       "emotion": "smirk",
@@ -769,43 +598,35 @@
       "pauseAfter": 0.32
     },
     {
-      "id": "l031",
+      "id": "l028",
       "actor": "vera",
       "text": "¿Quedamos el viernes para tomar algo?",
       "emotion": "smirk",
       "pauseAfter": 0.38
     },
     {
-      "id": "l032",
+      "id": "l029",
       "actor": "nico",
       "text": "Vale. Pero esta vez elijo yo el sitio.",
       "emotion": "nervous",
       "pauseAfter": 0.38
     },
     {
-      "id": "l033",
+      "id": "l030",
       "actor": "vera",
       "text": "Nico... el sitio de hoy lo has elegido tú.",
       "emotion": "smirk",
       "pauseAfter": 0.38
     },
     {
-      "id": "l034",
+      "id": "l031",
       "actor": "nico",
       "text": "Ah, mierda. Es verdad.",
       "emotion": "nervous",
       "pauseAfter": 0.38
     },
     {
-      "id": "l035",
-      "actor": "nico-voz",
-      "text": "Se fue riéndose. Yo me quedé sentado unos segundos, mirando cómo se alejaba, mientras el móvil vibraba en mi bolsillo.",
-      "emotion": "smirk",
-      "direction": "voz en off; narración retrospectiva, confidencial, con ironía española",
-      "pauseAfter": 0.32
-    },
-    {
-      "id": "l036",
+      "id": "l032",
       "actor": "nico-voz",
       "text": "Era una notificación de la aplicación de citas. «¿Cómo ha ido tu cita con Vera? Valora tu experiencia». Tenía cinco estrellas delante.",
       "emotion": "smirk",
@@ -813,22 +634,14 @@
       "pauseAfter": 0.32
     },
     {
-      "id": "l037",
-      "actor": "nico-voz",
-      "text": "Yo había perdido la cartera, casi me detienen y acababa de descubrir que debía llamar a un cerrajero. [pausa 0.7] Le di cinco estrellas.",
-      "emotion": "smirk",
-      "direction": "voz en off; narración retrospectiva, confidencial, con ironía española",
-      "pauseAfter": 0.32
-    },
-    {
-      "id": "l038",
+      "id": "l033",
       "actor": "nico",
       "text": "Inolvidable.",
       "emotion": "nervous",
       "pauseAfter": 0.38
     },
     {
-      "id": "l039",
+      "id": "l034",
       "actor": "nico-voz",
       "text": "Y así fue como conocí a Vera. No conseguí novia, pero encontré a alguien que podía decirme la verdad en la cara sin que me molestara. Lo peor de todo es que aquella no iba a ser nuestra última noche desastrosa.",
       "emotion": "smirk",

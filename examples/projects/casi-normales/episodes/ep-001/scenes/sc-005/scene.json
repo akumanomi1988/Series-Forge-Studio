@@ -72,11 +72,11 @@
           "nico",
           "vera"
         ],
-        "azimuthDeg": -15,
+        "azimuthDeg": 12,
         "compose": "thirds",
         "fov": 34
       },
-      "notes": "Cobertura del momento: Malentendidos sobre comida y aficiones; hay interés real bajo la torpeza."
+      "notes": "Cobertura: Malentendidos sobre comida y aficiones; hay interés real bajo la torpeza."
     },
     {
       "id": "p002",
@@ -86,11 +86,11 @@
         "type": "framing",
         "framing": "wide",
         "subject": "vera",
-        "azimuthDeg": 18,
+        "azimuthDeg": -26,
         "compose": "thirds",
-        "fov": 36
+        "fov": 34
       },
-      "notes": "Corte dentro de escena. Interpretación natural, evitar primeros planos del narrador fuera de campo."
+      "notes": "Alternar reacciones y narración. Narrador fuera de plano."
     },
     {
       "id": "p003",
@@ -104,7 +104,7 @@
         "compose": "thirds",
         "fov": 34
       },
-      "notes": "Corte dentro de escena. Interpretación natural, evitar primeros planos del narrador fuera de campo."
+      "notes": "Alternar reacciones y narración. Narrador fuera de plano."
     },
     {
       "id": "p004",
@@ -118,7 +118,7 @@
         "compose": "thirds",
         "fov": 34
       },
-      "notes": "Corte dentro de escena. Interpretación natural, evitar primeros planos del narrador fuera de campo."
+      "notes": "Alternar reacciones y narración. Narrador fuera de plano."
     },
     {
       "id": "p005",
@@ -132,7 +132,7 @@
         "compose": "thirds",
         "fov": 34
       },
-      "notes": "Corte dentro de escena. Interpretación natural, evitar primeros planos del narrador fuera de campo."
+      "notes": "Alternar reacciones y narración. Narrador fuera de plano."
     },
     {
       "id": "p006",
@@ -150,7 +150,7 @@
           "amount": 0.08
         }
       },
-      "notes": "Corte dentro de escena. Interpretación natural, evitar primeros planos del narrador fuera de campo."
+      "notes": "Alternar reacciones y narración. Narrador fuera de plano."
     },
     {
       "id": "p007",
@@ -164,7 +164,7 @@
         "compose": "thirds",
         "fov": 34
       },
-      "notes": "Corte dentro de escena. Interpretación natural, evitar primeros planos del narrador fuera de campo."
+      "notes": "Alternar reacciones y narración. Narrador fuera de plano."
     },
     {
       "id": "p008",
@@ -177,11 +177,11 @@
           "nico",
           "vera"
         ],
-        "azimuthDeg": 15,
+        "azimuthDeg": 12,
         "compose": "thirds",
         "fov": 34
       },
-      "notes": "Corte dentro de escena. Interpretación natural, evitar primeros planos del narrador fuera de campo."
+      "notes": "Alternar reacciones y narración. Narrador fuera de plano."
     },
     {
       "id": "p009",
@@ -191,11 +191,11 @@
         "type": "framing",
         "framing": "wide",
         "subject": "roman",
-        "azimuthDeg": 18,
+        "azimuthDeg": 24,
         "compose": "thirds",
-        "fov": 36
+        "fov": 34
       },
-      "notes": "Corte dentro de escena. Interpretación natural, evitar primeros planos del narrador fuera de campo."
+      "notes": "Alternar reacciones y narración. Narrador fuera de plano."
     },
     {
       "id": "p010",
@@ -209,7 +209,7 @@
         "compose": "thirds",
         "fov": 34
       },
-      "notes": "Corte dentro de escena. Interpretación natural, evitar primeros planos del narrador fuera de campo."
+      "notes": "Alternar reacciones y narración. Narrador fuera de plano."
     },
     {
       "id": "p011",
@@ -227,12 +227,12 @@
           "amount": 0.08
         }
       },
-      "notes": "Corte dentro de escena. Interpretación natural, evitar primeros planos del narrador fuera de campo."
+      "notes": "Alternar reacciones y narración. Narrador fuera de plano."
     },
     {
       "id": "p012",
       "at": 99,
-      "durationSec": 9,
+      "durationSec": 5,
       "camera": {
         "type": "framing",
         "framing": "medium",
@@ -241,122 +241,7 @@
         "compose": "thirds",
         "fov": 34
       },
-      "notes": "Corte dentro de escena. Interpretación natural, evitar primeros planos del narrador fuera de campo."
-    },
-    {
-      "id": "p013",
-      "at": 108,
-      "durationSec": 9,
-      "camera": {
-        "type": "framing",
-        "framing": "close",
-        "subject": "nico",
-        "azimuthDeg": 24,
-        "compose": "thirds",
-        "fov": 34
-      },
-      "notes": "Corte dentro de escena. Interpretación natural, evitar primeros planos del narrador fuera de campo."
-    },
-    {
-      "id": "p014",
-      "at": 117,
-      "durationSec": 9,
-      "camera": {
-        "type": "framing",
-        "framing": "medium-close",
-        "subject": "vera",
-        "azimuthDeg": -26,
-        "compose": "thirds",
-        "fov": 34
-      },
-      "notes": "Corte dentro de escena. Interpretación natural, evitar primeros planos del narrador fuera de campo."
-    },
-    {
-      "id": "p015",
-      "at": 126,
-      "durationSec": 9,
-      "camera": {
-        "type": "framing",
-        "framing": "two-shot",
-        "subjects": [
-          "nico",
-          "vera"
-        ],
-        "azimuthDeg": -15,
-        "compose": "thirds",
-        "fov": 34
-      },
-      "notes": "Corte dentro de escena. Interpretación natural, evitar primeros planos del narrador fuera de campo."
-    },
-    {
-      "id": "p016",
-      "at": 135,
-      "durationSec": 9,
-      "camera": {
-        "type": "framing",
-        "framing": "wide",
-        "subject": "nico",
-        "azimuthDeg": 18,
-        "compose": "thirds",
-        "fov": 36
-      },
-      "notes": "Corte dentro de escena. Interpretación natural, evitar primeros planos del narrador fuera de campo."
-    },
-    {
-      "id": "p017",
-      "at": 144,
-      "durationSec": 9,
-      "camera": {
-        "type": "framing",
-        "framing": "medium-close",
-        "subject": "vera",
-        "azimuthDeg": 24,
-        "compose": "thirds",
-        "fov": 34
-      },
-      "notes": "Corte dentro de escena. Interpretación natural, evitar primeros planos del narrador fuera de campo."
-    },
-    {
-      "id": "p018",
-      "at": 153,
-      "durationSec": 9,
-      "camera": {
-        "type": "framing",
-        "framing": "medium",
-        "subject": "roman",
-        "azimuthDeg": -26,
-        "compose": "thirds",
-        "fov": 34
-      },
-      "notes": "Corte dentro de escena. Interpretación natural, evitar primeros planos del narrador fuera de campo."
-    },
-    {
-      "id": "p019",
-      "at": 162,
-      "durationSec": 9,
-      "camera": {
-        "type": "framing",
-        "framing": "close",
-        "subject": "nico",
-        "azimuthDeg": 24,
-        "compose": "thirds",
-        "fov": 34
-      },
-      "notes": "Corte dentro de escena. Interpretación natural, evitar primeros planos del narrador fuera de campo."
-    },
-    {
-      "id": "p020",
-      "at": 171,
-      "durationSec": 7,
-      "camera": {
-        "type": "framing",
-        "framing": "medium-close",
-        "subject": "vera",
-        "azimuthDeg": -26,
-        "compose": "thirds",
-        "fov": 34
-      },
-      "notes": "Corte dentro de escena. Interpretación natural, evitar primeros planos del narrador fuera de campo."
+      "notes": "Alternar reacciones y narración. Narrador fuera de plano."
     }
   ],
   "actions": [
@@ -497,93 +382,69 @@
     },
     {
       "id": "l013",
-      "actor": "nico-voz",
-      "text": "Había pasado dos horas en una escala. Técnicamente había estado en Italia. Técnicamente también habría podido ser deportado por exageración turística.",
-      "emotion": "smirk",
-      "direction": "voz en off; narración retrospectiva, confidencial, con ironía española",
-      "pauseAfter": 0.32
-    },
-    {
-      "id": "l014",
       "actor": "vera",
       "text": "Bueno, al menos has visto un aeropuerto italiano.",
       "emotion": "smirk",
       "pauseAfter": 0.38
     },
     {
-      "id": "l015",
+      "id": "l014",
       "actor": "nico",
       "text": "Y compré una botella de agua que costaba ocho euros. Experiencia auténtica.",
       "emotion": "nervous",
       "pauseAfter": 0.38
     },
     {
-      "id": "l016",
-      "actor": "nico-voz",
-      "text": "Sonrió. Yo sentí que por primera vez aquella noche no necesitaba hacer una pirueta social para sobrevivir.",
-      "emotion": "smirk",
-      "direction": "voz en off; narración retrospectiva, confidencial, con ironía española",
-      "pauseAfter": 0.32
-    },
-    {
-      "id": "l017",
+      "id": "l015",
       "actor": "vera",
       "text": "¿Y tú qué haces cuando no estás visitando aeropuertos?",
       "emotion": "smirk",
       "pauseAfter": 0.38
     },
     {
-      "id": "l018",
+      "id": "l016",
       "actor": "nico",
       "text": "Programo cosas. A veces funcionan.",
       "emotion": "nervous",
       "pauseAfter": 0.38
     },
     {
-      "id": "l019",
+      "id": "l017",
       "actor": "vera",
       "text": "¿Y las otras veces?",
       "emotion": "smirk",
       "pauseAfter": 0.38
     },
     {
-      "id": "l020",
+      "id": "l018",
       "actor": "nico",
       "text": "Las arreglo para que parezca que funcionan.",
       "emotion": "nervous",
       "pauseAfter": 0.38
     },
     {
-      "id": "l021",
-      "actor": "nico-voz",
-      "text": "Vera soltó una carcajada. Me hizo gracia porque era exactamente la clase de respuesta que yo habría dado si no hubiera estado intentando convertirme en el tío más interesante de la ciudad.",
-      "emotion": "smirk",
-      "direction": "voz en off; narración retrospectiva, confidencial, con ironía española",
-      "pauseAfter": 0.32
-    },
-    {
-      "id": "l022",
+      "id": "l019",
       "actor": "vera",
       "text": "Yo diseño cosas que luego la gente me pide que haga más grandes.",
       "emotion": "smirk",
       "pauseAfter": 0.38
     },
     {
-      "id": "l023",
+      "id": "l020",
       "actor": "nico",
       "text": "¿Logos?",
       "emotion": "nervous",
       "pauseAfter": 0.38
     },
     {
-      "id": "l024",
+      "id": "l021",
       "actor": "vera",
       "text": "Sobre todo logos. Y botones. Siempre quieren el botón más grande.",
       "emotion": "smirk",
       "pauseAfter": 0.38
     },
     {
-      "id": "l025",
+      "id": "l022",
       "actor": "nico-voz",
       "text": "A partir de ahí empezamos a hablar con normalidad. De jefes incompetentes, de películas horribles que nos encantaban y de por qué todo el mundo parece tener una opinión fortísima sobre la piña en la pizza.",
       "emotion": "smirk",
@@ -591,71 +452,63 @@
       "pauseAfter": 0.32
     },
     {
-      "id": "l026",
+      "id": "l023",
       "actor": "vera",
       "text": "¿Tú eres de piña en la pizza?",
       "emotion": "smirk",
       "pauseAfter": 0.38
     },
     {
-      "id": "l027",
+      "id": "l024",
       "actor": "nico",
       "text": "Depende de lo guapa que sea la persona que me lo pregunta.",
       "emotion": "nervous",
       "pauseAfter": 0.38
     },
     {
-      "id": "l028",
+      "id": "l025",
       "actor": "vera",
       "text": "Eso ha sido tristísimo.",
       "emotion": "smirk",
       "pauseAfter": 0.38
     },
     {
-      "id": "l029",
+      "id": "l026",
       "actor": "nico",
       "text": "Pero efectivo, ¿no?",
       "emotion": "nervous",
       "pauseAfter": 0.38
     },
     {
-      "id": "l030",
+      "id": "l027",
       "actor": "vera",
       "text": "No demasiado.",
       "emotion": "smirk",
       "pauseAfter": 0.38
     },
     {
-      "id": "l031",
-      "actor": "nico-voz",
-      "text": "Y se rió otra vez. Yo también. Román, el camarero, aprovechó para dejarnos el vino con la cautela de quien intenta depositar un artefacto explosivo.",
-      "emotion": "smirk",
-      "direction": "voz en off; narración retrospectiva, confidencial, con ironía española",
-      "pauseAfter": 0.32
-    },
-    {
-      "id": "l032",
+      "id": "l028",
       "actor": "roman",
       "text": "¿Necesitan algo más?",
       "emotion": "neutral",
       "pauseAfter": 0.38
     },
     {
-      "id": "l033",
+      "id": "l029",
       "actor": "vera",
       "text": "De momento, paciencia.",
       "emotion": "smirk",
       "pauseAfter": 0.38
     },
     {
-      "id": "l034",
+      "id": "l030",
       "actor": "roman",
       "text": "De esa vamos justos.",
       "emotion": "neutral",
       "pauseAfter": 0.38
     },
     {
-      "id": "l035",
+      "id": "l031",
       "actor": "nico-voz",
       "text": "Por un instante pensé que quizá teníamos posibilidades. Una noche normal, incluso divertida. Se podría decir que el universo nos concedió cuarenta segundos de tregua.",
       "emotion": "smirk",

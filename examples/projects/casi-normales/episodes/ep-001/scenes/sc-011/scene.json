@@ -106,11 +106,11 @@
           "nico",
           "vera"
         ],
-        "azimuthDeg": -15,
+        "azimuthDeg": 12,
         "compose": "thirds",
         "fov": 34
       },
-      "notes": "Cobertura del momento: Comisaría improvisada en el restaurante tras el robo; Dani se enreda accidentalmente en mantel."
+      "notes": "Cobertura: Comisaría improvisada en el restaurante tras el robo; Dani se enreda accidentalmente en mantel."
     },
     {
       "id": "p002",
@@ -120,11 +120,11 @@
         "type": "framing",
         "framing": "wide",
         "subject": "vera",
-        "azimuthDeg": 18,
+        "azimuthDeg": -26,
         "compose": "thirds",
-        "fov": 36
+        "fov": 34
       },
-      "notes": "Corte dentro de escena. Interpretación natural, evitar primeros planos del narrador fuera de campo."
+      "notes": "Alternar reacciones y narración. Narrador fuera de plano."
     },
     {
       "id": "p003",
@@ -138,7 +138,7 @@
         "compose": "thirds",
         "fov": 34
       },
-      "notes": "Corte dentro de escena. Interpretación natural, evitar primeros planos del narrador fuera de campo."
+      "notes": "Alternar reacciones y narración. Narrador fuera de plano."
     },
     {
       "id": "p004",
@@ -152,7 +152,7 @@
         "compose": "thirds",
         "fov": 34
       },
-      "notes": "Corte dentro de escena. Interpretación natural, evitar primeros planos del narrador fuera de campo."
+      "notes": "Alternar reacciones y narración. Narrador fuera de plano."
     },
     {
       "id": "p005",
@@ -166,7 +166,7 @@
         "compose": "thirds",
         "fov": 34
       },
-      "notes": "Corte dentro de escena. Interpretación natural, evitar primeros planos del narrador fuera de campo."
+      "notes": "Alternar reacciones y narración. Narrador fuera de plano."
     },
     {
       "id": "p006",
@@ -184,7 +184,7 @@
           "amount": 0.08
         }
       },
-      "notes": "Corte dentro de escena. Interpretación natural, evitar primeros planos del narrador fuera de campo."
+      "notes": "Alternar reacciones y narración. Narrador fuera de plano."
     },
     {
       "id": "p007",
@@ -198,7 +198,7 @@
         "compose": "thirds",
         "fov": 34
       },
-      "notes": "Corte dentro de escena. Interpretación natural, evitar primeros planos del narrador fuera de campo."
+      "notes": "Alternar reacciones y narración. Narrador fuera de plano."
     },
     {
       "id": "p008",
@@ -211,11 +211,11 @@
           "nico",
           "vera"
         ],
-        "azimuthDeg": 15,
+        "azimuthDeg": 12,
         "compose": "thirds",
         "fov": 34
       },
-      "notes": "Corte dentro de escena. Interpretación natural, evitar primeros planos del narrador fuera de campo."
+      "notes": "Alternar reacciones y narración. Narrador fuera de plano."
     },
     {
       "id": "p009",
@@ -225,11 +225,11 @@
         "type": "framing",
         "framing": "wide",
         "subject": "ines",
-        "azimuthDeg": 18,
+        "azimuthDeg": 24,
         "compose": "thirds",
-        "fov": 36
+        "fov": 34
       },
-      "notes": "Corte dentro de escena. Interpretación natural, evitar primeros planos del narrador fuera de campo."
+      "notes": "Alternar reacciones y narración. Narrador fuera de plano."
     },
     {
       "id": "p010",
@@ -243,7 +243,7 @@
         "compose": "thirds",
         "fov": 34
       },
-      "notes": "Corte dentro de escena. Interpretación natural, evitar primeros planos del narrador fuera de campo."
+      "notes": "Alternar reacciones y narración. Narrador fuera de plano."
     },
     {
       "id": "p011",
@@ -261,7 +261,7 @@
           "amount": 0.08
         }
       },
-      "notes": "Corte dentro de escena. Interpretación natural, evitar primeros planos del narrador fuera de campo."
+      "notes": "Alternar reacciones y narración. Narrador fuera de plano."
     },
     {
       "id": "p012",
@@ -275,7 +275,7 @@
         "compose": "thirds",
         "fov": 34
       },
-      "notes": "Corte dentro de escena. Interpretación natural, evitar primeros planos del narrador fuera de campo."
+      "notes": "Alternar reacciones y narración. Narrador fuera de plano."
     },
     {
       "id": "p013",
@@ -289,12 +289,12 @@
         "compose": "thirds",
         "fov": 34
       },
-      "notes": "Corte dentro de escena. Interpretación natural, evitar primeros planos del narrador fuera de campo."
+      "notes": "Alternar reacciones y narración. Narrador fuera de plano."
     },
     {
       "id": "p014",
       "at": 117,
-      "durationSec": 9,
+      "durationSec": 6,
       "camera": {
         "type": "framing",
         "framing": "medium-close",
@@ -303,129 +303,7 @@
         "compose": "thirds",
         "fov": 34
       },
-      "notes": "Corte dentro de escena. Interpretación natural, evitar primeros planos del narrador fuera de campo."
-    },
-    {
-      "id": "p015",
-      "at": 126,
-      "durationSec": 9,
-      "camera": {
-        "type": "framing",
-        "framing": "two-shot",
-        "subjects": [
-          "nico",
-          "vera"
-        ],
-        "azimuthDeg": -15,
-        "compose": "thirds",
-        "fov": 34
-      },
-      "notes": "Corte dentro de escena. Interpretación natural, evitar primeros planos del narrador fuera de campo."
-    },
-    {
-      "id": "p016",
-      "at": 135,
-      "durationSec": 9,
-      "camera": {
-        "type": "framing",
-        "framing": "wide",
-        "subject": "nico",
-        "azimuthDeg": 18,
-        "compose": "thirds",
-        "fov": 36
-      },
-      "notes": "Corte dentro de escena. Interpretación natural, evitar primeros planos del narrador fuera de campo."
-    },
-    {
-      "id": "p017",
-      "at": 144,
-      "durationSec": 9,
-      "camera": {
-        "type": "framing",
-        "framing": "medium-close",
-        "subject": "vera",
-        "azimuthDeg": 24,
-        "compose": "thirds",
-        "fov": 34
-      },
-      "notes": "Corte dentro de escena. Interpretación natural, evitar primeros planos del narrador fuera de campo."
-    },
-    {
-      "id": "p018",
-      "at": 153,
-      "durationSec": 9,
-      "camera": {
-        "type": "framing",
-        "framing": "medium",
-        "subject": "dani",
-        "azimuthDeg": -26,
-        "compose": "thirds",
-        "fov": 34
-      },
-      "notes": "Corte dentro de escena. Interpretación natural, evitar primeros planos del narrador fuera de campo."
-    },
-    {
-      "id": "p019",
-      "at": 162,
-      "durationSec": 9,
-      "camera": {
-        "type": "framing",
-        "framing": "close",
-        "subject": "ines",
-        "azimuthDeg": 24,
-        "compose": "thirds",
-        "fov": 34
-      },
-      "notes": "Corte dentro de escena. Interpretación natural, evitar primeros planos del narrador fuera de campo."
-    },
-    {
-      "id": "p020",
-      "at": 171,
-      "durationSec": 9,
-      "camera": {
-        "type": "framing",
-        "framing": "medium-close",
-        "subject": "roman",
-        "azimuthDeg": -26,
-        "compose": "thirds",
-        "fov": 34
-      },
-      "notes": "Corte dentro de escena. Interpretación natural, evitar primeros planos del narrador fuera de campo."
-    },
-    {
-      "id": "p021",
-      "at": 180,
-      "durationSec": 9,
-      "camera": {
-        "type": "framing",
-        "framing": "medium",
-        "subject": "nico",
-        "azimuthDeg": 24,
-        "compose": "thirds",
-        "fov": 34,
-        "move": {
-          "type": "push-in",
-          "amount": 0.08
-        }
-      },
-      "notes": "Corte dentro de escena. Interpretación natural, evitar primeros planos del narrador fuera de campo."
-    },
-    {
-      "id": "p022",
-      "at": 189,
-      "durationSec": 7,
-      "camera": {
-        "type": "framing",
-        "framing": "two-shot",
-        "subjects": [
-          "nico",
-          "vera"
-        ],
-        "azimuthDeg": 15,
-        "compose": "thirds",
-        "fov": 34
-      },
-      "notes": "Corte dentro de escena. Interpretación natural, evitar primeros planos del narrador fuera de campo."
+      "notes": "Alternar reacciones y narración. Narrador fuera de plano."
     }
   ],
   "actions": [
@@ -551,92 +429,76 @@
     },
     {
       "id": "l009",
-      "actor": "nico-voz",
-      "text": "La agente se llamaba Inés y tenía la mirada de alguien que llevaba demasiados años escuchando historias de gente convencida de ser el protagonista de su propia película.",
-      "emotion": "smirk",
-      "direction": "voz en off; narración retrospectiva, confidencial, con ironía española",
-      "pauseAfter": 0.32
-    },
-    {
-      "id": "l010",
       "actor": "ines",
       "text": "Usted, el de la camisa azul, ¿qué ha pasado?",
       "emotion": "neutral",
       "pauseAfter": 0.38
     },
     {
-      "id": "l011",
+      "id": "l010",
       "actor": "nico",
       "text": "Nos han robado. Hemos salido detrás del ladrón. Ha habido un pequeño problema con una puerta.",
       "emotion": "nervous",
       "pauseAfter": 0.38
     },
     {
-      "id": "l012",
+      "id": "l011",
       "actor": "vera",
       "text": "Se ha encerrado en el cuarto de limpieza.",
       "emotion": "smirk",
       "pauseAfter": 0.38
     },
     {
-      "id": "l013",
+      "id": "l012",
       "actor": "nico",
       "text": "Eso es una interpretación.",
       "emotion": "nervous",
       "pauseAfter": 0.38
     },
     {
-      "id": "l014",
+      "id": "l013",
       "actor": "vera",
       "text": "Es literalmente lo que ha pasado.",
       "emotion": "smirk",
       "pauseAfter": 0.38
     },
     {
-      "id": "l015",
+      "id": "l014",
       "actor": "dani",
       "text": "¡Todo esto es culpa de tu acompañante, Vera! ¡Menudo numerito!",
       "emotion": "smirk",
       "pauseAfter": 0.38
     },
     {
-      "id": "l016",
-      "actor": "nico-voz",
-      "text": "Entonces Dani cometió su error definitivo. Yo llevaba toda la noche intentando ser el tío más correcto, más educado y más cómodo del universo. Pero aquello me tocó los cojones.",
-      "emotion": "smirk",
-      "direction": "voz en off; narración retrospectiva, confidencial, con ironía española",
-      "pauseAfter": 0.32
-    },
-    {
-      "id": "l017",
+      "id": "l015",
       "actor": "nico",
       "text": "Mira, Dani. No sé qué problema tienes conmigo. Ni te conozco. Pero llevas toda la noche intentando hacerme sentir como un idiota.",
       "emotion": "nervous",
       "pauseAfter": 0.38
     },
     {
-      "id": "l018",
+      "id": "l016",
       "actor": "dani",
       "text": "No te pongas agresivo, campeón.",
       "emotion": "smirk",
       "pauseAfter": 0.38
     },
     {
-      "id": "l019",
+      "id": "l017",
       "actor": "nico",
       "text": "No me pongo agresivo. Me pongo sincero. Y te aseguro que para hacer el ridículo no necesito ayuda de nadie.",
       "emotion": "nervous",
       "pauseAfter": 0.38
     },
     {
-      "id": "l020",
+      "id": "l018",
       "actor": "vera",
       "text": "Ahí te doy la razón.",
       "emotion": "smirk",
       "pauseAfter": 0.38
     },
     {
-      "id": "l021",
+      "id": "l019",
       "actor": "nico-voz",
       "text": "Vera lo dijo sonriendo. Dani se levantó para responder y se enganchó con el mantel que había quedado en el suelo. Yo intenté sujetarlo. Él pensó que le estaba atacando. Un segundo después estábamos los dos tirando de un mismo trozo de tela como dos gatos peleándose por una cortina.",
       "emotion": "smirk",
@@ -644,7 +506,7 @@
       "pauseAfter": 0.32
     },
     {
-      "id": "l022",
+      "id": "l020",
       "actor": "ines",
       "text": "¡QUIETOS LOS DOS!",
       "emotion": "angry",
@@ -652,14 +514,14 @@
       "pauseAfter": 0.2
     },
     {
-      "id": "l023",
+      "id": "l021",
       "actor": "roman",
       "text": "Cuidado con la copa.",
       "emotion": "neutral",
       "pauseAfter": 0.38
     },
     {
-      "id": "l024",
+      "id": "l022",
       "actor": "nico-voz",
       "text": "La copa no sobrevivió. Dani terminó sentado en una silla, con el mantel enredado alrededor de los brazos y una expresión digna de alguien que acababa de descubrir que el universo tenía sentido del humor.",
       "emotion": "smirk",
@@ -667,34 +529,26 @@
       "pauseAfter": 0.32
     },
     {
-      "id": "l025",
+      "id": "l023",
       "actor": "ines",
       "text": "¿Y vosotros dos sois pareja?",
       "emotion": "neutral",
       "pauseAfter": 0.38
     },
     {
-      "id": "l026",
+      "id": "l024",
       "actor": "nico",
       "text": "No.",
       "emotion": "nervous",
       "pauseAfter": 0.38
     },
     {
-      "id": "l027",
+      "id": "l025",
       "actor": "vera",
       "text": "¡Ni de coña!",
       "emotion": "angry",
       "direction": "gritando con intensidad",
       "pauseAfter": 0.2
-    },
-    {
-      "id": "l028",
-      "actor": "nico-voz",
-      "text": "Fue entonces cuando empecé a comprender que hay amistades que se forman a base de afinidades, y otras que se fraguan sobreviviendo al mismo desastre.",
-      "emotion": "smirk",
-      "direction": "voz en off; narración retrospectiva, confidencial, con ironía española",
-      "pauseAfter": 0.32
     }
   ],
   "sound": [

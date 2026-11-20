@@ -63,7 +63,7 @@
           "amount": 0.08
         }
       },
-      "notes": "Cobertura del momento: Nico prepara la cita, ensaya, comete errores con los mensajes. Autocrítica retrospectiva."
+      "notes": "Cobertura: Nico prepara la cita, ensaya, comete errores con los mensajes. Autocrítica retrospectiva."
     },
     {
       "id": "p002",
@@ -73,11 +73,11 @@
         "type": "framing",
         "framing": "wide",
         "subject": "nico",
-        "azimuthDeg": 18,
+        "azimuthDeg": -26,
         "compose": "thirds",
-        "fov": 36
+        "fov": 34
       },
-      "notes": "Corte dentro de escena. Interpretación natural, evitar primeros planos del narrador fuera de campo."
+      "notes": "Alternar reacciones y narración. Narrador fuera de plano."
     },
     {
       "id": "p003",
@@ -91,7 +91,7 @@
         "compose": "thirds",
         "fov": 34
       },
-      "notes": "Corte dentro de escena. Interpretación natural, evitar primeros planos del narrador fuera de campo."
+      "notes": "Alternar reacciones y narración. Narrador fuera de plano."
     },
     {
       "id": "p004",
@@ -105,7 +105,7 @@
         "compose": "thirds",
         "fov": 34
       },
-      "notes": "Corte dentro de escena. Interpretación natural, evitar primeros planos del narrador fuera de campo."
+      "notes": "Alternar reacciones y narración. Narrador fuera de plano."
     },
     {
       "id": "p005",
@@ -119,7 +119,7 @@
         "compose": "thirds",
         "fov": 34
       },
-      "notes": "Corte dentro de escena. Interpretación natural, evitar primeros planos del narrador fuera de campo."
+      "notes": "Alternar reacciones y narración. Narrador fuera de plano."
     },
     {
       "id": "p006",
@@ -137,7 +137,7 @@
           "amount": 0.08
         }
       },
-      "notes": "Corte dentro de escena. Interpretación natural, evitar primeros planos del narrador fuera de campo."
+      "notes": "Alternar reacciones y narración. Narrador fuera de plano."
     },
     {
       "id": "p007",
@@ -151,7 +151,7 @@
         "compose": "thirds",
         "fov": 34
       },
-      "notes": "Corte dentro de escena. Interpretación natural, evitar primeros planos del narrador fuera de campo."
+      "notes": "Alternar reacciones y narración. Narrador fuera de plano."
     },
     {
       "id": "p008",
@@ -165,7 +165,7 @@
         "compose": "thirds",
         "fov": 34
       },
-      "notes": "Corte dentro de escena. Interpretación natural, evitar primeros planos del narrador fuera de campo."
+      "notes": "Alternar reacciones y narración. Narrador fuera de plano."
     },
     {
       "id": "p009",
@@ -175,11 +175,11 @@
         "type": "framing",
         "framing": "wide",
         "subject": "nico",
-        "azimuthDeg": 18,
+        "azimuthDeg": 24,
         "compose": "thirds",
-        "fov": 36
+        "fov": 34
       },
-      "notes": "Corte dentro de escena. Interpretación natural, evitar primeros planos del narrador fuera de campo."
+      "notes": "Alternar reacciones y narración. Narrador fuera de plano."
     },
     {
       "id": "p010",
@@ -193,7 +193,7 @@
         "compose": "thirds",
         "fov": 34
       },
-      "notes": "Corte dentro de escena. Interpretación natural, evitar primeros planos del narrador fuera de campo."
+      "notes": "Alternar reacciones y narración. Narrador fuera de plano."
     },
     {
       "id": "p011",
@@ -211,7 +211,7 @@
           "amount": 0.08
         }
       },
-      "notes": "Corte dentro de escena. Interpretación natural, evitar primeros planos del narrador fuera de campo."
+      "notes": "Alternar reacciones y narración. Narrador fuera de plano."
     },
     {
       "id": "p012",
@@ -225,12 +225,12 @@
         "compose": "thirds",
         "fov": 34
       },
-      "notes": "Corte dentro de escena. Interpretación natural, evitar primeros planos del narrador fuera de campo."
+      "notes": "Alternar reacciones y narración. Narrador fuera de plano."
     },
     {
       "id": "p013",
       "at": 108,
-      "durationSec": 9,
+      "durationSec": 8,
       "camera": {
         "type": "framing",
         "framing": "close",
@@ -239,197 +239,7 @@
         "compose": "thirds",
         "fov": 34
       },
-      "notes": "Corte dentro de escena. Interpretación natural, evitar primeros planos del narrador fuera de campo."
-    },
-    {
-      "id": "p014",
-      "at": 117,
-      "durationSec": 9,
-      "camera": {
-        "type": "framing",
-        "framing": "medium-close",
-        "subject": "nico",
-        "azimuthDeg": -26,
-        "compose": "thirds",
-        "fov": 34
-      },
-      "notes": "Corte dentro de escena. Interpretación natural, evitar primeros planos del narrador fuera de campo."
-    },
-    {
-      "id": "p015",
-      "at": 126,
-      "durationSec": 9,
-      "camera": {
-        "type": "framing",
-        "framing": "medium",
-        "subject": "nico",
-        "azimuthDeg": 24,
-        "compose": "thirds",
-        "fov": 34
-      },
-      "notes": "Corte dentro de escena. Interpretación natural, evitar primeros planos del narrador fuera de campo."
-    },
-    {
-      "id": "p016",
-      "at": 135,
-      "durationSec": 9,
-      "camera": {
-        "type": "framing",
-        "framing": "wide",
-        "subject": "nico",
-        "azimuthDeg": 18,
-        "compose": "thirds",
-        "fov": 36
-      },
-      "notes": "Corte dentro de escena. Interpretación natural, evitar primeros planos del narrador fuera de campo."
-    },
-    {
-      "id": "p017",
-      "at": 144,
-      "durationSec": 9,
-      "camera": {
-        "type": "framing",
-        "framing": "medium-close",
-        "subject": "nico",
-        "azimuthDeg": 24,
-        "compose": "thirds",
-        "fov": 34
-      },
-      "notes": "Corte dentro de escena. Interpretación natural, evitar primeros planos del narrador fuera de campo."
-    },
-    {
-      "id": "p018",
-      "at": 153,
-      "durationSec": 9,
-      "camera": {
-        "type": "framing",
-        "framing": "medium",
-        "subject": "nico",
-        "azimuthDeg": -26,
-        "compose": "thirds",
-        "fov": 34
-      },
-      "notes": "Corte dentro de escena. Interpretación natural, evitar primeros planos del narrador fuera de campo."
-    },
-    {
-      "id": "p019",
-      "at": 162,
-      "durationSec": 9,
-      "camera": {
-        "type": "framing",
-        "framing": "close",
-        "subject": "nico",
-        "azimuthDeg": 24,
-        "compose": "thirds",
-        "fov": 34
-      },
-      "notes": "Corte dentro de escena. Interpretación natural, evitar primeros planos del narrador fuera de campo."
-    },
-    {
-      "id": "p020",
-      "at": 171,
-      "durationSec": 9,
-      "camera": {
-        "type": "framing",
-        "framing": "medium-close",
-        "subject": "nico",
-        "azimuthDeg": -26,
-        "compose": "thirds",
-        "fov": 34
-      },
-      "notes": "Corte dentro de escena. Interpretación natural, evitar primeros planos del narrador fuera de campo."
-    },
-    {
-      "id": "p021",
-      "at": 180,
-      "durationSec": 9,
-      "camera": {
-        "type": "framing",
-        "framing": "medium",
-        "subject": "nico",
-        "azimuthDeg": 24,
-        "compose": "thirds",
-        "fov": 34,
-        "move": {
-          "type": "push-in",
-          "amount": 0.08
-        }
-      },
-      "notes": "Corte dentro de escena. Interpretación natural, evitar primeros planos del narrador fuera de campo."
-    },
-    {
-      "id": "p022",
-      "at": 189,
-      "durationSec": 9,
-      "camera": {
-        "type": "framing",
-        "framing": "close",
-        "subject": "nico",
-        "azimuthDeg": -26,
-        "compose": "thirds",
-        "fov": 34
-      },
-      "notes": "Corte dentro de escena. Interpretación natural, evitar primeros planos del narrador fuera de campo."
-    },
-    {
-      "id": "p023",
-      "at": 198,
-      "durationSec": 9,
-      "camera": {
-        "type": "framing",
-        "framing": "wide",
-        "subject": "nico",
-        "azimuthDeg": 18,
-        "compose": "thirds",
-        "fov": 36
-      },
-      "notes": "Corte dentro de escena. Interpretación natural, evitar primeros planos del narrador fuera de campo."
-    },
-    {
-      "id": "p024",
-      "at": 207,
-      "durationSec": 9,
-      "camera": {
-        "type": "framing",
-        "framing": "medium",
-        "subject": "nico",
-        "azimuthDeg": -26,
-        "compose": "thirds",
-        "fov": 34
-      },
-      "notes": "Corte dentro de escena. Interpretación natural, evitar primeros planos del narrador fuera de campo."
-    },
-    {
-      "id": "p025",
-      "at": 216,
-      "durationSec": 9,
-      "camera": {
-        "type": "framing",
-        "framing": "close",
-        "subject": "nico",
-        "azimuthDeg": 24,
-        "compose": "thirds",
-        "fov": 34
-      },
-      "notes": "Corte dentro de escena. Interpretación natural, evitar primeros planos del narrador fuera de campo."
-    },
-    {
-      "id": "p026",
-      "at": 225,
-      "durationSec": 5,
-      "camera": {
-        "type": "framing",
-        "framing": "medium-close",
-        "subject": "nico",
-        "azimuthDeg": -26,
-        "compose": "thirds",
-        "fov": 34,
-        "move": {
-          "type": "push-in",
-          "amount": 0.08
-        }
-      },
-      "notes": "Corte dentro de escena. Interpretación natural, evitar primeros planos del narrador fuera de campo."
+      "notes": "Alternar reacciones y narración. Narrador fuera de plano."
     }
   ],
   "actions": [
@@ -495,66 +305,34 @@
     {
       "id": "l002",
       "actor": "nico-voz",
-      "text": "No era por falta de intentarlo. Me había descargado una aplicación de citas. Bueno, me había descargado cuatro. Pero solo en una había conseguido algo más que un mensaje automático pidiéndome que pagase la suscripción.",
-      "emotion": "smirk",
-      "direction": "voz en off; narración retrospectiva, confidencial, con ironía española",
-      "pauseAfter": 0.32
-    },
-    {
-      "id": "l003",
-      "actor": "nico-voz",
       "text": "Entonces apareció Vera. En su perfil ponía que le gustaban las películas malas, el humor negro y la gente que sabía reírse de sí misma. Esto último debería haberme servido de advertencia.",
       "emotion": "smirk",
       "direction": "voz en off; narración retrospectiva, confidencial, con ironía española",
       "pauseAfter": 0.32
     },
     {
-      "id": "l004",
+      "id": "l003",
       "actor": "nico",
       "text": "A ver... Hola, Vera. Estás preciosa.",
       "emotion": "nervous",
       "pauseAfter": 0.38
     },
     {
-      "id": "l005",
-      "actor": "nico-voz",
-      "text": "Estuve practicando el saludo delante del espejo durante veinte minutos. No porque fuese un romántico, sino porque soy el tipo de persona que ensaya hasta cómo va a pedir una bolsa en el supermercado.",
-      "emotion": "smirk",
-      "direction": "voz en off; narración retrospectiva, confidencial, con ironía española",
-      "pauseAfter": 0.32
-    },
-    {
-      "id": "l006",
+      "id": "l004",
       "actor": "nico",
       "text": "No, no, no. Eso suena a anuncio de colonia. Buenas noches, señorita.",
       "emotion": "nervous",
       "pauseAfter": 0.38
     },
     {
-      "id": "l007",
-      "actor": "nico-voz",
-      "text": "No. Eso sonaba a que acababa de bajarme de un carruaje y venía a reclamar una herencia.",
-      "emotion": "smirk",
-      "direction": "voz en off; narración retrospectiva, confidencial, con ironía española",
-      "pauseAfter": 0.32
-    },
-    {
-      "id": "l008",
+      "id": "l005",
       "actor": "nico",
       "text": "Qué tal, qué tal. Normal. Sé normal.",
       "emotion": "nervous",
       "pauseAfter": 0.38
     },
     {
-      "id": "l009",
-      "actor": "nico-voz",
-      "text": "Ahí estaba yo, diciéndome a mí mismo que fuese normal delante de un espejo, solo, a los treinta y uno. Una situación completamente normal.",
-      "emotion": "smirk",
-      "direction": "voz en off; narración retrospectiva, confidencial, con ironía española",
-      "pauseAfter": 0.32
-    },
-    {
-      "id": "l010",
+      "id": "l006",
       "actor": "nico-voz",
       "text": "Entonces me llegó un mensaje.",
       "emotion": "smirk",
@@ -562,22 +340,14 @@
       "pauseAfter": 0.32
     },
     {
-      "id": "l011",
+      "id": "l007",
       "actor": "nico",
       "text": "¿Cenamos el viernes?",
       "emotion": "nervous",
       "pauseAfter": 0.38
     },
     {
-      "id": "l012",
-      "actor": "nico-voz",
-      "text": "No, eso era lo que había escrito ella. Yo estaba tan sorprendido que lo leí en voz alta, como si necesitase pruebas de que existía.",
-      "emotion": "smirk",
-      "direction": "voz en off; narración retrospectiva, confidencial, con ironía española",
-      "pauseAfter": 0.32
-    },
-    {
-      "id": "l013",
+      "id": "l008",
       "actor": "nico-voz",
       "text": "Podría haber respondido tranquilamente. Podría haber esperado diez segundos. Podría haber preguntado qué le apetecía. En su lugar, tardé quince minutos en elegir una respuesta y al final mandé un pulgar hacia arriba.",
       "emotion": "smirk",
@@ -585,14 +355,14 @@
       "pauseAfter": 0.32
     },
     {
-      "id": "l014",
+      "id": "l009",
       "actor": "nico",
       "text": "Muy bien, Nico. Has comunicado la pasión de una administración pública.",
       "emotion": "nervous",
       "pauseAfter": 0.38
     },
     {
-      "id": "l015",
+      "id": "l010",
       "actor": "nico-voz",
       "text": "Y como tenía la autoestima completamente descontrolada, decidí reservar una mesa en un restaurante elegante. No conozco muchos restaurantes elegantes. Mi concepto habitual de cena romántica era sentarme lejos del microondas para no escuchar el pitido.",
       "emotion": "smirk",
@@ -600,22 +370,14 @@
       "pauseAfter": 0.32
     },
     {
-      "id": "l016",
-      "actor": "nico-voz",
-      "text": "Elegí uno que se llamaba La Perla. Luces cálidas, mantel blanco, platos de esos que parecen esculturas y un precio por persona que me hizo replantearme todas mis decisiones vitales. Reservé igualmente.",
-      "emotion": "smirk",
-      "direction": "voz en off; narración retrospectiva, confidencial, con ironía española",
-      "pauseAfter": 0.32
-    },
-    {
-      "id": "l017",
+      "id": "l011",
       "actor": "nico",
       "text": "Si todo sale bien, merecerá la pena.",
       "emotion": "nervous",
       "pauseAfter": 0.38
     },
     {
-      "id": "l018",
+      "id": "l012",
       "actor": "nico-voz",
       "text": "Y aquí fue donde empezó a salir absolutamente todo mal. [pausa 0.7] Primero, el perfume. Me eché tanto que creo que el vecino del tercero también se perfumó sin querer.",
       "emotion": "smirk",
@@ -623,7 +385,7 @@
       "pauseAfter": 0.32
     },
     {
-      "id": "l019",
+      "id": "l013",
       "actor": "nico-voz",
       "text": "Después, la camisa. Una azul, porque leí por Internet que el azul transmitía confianza. No tengo idea de quién escribió aquello, pero desde aquí le mando mis peores deseos.",
       "emotion": "smirk",
@@ -631,7 +393,7 @@
       "pauseAfter": 0.32
     },
     {
-      "id": "l020",
+      "id": "l014",
       "actor": "nico-voz",
       "text": "Y por último, el mensaje definitivo. «Voy de camino». Lo envié veintidós minutos antes de salir de casa, porque quería parecer espontáneo. Y eso, amigos, es el resumen perfecto de mi personalidad.",
       "emotion": "smirk",
