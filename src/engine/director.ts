@@ -227,11 +227,18 @@ export function compileScene(scene: SceneV2, lib: AssetLibrary, opts: DirectorOp
   for (const it of items) for (const ref of [it.after, it.with]) if (ref && !byId.has(ref)) throw new Error(`Referencia temporal desconocida en ${scene.id}/${it.id}: ${ref}`);
   const untilFx: { ref: string; idx: number; src: string }[] = [];
   const pending = new Set(items);
+  // voices never overlap: a line that would start before the previous one ends waits for it (+ a breath)
+  const LINE_GAP = 0.12;
+  let lastLineEnd = -Infinity;
   const startOf = (it: Item): number | null => {
-    if (it.at !== undefined) return it.at + it.offset;
-    const ref = byId.get((it.after ?? it.with)!)!;
-    if (ref.start === undefined) return null;
-    return Math.max(0, (it.after ? ref.end! : ref.start) + it.offset);
+    let s: number;
+    if (it.at !== undefined) s = it.at + it.offset;
+    else {
+      const ref = byId.get((it.after ?? it.with)!)!;
+      if (ref.start === undefined) return null;
+      s = Math.max(0, (it.after ? ref.end! : ref.start) + it.offset);
+    }
+    return it.kind === 'line' ? Math.max(s, lastLineEnd + LINE_GAP) : s;
   };
   let guard = 0;
   while (pending.size) {
@@ -242,6 +249,7 @@ export function compileScene(scene: SceneV2, lib: AssetLibrary, opts: DirectorOp
     pending.delete(best);
     best.start = bestT;
     best.end = execute(best, bestT);
+    if (best.kind === 'line') lastLineEnd = Math.max(lastLineEnd, best.end);
   }
   for (const u of untilFx) { const ref = byId.get(u.ref); if (!ref) throw new Error(`Efecto ${u.src}: until desconocido ${u.ref}`); effects[u.idx].end = Math.max(effects[u.idx].start + 0.05, ref.start!); }
 
@@ -532,6 +540,9 @@ export function compileScene(scene: SceneV2, lib: AssetLibrary, opts: DirectorOp
   if (scene.coverage === 'auto') resolved.shots = autoCoverage(resolved.shots, shotItems.map(i => i.data as Shot));
   function autoCoverage(inserts: ResolvedShot[], src: Shot[]): ResolvedShot[] {
     const ids = actors.map(a => a.id);
+    // only characters inside the set count (someone waiting behind a door or hidden in another room is not framed)
+    const envSize = scene.environmentId ? (lib.environments[scene.environmentId] as { size?: Vec3; kind?: string } | undefined) : undefined;
+    const onSet = (id: string, t: number) => { if (!envSize?.size || envSize.kind !== 'room') return true; const p = rootStateAt(actor(id), t); return Math.abs(p[0]) < envSize.size[0] / 2 - 0.1 && Math.abs(p[2]) < envSize.size[2] / 2 + 1; };
     const at = (id: string, t: number) => rootStateAt(actor(id), t);
     // which side of the A-B line the audience sits on: towards +z (the open side of the sets), consistently
     const sideFor = (over: string, subj: string, t: number): 'left' | 'right' => {
@@ -539,11 +550,13 @@ export function compileScene(scene: SceneV2, lib: AssetLibrary, opts: DirectorOp
       const rx = az, rz = -ax; // camera.ts "right" for side=right
       return (Math.abs(rz) > 1e-3 ? rz : rx) > 0 ? 'right' : 'left';
     };
+    // a single shot sits 22° off the face; when the partner is close in front, 42° so the camera is not inside them
+    const singleAz = (subj: string, other: string | undefined, t: number) => other && dist2D(at(subj, t), at(other, t)) < 2.6 ? 42 : 22;
     const singleSide = (subj: string, other: string | undefined, t: number): 'left' | 'right' => {
       if (!other) return 'right';
       // camera.ts puts a single at facing+22deg (right) or facing-22deg (left): pick the one on the audience side
       const a = at(subj, t), b = at(other, t), yaw = Math.atan2(b[0] - a[0], b[2] - a[2]);
-      const zr = Math.cos(yaw + 22 * Math.PI / 180), zl = Math.cos(yaw - 22 * Math.PI / 180);
+      const az = singleAz(subj, other, t) * Math.PI / 180, zr = Math.cos(yaw + az), zl = Math.cos(yaw - az);
       return zr >= zl ? 'right' : 'left';
     };
     const lines = scene.dialogue.map(l => ({ l, sp: actor(l.actor).speech.find(x => x.lineId === l.id)! })).filter(x => x.sp).sort((p, q) => p.sp.start - q.sp.start);
@@ -554,28 +567,33 @@ export function compileScene(scene: SceneV2, lib: AssetLibrary, opts: DirectorOp
         if (out.length === 1) return;
         const before = out[out.length - 2].camera;
         const jump = before.subject === camera.subject && before.framing === camera.framing && !before.over && !camera.over;
-        prev.camera = jump && ids.length > 1 ? CameraSchema.parse({ framing: 'two-shot', subjects: [...ids].sort().slice(0, 2), side: 'right' }) : camera; prev.id = id; return;
+        const here = ids.filter(x => onSet(x, start)); const pair = camera.subject && here.includes(camera.subject) ? [camera.subject, ...here.filter(x => x !== camera.subject)].slice(0, 2) : here.slice(0, 2);
+        prev.camera = jump && pair.length > 1 ? CameraSchema.parse({ framing: 'two-shot', subjects: pair.sort(), side: 'right' }) : camera; prev.id = id; return;
       }
       out.push({ id, start: Math.max(0, start), end: duration, camera, transitionIn });
     };
     const firstLine = lines[0]?.sp.start ?? duration;
     const opening = inserts.find(s => s.start < 0.01);
-    if (!opening) push('auto-establishing', 0, CameraSchema.parse({ framing: ids.length > 1 ? 'wide' : 'full', subjects: ids.length > 1 ? ids : undefined, subject: ids.length === 1 ? ids[0] : undefined, move: { type: 'push-in', amount: 0.08 } }));
+    const present0 = ids.filter(id => onSet(id, 0.5));
+    if (!opening) push('auto-establishing', 0, CameraSchema.parse({ framing: present0.length > 1 ? 'wide' : 'full', subjects: present0.length > 1 ? present0 : undefined, subject: present0.length <= 1 ? present0[0] ?? ids[0] : undefined, move: { type: 'push-in', amount: 0.08 } }));
     let n = 0, lastSpeaker = '';
     for (const { l, sp } of lines) {
       const s = sp.start - 0.12; // J-cut: picture changes just before the voice
       if (s < Math.min(firstLine, 2.2) && out.length && !opening) { lastSpeaker = l.actor; continue; } // let the opening breathe
       if (l.actor === lastSpeaker && sp.end - sp.start < 2.5) continue;
-      const other = l.to && ids.includes(l.to) ? l.to : ids.filter(x => x !== l.actor).sort((p, q) => dist2D(at(p, sp.start), at(l.actor, sp.start)) - dist2D(at(q, sp.start), at(l.actor, sp.start)))[0];
+      const other = l.to && ids.includes(l.to) && onSet(l.to, sp.start) ? l.to : ids.filter(x => x !== l.actor && onSet(x, sp.start)).sort((p, q) => dist2D(at(p, sp.start), at(l.actor, sp.start)) - dist2D(at(q, sp.start), at(l.actor, sp.start)))[0];
       const walking = actor(l.actor).root.some(r => r.kind === 'walk' && r.start < sp.end && r.end > sp.start);
       const emo = resolveEmotion(l.emotion) ?? 'neutral';
       let cam: Record<string, unknown>;
-      if (walking) cam = { framing: 'medium', subject: l.actor, track: true, side: singleSide(l.actor, other, sp.start) };
+      const gap = other ? dist2D(at(l.actor, sp.start), at(other, sp.start)) : 0;
+      const single = (framing: string, extra: Record<string, unknown> = {}) => ({ framing, subject: l.actor, side: singleSide(l.actor, other, sp.start), azimuthDeg: singleAz(l.actor, other, sp.start), ...extra });
+      if (walking) cam = single('medium', { track: true });
       else if (!other) cam = { framing: n % 2 ? 'medium-close' : 'medium', subject: l.actor };
       else if (n % 5 === 4) cam = { framing: 'two-shot', subjects: [l.actor, other].sort(), side: 'right' };
-      else if (['surprise', 'angry', 'fear', 'sad'].includes(emo) && l.intensity >= 0.9) cam = { framing: 'close', subject: l.actor, side: singleSide(l.actor, other, sp.start), move: { type: 'push-in', amount: 0.06 } };
-      else if (n % 2 === 0 && dist2D(at(l.actor, sp.start), at(other, sp.start)) < 3) cam = { framing: 'over-shoulder', over: other, subject: l.actor, side: sideFor(other, l.actor, sp.start) };
-      else cam = { framing: 'medium-close', subject: l.actor, side: singleSide(l.actor, other, sp.start) };
+      else if (['surprise', 'angry', 'fear', 'sad'].includes(emo) && l.intensity >= 0.9) cam = single('close', { move: { type: 'push-in', amount: 0.06 } });
+      // over-the-shoulder only at conversational distance: closer, the near head would fill half the frame
+      else if (n % 2 === 0 && gap >= 1.0 && gap <= 3) cam = { framing: 'over-shoulder', over: other, subject: l.actor, side: sideFor(other, l.actor, sp.start) };
+      else cam = single('medium-close');
       // same subject and size twice in a row is a jump cut: change the size instead
       const prev = out[out.length - 1]?.camera;
       if (prev && prev.subject === cam.subject && prev.framing === cam.framing && !prev.over) cam = { ...cam, framing: cam.framing === 'medium-close' ? 'medium' : 'medium-close', move: undefined };

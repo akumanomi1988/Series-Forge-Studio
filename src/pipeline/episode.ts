@@ -15,6 +15,7 @@ import type { ResolvedScene, AudioCue, AssetLibrary } from '../engine/timeline.t
 import { SceneEvaluator } from '../engine/pose.ts';
 import { evaluateShots } from '../engine/camera.ts';
 import { synthesize, resolveVoice } from '../audio/tts.ts';
+import { racord } from './continuity.ts';
 import { estimateSpeech } from '../audio/phonetics-es.ts';
 import { mixSegment, blockPowers, loudnessFromPowers, limit } from '../audio/mixer.ts';
 import type { MixContext } from '../audio/mixer.ts';
@@ -103,6 +104,10 @@ export async function compileEpisode(project: string, episode: string, settings:
       plan.speech[line.id] = { file: r.file, duration: r.duration, cached: r.cached, provider: r.provider, method: r.alignment.method, key: r.key };
     }
     const resolved = compileScene(scene, lib, { speech });
+    if (scene.continuous && resolvedAll.length) {
+      const env = scene.environmentId ? p.environments[scene.environmentId] : null;
+      for (const e of racord(resolvedAll[resolvedAll.length - 1], scene, env && env.env.kind === 'room' ? env.env.size : undefined)) resolved.warnings.push(e);
+    }
     // snap scene to whole frames so global time never drifts
     let frames = Math.max(1, Math.round(resolved.durationSec * fps));
     if (frame + frames > maxFrames) frames = maxFrames - frame;

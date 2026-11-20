@@ -43,6 +43,16 @@ export function pacingReport(plan: Pick<EpisodePlan, 'audio' | 'durationSec' | '
   };
 }
 
+/** Pairs of dialogue lines whose audio overlaps by more than 50 ms (two voices at once). */
+export function dialogueOverlaps(plan: Pick<EpisodePlan, 'audio'>): { a: string; b: string; overlapMs: number }[] {
+  const d = plan.audio.filter(c => c.kind === 'dialogue').sort((x, y) => x.start - y.start), out: { a: string; b: string; overlapMs: number }[] = [];
+  for (let i = 0; i < d.length; i++) for (let j = i + 1; j < d.length && d[j].start < d[i].start + d[i].duration; j++) {
+    const ov = d[i].start + d[i].duration - d[j].start;
+    if (ov > 0.05) out.push({ a: d[i].id, b: d[j].id, overlapMs: Math.round(ov * 1000) });
+  }
+  return out;
+}
+
 export async function validateEpisode(project: string, episode: string): Promise<{ ok: boolean; checks: Check[]; report: string }> {
   const p = await loadProject(project);
   const ep = p.episodes[episode];
@@ -166,6 +176,10 @@ export async function validateEpisode(project: string, episode: string): Promise
   // ---------------------------------------------------------------- pacing (dead air)
   const pace = pacingReport(plan);
   add('pacing.deadAir', pace.deadAir.length === 0, pace, 'warning');
+  const overlaps = dialogueOverlaps(plan);
+  add('dialogue.noOverlap', overlaps.length === 0, { overlaps: overlaps.slice(0, 20) });
+  const rac = plan.scenes.flatMap(s => s.warnings.filter(w => w.startsWith('racord')).map(w => `${s.id}: ${w}`));
+  add('continuity.racord', rac.length === 0, { errors: rac });
   return finish();
   async function finish() {
     const ok = checks.filter(c => c.severity !== 'warning').every(c => c.ok);

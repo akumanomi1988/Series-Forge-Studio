@@ -6,27 +6,30 @@ import { loadLibrary } from '../src/pipeline/project.ts';
 import { CharacterGeometrySchema, SceneSchemaV2, MusicSchema } from '../src/engine/schema.ts';
 import { compileScene } from '../src/engine/director.ts';
 import { generateMusic, SR } from '../src/audio/synth.ts';
-import { pacingReport } from '../src/pipeline/validate.ts';
+import { pacingReport, dialogueOverlaps } from '../src/pipeline/validate.ts';
+import { racord } from '../src/pipeline/continuity.ts';
+import { SceneEvaluator } from '../src/engine/pose.ts';
+import { shotCamera } from '../src/engine/camera.ts';
 import type { AssetLibrary, AudioCue } from '../src/engine/timeline.ts';
 
 async function lib(): Promise<AssetLibrary> {
   const L = await loadLibrary();
   const ch = () => ({ geometry: CharacterGeometrySchema.parse({ schemaVersion: 2 }), rigOffsets: {}, clips: L.clips, locomotion: L.loco, expressions: L.expressions });
-  return { characters: { vera: ch(), dani: ch() }, props: {}, environments: {} };
+  return { characters: { susana: ch(), dani: ch() }, props: {}, environments: {} };
 }
 const speech = (ids: string[], d = 2.4) => Object.fromEntries(ids.map(id => [id, { duration: d, visemes: [] as [number, string][] }]));
 const lines = [
-  { id: 'l1', actor: 'vera', text: 'Las doce menos cinco. Llegas puntual otra vez, como cada noche.', emotion: 'smirk' },
+  { id: 'l1', actor: 'susana', text: 'Las doce menos cinco. Llegas puntual otra vez, como cada noche.', emotion: 'smirk' },
   { id: 'l2', actor: 'dani', text: '¿Te has fijado en eso?', emotion: 'surprise' },
-  { id: 'l3', actor: 'vera', text: 'Me fijo en todo lo que pasa en esta barra.', emotion: 'smirk' },
+  { id: 'l3', actor: 'susana', text: 'Me fijo en todo lo que pasa en esta barra.', emotion: 'smirk' },
   { id: 'l4', actor: 'dani', text: 'No, no es lo que parece, vengo por la iluminación.', emotion: 'nervous' },
-  { id: 'l5', actor: 'vera', text: 'Claro. ¿Y qué tal la iluminación esta noche?' },
+  { id: 'l5', actor: 'susana', text: 'Claro. ¿Y qué tal la iluminación esta noche?' },
   { id: 'l6', actor: 'dani', text: 'Sí, muy bien, perfecta.', emotion: 'joy' },
-  { id: 'l7', actor: 'vera', text: 'Mira, te he preparado algo nuevo para que lo pruebes.', emotion: 'joy' }
+  { id: 'l7', actor: 'susana', text: 'Mira, te he preparado algo nuevo para que lo pruebes.', emotion: 'joy' }
 ];
 const scene = (extra: Record<string, unknown> = {}) => SceneSchemaV2.parse({
   schemaVersion: 2, id: 'sc-001', name: 'T', environmentId: null, coverage: 'auto',
-  actors: [{ id: 'vera', characterId: 'vera', position: [-0.8, 0, 0], yawDeg: 90 }, { id: 'dani', characterId: 'dani', position: [0.6, 0, 0.1], yawDeg: -90 }],
+  actors: [{ id: 'susana', characterId: 'susana', position: [-0.8, 0, 0], yawDeg: 90 }, { id: 'dani', characterId: 'dani', position: [0.6, 0, 0.1], yawDeg: -90 }],
   dialogue: lines, ...extra
 });
 
@@ -39,17 +42,17 @@ test('cobertura automática: plano desde t=0, sin destellos, sin saltos de eje n
     const a = r.shots[i - 1].camera, b = r.shots[i].camera;
     assert.ok(!(a.subject && a.subject === b.subject && a.framing === b.framing && !a.over && !b.over), `jump cut entre ${r.shots[i - 1].id} y ${r.shots[i].id}`);
   }
-  // 180-degree rule: every over-the-shoulder camera sits on the same side of the vera-dani line (+z, the audience side)
+  // 180-degree rule: every over-the-shoulder camera sits on the same side of the susana-dani line (+z, the audience side)
   const ots = r.shots.filter(s => s.camera.framing === 'over-shoulder');
   assert.ok(ots.length >= 1, 'hay contraplanos');
   for (const s of ots) {
-    const over = s.camera.over === 'vera' ? [-0.8, 0] : [0.6, 0.1], subj = s.camera.subject === 'vera' ? [-0.8, 0] : [0.6, 0.1];
+    const over = s.camera.over === 'susana' ? [-0.8, 0] : [0.6, 0.1], subj = s.camera.subject === 'susana' ? [-0.8, 0] : [0.6, 0.1];
     const ax = subj[0] - over[0], az = subj[1] - over[1], len = Math.hypot(ax, az);
     const rz = (-ax / len) * (s.camera.side === 'left' ? -1 : 1); // z of camera.ts "right" vector
     assert.ok(rz > 0, `${s.id} cruza el eje`);
   }
   // cuts lead the voice slightly (J-cut) and never come after it
-  const l3 = r.actors.find(a => a.id === 'vera')!.speech.find(x => x.lineId === 'l3')!;
+  const l3 = r.actors.find(a => a.id === 'susana')!.speech.find(x => x.lineId === 'l3')!;
   const cut = r.shots.find(s => s.id === 'auto-l3');
   if (cut) assert.ok(cut.start <= l3.start && l3.start - cut.start < 0.3);
 });
@@ -74,8 +77,8 @@ test('actuación automática: gestos según texto y emoción, nunca encima de un
   assert.ok(has('dani', 'headshake'), 'un «No, no…» niega con la cabeza');
   assert.ok(has('dani', 'nod'), 'un «Sí…» asiente');
   assert.ok(auto.every(c => c.weight > 0 && c.weight <= 1));
-  const vera = r.actors.find(a => a.id === 'vera')!, l7 = vera.speech.find(s => s.lineId === 'l7')!;
-  assert.ok(!auto.some(c => c.actor === 'vera' && c.start < l7.end && c.end > l7.start + 0.2), 'no tapa el gesto escrito');
+  const susana = r.actors.find(a => a.id === 'susana')!, l7 = susana.speech.find(s => s.lineId === 'l7')!;
+  assert.ok(!auto.some(c => c.actor === 'susana' && c.start < l7.end && c.end > l7.start + 0.2), 'no tapa el gesto escrito');
   const off = compileScene(scene({ autoActing: 0 }), L, { speech: speech(lines.map(l => l.id)) });
   assert.equal(off.actors.flatMap(a => a.clips).filter(c => c.source?.startsWith('auto:')).length, 0);
 });
@@ -120,4 +123,36 @@ test('ritmo: un hueco cubierto por música en primer plano (cortinilla) no es ti
   const r = pacingReport(plan);
   assert.equal(r.deadAir.length, 1, 'el primer hueco tiene cortinilla');
   assert.equal(r.deadAir[0].from, 14);
+});
+
+test('las voces nunca se pisan: una frase con tiempo forzado espera a que acabe la anterior', async () => {
+  const forced = [...lines.slice(0, 3), { id: 'pisa', actor: 'dani', text: '¡Espera!', at: 1.0 }, ...lines.slice(3)];
+  const r = compileScene(scene({ dialogue: forced }), await lib(), { speech: speech(forced.map(l => l.id)) });
+  const cues = r.audio.filter(c => c.kind === 'dialogue');
+  assert.equal(dialogueOverlaps({ audio: cues }).length, 0);
+  const sp = r.actors.flatMap(a => a.speech).sort((x, y) => x.start - y.start);
+  for (let i = 1; i < sp.length; i++) assert.ok(sp[i].start >= sp[i - 1].end + 0.1 - 1e-9, `${sp[i].lineId} empieza antes de que acabe ${sp[i - 1].lineId}`);
+});
+
+test('racord: detecta cambios de sitio, de orientación, de postura y de objeto en mano entre escenas continuas', async () => {
+  const L = await lib();
+  const prev = compileScene(scene(), L, { speech: speech(lines.map(l => l.id)) });
+  const same = scene({ continuous: true });
+  assert.deepEqual(racord(prev, same), []);
+  const moved = scene({ continuous: true, actors: [{ id: 'susana', characterId: 'susana', position: [-0.8, 0, 0], yawDeg: -90 }, { id: 'dani', characterId: 'dani', position: [1.4, 0, 0.1], yawDeg: -90 }] });
+  const errs = racord(prev, moved);
+  assert.ok(errs.some(e => /susana: termina mirando/.test(e)), errs.join('; '));
+  assert.ok(errs.some(e => /dani: termina en/.test(e)), errs.join('; '));
+});
+
+test('plano con seguimiento: se traslada con el personaje pero no gira cuando él gira', async () => {
+  const L = await lib();
+  const sc = scene({ coverage: 'manual', dialogue: [], shots: [{ id: 's', at: 0, camera: { framing: 'medium', subject: 'dani', track: true } }],
+    actions: [{ id: 'gira', type: 'turn', actor: 'dani', at: 1, yawDeg: 90, durationSec: 1 }, { id: 'anda', type: 'walk', actor: 'dani', at: 3, to: [1.6, 0, 1.1] }] });
+  const r = compileScene(sc, L);
+  const ev = new SceneEvaluator(r, L);
+  const cam = (t: number) => { ev.evaluate(t); const c = shotCamera(ev, r.shots[0], t, 16 / 9); return c.target.clone().sub(c.position).setY(0).normalize(); };
+  const d0 = cam(0.5), d1 = cam(2.5), d2 = cam(r.durationSec - 0.1);
+  assert.ok(d0.angleTo(d1) < 0.02, 'no gira al girar el personaje');
+  assert.ok(d0.angleTo(d2) < 0.02, 'no gira al caminar');
 });

@@ -357,6 +357,9 @@ export const SceneSchemaV2 = z.object({
   /** manual: the shots listed; auto: the director cuts dialogue coverage itself (establishing, singles, over-the-shoulders,
    * two-shots, 180-degree rule, J-cuts) and listed shots become inserts that interrupt it for their durationSec. */
   coverage: z.enum(['manual', 'auto']).default('manual'),
+  /** The scene continues the previous one with no time jump: production checks the racord (positions, facing,
+   * seated, props in hand) against where the previous scene ended. */
+  continuous: z.boolean().default(false),
   shots: z.array(ShotSchema).max(200).default([]),
   actions: z.array(ActionSchema).max(2000).default([]),
   dialogue: z.array(DialogueLineSchema).max(1000).default([]),

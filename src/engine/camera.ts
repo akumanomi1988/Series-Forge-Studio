@@ -41,11 +41,13 @@ function unoccluded(ev: SceneEvaluator, subjects: string[], t: number, target: T
   });
   if (!blocked(position)) return position;
   const rel = position.clone().sub(target);
-  for (let k = 1; k <= 12; k++) {
+  // small swings only (±45°): a bigger rotation would show the scene from an unexpected side; otherwise move closer
+  for (let k = 1; k <= 6; k++) {
     const ang = (k % 2 ? 1 : -1) * Math.ceil(k / 2) * 15 * DEG;
     const cand = target.clone().add(rel.clone().applyAxisAngle(new THREE.Vector3(0, 1, 0), ang));
     if (!blocked(cand)) return cand;
   }
+  for (const f of [0.75, 0.55, 0.4]) { const cand = target.clone().addScaledVector(rel, f); if (!blocked(cand)) return cand; }
   return position;
 }
 
@@ -56,14 +58,37 @@ function insideRoom(ev: SceneEvaluator, target: THREE.Vector3, position: THREE.V
   const [W, H, D] = env.size, m = 0.25;
   const sides = env.walls.sides;
   const inside = (p: THREE.Vector3) => (!sides.includes('left') || p.x > -W / 2 + m) && (!sides.includes('right') || p.x < W / 2 - m) && (!sides.includes('back') || p.z > -D / 2 + m) && p.y < H - m && p.y > 0.1;
+  // props built from parts (bar counters, kitchen islands…) are solid boxes for the camera, tested in their own frame
+  const boxHit = (p: THREE.Vector3) => ev.scene.props.some(pr => {
+    const g = ev.lib.props[pr.propId]; if (!g || g.generator !== 'parts' || !g.parts.length) return false;
+    const w = ev.propWorld(pr.id, 0); if (!w) return false;
+    const lp = p.clone().applyMatrix4(new THREE.Matrix4().copy(w.matrix).invert());
+    let x0 = Infinity, x1 = -Infinity, y1 = -Infinity, z0 = Infinity, z1 = -Infinity;
+    for (const q of g.parts) {
+      // rotated extents of each part (a horizontal rail must not count as a tall pole)
+      const [sx, sy, sz] = q.primitive === 'box' || q.primitive === 'roundedBox' ? q.size : q.primitive === 'torus' ? [(q.size[0] + q.size[1]) * 2, q.size[1] * 2, (q.size[0] + q.size[1]) * 2] : [q.size[0] * 2, q.size[1], (q.size[2] || q.size[0]) * 2];
+      const rot = new THREE.Euler(...(q.rotationDeg ?? [0, 0, 0]).map((v: number) => v * DEG) as [number, number, number]);
+      const bb = new THREE.Box3().setFromCenterAndSize(new THREE.Vector3(), new THREE.Vector3(sx, sy, sz)).applyMatrix4(new THREE.Matrix4().makeRotationFromEuler(rot)).translate(new THREE.Vector3(...q.position as [number, number, number]));
+      x0 = Math.min(x0, bb.min.x); x1 = Math.max(x1, bb.max.x); y1 = Math.max(y1, bb.max.y); z0 = Math.min(z0, bb.min.z); z1 = Math.max(z1, bb.max.z);
+    }
+    if (x1 - x0 < 0.3 && z1 - z0 < 0.3) return false; // small objects never block the camera
+    const m = 0.12; return lp.x > x0 - m && lp.x < x1 + m && lp.z > z0 - m && lp.z < z1 + m && lp.y < y1 + 0.05;
+  });
   const propHit = (p: THREE.Vector3) => ev.scene.props.some(pr => { const w = ev.propWorld(pr.id, 0); if (!w) return false; const c = new THREE.Vector3().setFromMatrixPosition(w.matrix); const g = ev.lib.props[pr.propId]; const gen = g?.generator; const r = gen === 'shelf' || gen === 'workbench' || gen === 'table' ? 0.75 : gen === 'robot' || gen === 'barrel' || gen === 'console' || gen === 'monitor' || gen === 'door' ? 0.45 : 0; const top = c.y + (gen === 'robot' ? Number(g?.params.height ?? 1.1) + 0.05 : gen === 'workbench' || gen === 'table' ? 1.0 : gen === 'barrel' ? 0.95 : gen === 'console' || gen === 'monitor' ? 1.3 : 2.2); return r > 0 && Math.hypot(p.x - c.x, p.z - c.z) < r && p.y < top; });
-  if (inside(position) && !propHit(position)) return position;
-  for (let k = 1; k <= 40; k++) { const p = position.clone().lerp(target, k / 44); if (inside(p) && !propHit(p)) return p; }
+  const ok = (p: THREE.Vector3) => inside(p) && !propHit(p) && !boxHit(p);
+  if (ok(position)) return position;
+  const d0 = position.distanceTo(target);
+  for (let k = 1; k <= 40; k++) { const p = position.clone().lerp(target, k / 44); if (ok(p) && p.distanceTo(target) > Math.max(0.45, d0 * 0.4)) return p; }
+  // never end up inside the subject: shoot from above the obstacle instead (over a counter)
+  for (let h = 0.15; h <= 0.9; h += 0.15) { const p = position.clone().add(new THREE.Vector3(0, h, 0)); if (ok(p)) return p; }
+  for (let k = 1; k <= 40; k++) { const p = position.clone().lerp(target, k / 44); if (ok(p) && p.distanceTo(target) > 0.35) return p; }
   return position;
 }
 export function shotCamera(ev: SceneEvaluator, shot: ResolvedShot, t: number, aspect: number): CameraState {
   const c = shot.camera;
-  const tt = c.track ? t : shot.start + 0.001;
+  // the framing (orientation, distance, side, occlusion) is decided once per shot; a tracking shot then only
+  // translates with its subjects, so the camera never swings around a character who turns or walks
+  const tt = shot.start + 0.001;
   const u = clamp((t - shot.start) / Math.max(1e-3, shot.end - shot.start), 0, 1);
   let position: THREE.Vector3, target: THREE.Vector3;
   const fov = c.fov;
@@ -78,7 +103,7 @@ export function shotCamera(ev: SceneEvaluator, shot: ResolvedShot, t: number, as
     const axis = pts.length > 1 ? new THREE.Vector3().subVectors(pts[pts.length - 1], pts[0]).setY(0).normalize() : new THREE.Vector3(1, 0, 0);
     const normal = new THREE.Vector3(-axis.z, 0, axis.x);
     // choose the side the characters are (on average) facing
-    const facing = ids.reduce((s, id) => s + Math.sin(facingOf(ev, id, tt, c.track ? tt : shot.end) * DEG) * normal.x + Math.cos(facingOf(ev, id, tt, c.track ? tt : shot.end) * DEG) * normal.z, 0);
+    const facing = ids.reduce((s, id) => s + Math.sin(facingOf(ev, id, tt, shot.end) * DEG) * normal.x + Math.cos(facingOf(ev, id, tt, shot.end) * DEG) * normal.z, 0);
     if ((c.side === 'right') !== (facing < 0)) normal.multiplyScalar(-1);
     const az = (c.azimuthDeg ?? 0) * DEG;
     const dir = normal.clone().applyAxisAngle(new THREE.Vector3(0, 1, 0), az);
@@ -98,7 +123,7 @@ export function shotCamera(ev: SceneEvaluator, shot: ResolvedShot, t: number, as
   } else {
     const id = c.subject ?? ev.scene.actors[0]?.id ?? '';
     const p = subjectPoint(ev, id, tt, c.framing);
-    const yaw = (ev.scene.actors.some(a => a.id === id) ? facingOf(ev, id, tt, c.track ? tt : shot.end) : 0) + (c.azimuthDeg ?? (c.framing === 'establishing' || c.framing === 'wide' ? 0 : 22) * (c.side === 'left' ? -1 : 1));
+    const yaw = (ev.scene.actors.some(a => a.id === id) ? facingOf(ev, id, tt, shot.end) : 0) + (c.azimuthDeg ?? (c.framing === 'establishing' || c.framing === 'wide' ? 0 : 22)) * (c.side === 'left' ? -1 : 1);
     const el = (c.elevationDeg ?? (c.framing === 'establishing' ? 16 : c.framing === 'wide' ? 9 : 3)) * DEG;
     const d = dist(EXTENT[c.framing] ?? 1.2);
     const dir = new THREE.Vector3(Math.sin(yaw * DEG) * Math.cos(el), Math.sin(el), Math.cos(yaw * DEG) * Math.cos(el));
@@ -107,11 +132,17 @@ export function shotCamera(ev: SceneEvaluator, shot: ResolvedShot, t: number, as
     // rule of thirds with looking room: aim beside the subject, towards where it looks, so it sits on the far third
     if (c.compose !== 'center' && ['full', 'medium', 'medium-close', 'close'].includes(c.framing) && ev.scene.actors.some(a => a.id === id)) {
       const fwd = target.clone().sub(position).setY(0).normalize(), right = new THREE.Vector3(-fwd.z, 0, fwd.x);
-      const fy = facingOf(ev, id, tt, c.track ? tt : shot.end) * DEG, gaze = Math.sin(fy) * right.x + Math.cos(fy) * right.z;
+      const fy = facingOf(ev, id, tt, shot.end) * DEG, gaze = Math.sin(fy) * right.x + Math.cos(fy) * right.z;
       const hw = d * Math.tan((fov * DEG) / 2) * Math.max(1, aspect);
       target.addScaledVector(right, clamp(gaze * 2.2, -1, 1) * hw * 0.3);
     }
     position = unoccluded(ev, [id], tt, target, position);
+  }
+  if (c.track && c.type !== 'static' && c.framing) {
+    const ids = c.framing === 'over-shoulder' && c.over && c.subject ? [c.over, c.subject] : c.subjects && c.subjects.length > 1 ? c.subjects : c.framing === 'two-shot' && !c.subject ? ev.scene.actors.map(a => a.id) : [c.subject ?? ev.scene.actors[0]?.id ?? ''];
+    const anchor = (time: number) => ids.reduce((acc, id) => acc.add(subjectPoint(ev, id, time, 'medium')), new THREE.Vector3()).divideScalar(Math.max(1, ids.length)).setY(0);
+    const delta = anchor(t).sub(anchor(tt));
+    position.add(delta); target.add(delta);
   }
   // camera moves
   if (c.move && c.move.type !== 'none') {
