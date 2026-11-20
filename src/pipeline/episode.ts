@@ -149,6 +149,21 @@ export async function compileEpisode(project: string, episode: string, settings:
     const start = at + (s.offset ?? 0);
     plan.audio.push({ id: `episode/${s.id ?? 'music-' + (i + 1)}`, kind: s.kind, sound: s.sound, start, duration: Math.min(s.durationSec ?? plan.durationSec - start, plan.durationSec - start), gainDb: s.gainDb, fadeIn: s.fadeIn, fadeOut: s.fadeOut, pan: s.pan, duck: true });
   }
+  // automatic score
+  const sc = ep.episode.score, D = plan.durationSec;
+  const cue = (id: string, sound: string, start: number, duration: number, gainDb: number, fadeIn: number, fadeOut: number, feature: boolean) => {
+    if (!p.music[sound]) throw new Error(`score: música desconocida ${sound}`);
+    const s = Math.max(0, start), d = Math.min(duration, D - s);
+    if (d > 0.2) plan.audio.push({ id: `episode/score/${id}`, kind: 'music', sound, start: s, duration: d, gainDb, fadeIn, fadeOut, pan: 0, duck: true, feature });
+  };
+  if (sc?.theme) cue('theme', sc.theme.music, 0, sc.theme.durationSec, sc.theme.gainDb, 0.05, sc.theme.fadeOut, true);
+  const endStart = sc?.ending ? Math.max(0, D - sc.ending.durationSec) : D;
+  if (sc?.underscore) { const s0 = sc.theme ? Math.max(0, sc.theme.durationSec - sc.theme.fadeOut) : 0; cue('underscore', sc.underscore.music, s0, endStart + 1 - s0, sc.underscore.gainDb, sc.underscore.fadeIn, sc.underscore.fadeOut, false); }
+  if (sc?.bumpers) for (const s of plan.scenes.slice(1)) {
+    if (sc.bumpers.scenes && !sc.bumpers.scenes.includes(s.id)) continue;
+    cue(`bumper-${s.id}`, sc.bumpers.music, s.start - sc.bumpers.leadSec, sc.bumpers.durationSec ?? p.music[sc.bumpers.music]?.durationSec ?? 3, sc.bumpers.gainDb, 0.02, 0.4, true);
+  }
+  if (sc?.ending) cue('ending', sc.ending.music, endStart, sc.ending.durationSec, sc.ending.gainDb, 0.8, sc.ending.fadeOut, true);
   plan.audio.sort((a, b) => a.start - b.start);
   await writeFile(join(gen, 'episode-plan.json'), JSON.stringify(plan, null, 1));
   return { plan, project: p, resolved: resolvedAll, lib };

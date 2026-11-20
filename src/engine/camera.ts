@@ -32,7 +32,7 @@ function facingOf(ev: SceneEvaluator, id: string, t: number, t1 = t): number {
 }
 /** Rotate the camera around the subject until no other actor blocks the view (vertical capsules r=0.32 m). */
 function unoccluded(ev: SceneEvaluator, subjects: string[], t: number, target: THREE.Vector3, position: THREE.Vector3): THREE.Vector3 {
-  const blockers: { x: number; z: number; top: number; r: number }[] = ev.scene.actors.filter(a => !subjects.includes(a.id)).map(a => { const h = ev.headWorld(a.id, t); return { x: h.x, z: h.z, top: h.y + 0.25, r: 0.34 }; });
+  const blockers: { x: number; z: number; top: number; r: number }[] = ev.scene.actors.filter(a => !subjects.includes(a.id)).map(a => { const h = ev.headWorld(a.id, t); return { x: h.x, z: h.z, top: h.y + 0.25, r: 0.42 }; });
   for (const pr of ev.scene.props) { if (subjects.includes(pr.id)) continue; const g = ev.lib.props[pr.propId]; const r = g?.generator === 'robot' ? 0.4 : g?.generator === 'shelf' || g?.generator === 'workbench' ? 0.7 : 0; if (!r) continue; const w = ev.propWorld(pr.id, t); if (!w) continue; const c = new THREE.Vector3().setFromMatrixPosition(w.matrix); blockers.push({ x: c.x, z: c.z, top: c.y + (g?.generator === 'robot' ? Number(g.params.height ?? 1.1) + 0.05 : 2.0), r }); }
   const blocked = (cam: THREE.Vector3) => blockers.some(h => {
     const seg = target.clone().sub(cam); const L = seg.length(); seg.normalize();
@@ -92,7 +92,8 @@ export function shotCamera(ev: SceneEvaluator, shot: ResolvedShot, t: number, as
     const over = subjectPoint(ev, c.over, tt, 'close'), subj = subjectPoint(ev, c.subject, tt, 'close');
     const axis = subj.clone().sub(over).setY(0).normalize();
     const right = new THREE.Vector3(axis.z, 0, -axis.x).multiplyScalar(c.side === 'left' ? -1 : 1);
-    position = over.clone().addScaledVector(axis, -0.75).addScaledVector(right, 0.38).add(new THREE.Vector3(0, 0.08, 0));
+    // far enough behind and beside the near shoulder that hair or head take at most a third of the frame
+    position = over.clone().addScaledVector(axis, -0.85).addScaledVector(right, 0.5).add(new THREE.Vector3(0, 0.12, 0));
     target = subj.clone().addScaledVector(right, -0.05).add(new THREE.Vector3(0, -0.05, 0));
   } else {
     const id = c.subject ?? ev.scene.actors[0]?.id ?? '';
@@ -103,6 +104,13 @@ export function shotCamera(ev: SceneEvaluator, shot: ResolvedShot, t: number, as
     const dir = new THREE.Vector3(Math.sin(yaw * DEG) * Math.cos(el), Math.sin(el), Math.cos(yaw * DEG) * Math.cos(el));
     position = p.clone().addScaledVector(dir, d);
     target = p.clone();
+    // rule of thirds with looking room: aim beside the subject, towards where it looks, so it sits on the far third
+    if (c.compose !== 'center' && ['full', 'medium', 'medium-close', 'close'].includes(c.framing) && ev.scene.actors.some(a => a.id === id)) {
+      const fwd = target.clone().sub(position).setY(0).normalize(), right = new THREE.Vector3(-fwd.z, 0, fwd.x);
+      const fy = facingOf(ev, id, tt, c.track ? tt : shot.end) * DEG, gaze = Math.sin(fy) * right.x + Math.cos(fy) * right.z;
+      const hw = d * Math.tan((fov * DEG) / 2) * Math.max(1, aspect);
+      target.addScaledVector(right, clamp(gaze * 2.2, -1, 1) * hw * 0.3);
+    }
     position = unoccluded(ev, [id], tt, target, position);
   }
   // camera moves

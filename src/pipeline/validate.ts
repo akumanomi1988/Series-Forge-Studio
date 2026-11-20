@@ -32,11 +32,13 @@ export function pacingReport(plan: Pick<EpisodePlan, 'audio' | 'durationSec' | '
   for (const [a, b] of lines) { if (a > cursor) gaps.push({ from: +cursor.toFixed(2), to: +a.toFixed(2), gapSec: +(a - cursor).toFixed(2), scene: sceneAt(cursor) }); spoken += Math.max(0, b - Math.max(a, cursor)); cursor = Math.max(cursor, b); }
   if (plan.durationSec > cursor) gaps.push({ from: +cursor.toFixed(2), to: +plan.durationSec.toFixed(2), gapSec: +(plan.durationSec - cursor).toFixed(2), scene: 'final' });
   const inner = gaps.filter(g => g.from > 0 && g.scene !== 'final');
+  const musical = (g: { from: number; to: number }) => plan.audio.some(c => c.kind === 'music' && (c.feature || (!c.duck && c.gainDb >= -18)) && Math.min(c.start + c.duration, g.to) - Math.max(c.start, g.from) >= 0.6 * (g.to - g.from));
   return {
     maxGapSec,
     longestGapSec: Math.max(0, ...inner.map(g => g.gapSec)),
     meanGapSec: inner.length ? +(inner.reduce((s, g) => s + g.gapSec, 0) / inner.length).toFixed(2) : 0,
-    deadAir: gaps.filter(g => g.gapSec > (g.scene === 'final' ? maxGapSec + 1.5 : maxGapSec)),
+    // a gap filled by a foreground musical moment (theme, scene bumper, sting) is a beat, not dead air (up to 6 s)
+    deadAir: gaps.filter(g => g.gapSec > (g.scene === 'final' ? maxGapSec + 1.5 : musical(g) ? Math.max(maxGapSec, 6) : maxGapSec)),
     dialogueShare: +(spoken / Math.max(1e-6, plan.durationSec)).toFixed(2)
   };
 }

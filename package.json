@@ -11,7 +11,7 @@
     "start": "node src/server/studio-server.ts",
     "studio": "node src/cli/studio.ts",
     "build": "node scripts/build.ts",
-    "test": "node --test --test-timeout=600000 tests/engine.test.ts tests/project.test.ts tests/story.test.ts tests/audio.test.ts tests/pipeline.test.ts tests/youtube.test.ts tests/providers.test.ts tests/ui.test.ts tests/workspace.test.mjs tests/render.test.mjs tests/studio.test.mjs tests/live-assets.test.mjs tests/three-pipeline.test.mjs",
+    "test": "node --test --test-timeout=600000 tests/engine.test.ts tests/project.test.ts tests/story.test.ts tests/audio.test.ts tests/pipeline.test.ts tests/youtube.test.ts tests/providers.test.ts tests/direction.test.ts tests/ui.test.ts tests/workspace.test.mjs tests/render.test.mjs tests/studio.test.mjs tests/live-assets.test.mjs tests/three-pipeline.test.mjs",
     "typecheck": "tsc -p tsconfig.json",
     "pilot": "node src/cli/studio.ts init pilot --force && node src/cli/studio.ts produce el-ultimo-turno ep-001",
     "legacy-v04": "node src/studio-server.mjs",

@@ -96,6 +96,7 @@ function reverb(L: Float32Array, R: Float32Array, wet = 0.25, room = 0.82) {
   }
 }
 export function generateMusic(def: MusicDef, durationSec = def.durationSec): [Float32Array, Float32Array] {
+  if (def.style !== 'ambient' || def.form !== 'loop' || def.sevenths || def.instruments.some(i => ['keys', 'guitar', 'strings', 'brushes', 'snaps', 'sub', 'lead'].includes(i))) return arrange(def, durationSec);
   const N = Math.round(durationSec * SR), L = new Float32Array(N), R = new Float32Array(N);
   const rnd = mulberry32(def.seed);
   const beat = 60 / def.tempo, bar = beat * 4;
@@ -129,6 +130,105 @@ export function generateMusic(def: MusicDef, durationSec = def.durationSec): [Fl
   }
   reverb(L, R, 0.28);
   const F = Math.min(N, SR * 2); for (let i = 0; i < F; i++) { const g = i / F; L[N - 1 - i] *= g; R[N - 1 - i] *= g; }
+  let pk = 0; for (let i = 0; i < N; i++) pk = Math.max(pk, Math.abs(L[i]), Math.abs(R[i]));
+  if (pk > 0) for (let i = 0; i < N; i++) { L[i] *= 0.7 / pk; R[i] *= 0.7 / pk; }
+  return [L, R];
+}
+
+// ---------------------------------------------------------------- arranger (styles, melody, stings)
+/** Styled arrangement: sevenths, swing, a composed lead melody (motif A A' B A), and instruments with
+ * physical/FM models: keys (electric piano), guitar (Karplus-Strong nylon), strings, brushes, snaps, sub.
+ * form 'sting' = a short cadence that rings out; 'button' = two comedic stabs (V then I). Deterministic by seed. */
+function arrange(def: MusicDef, durationSec: number): [Float32Array, Float32Array] {
+  const N = Math.round(durationSec * SR), L = new Float32Array(N), R = new Float32Array(N);
+  const rnd = mulberry32(def.seed * 7919 + 13);
+  const beat = 60 / def.tempo, bar = beat * 4, swing = def.swing;
+  const scale = MODES[def.mode], root = 48 + NOTE[def.key];
+  const note = (deg: number, oct = 0) => root + scale[((deg % 7) + 7) % 7] + 12 * (Math.floor(deg / 7) + oct);
+  const has = (i: string) => (def.instruments as string[]).includes(i);
+  const add = (start: number, y: Float32Array, gain: number, pan = 0) => {
+    const s = Math.round(start * SR), gl = gain * Math.min(1, 1 - pan), gr = gain * Math.min(1, 1 + pan);
+    for (let i = 0; i < y.length && s + i < N; i++) if (s + i >= 0) { L[s + i] += y[i] * gl; R[s + i] += y[i] * gr; }
+  };
+  // swung position inside a bar: offbeat eighths are delayed by `swing`
+  const at = (barT: number, beatIdx: number, sub = 0) => barT + beatIdx * beat + (sub === 0.5 ? beat * 0.5 * (1 + swing) : sub * beat);
+  const keys = (hz: number, len: number) => { const M = Math.round((len + 0.6) * SR), y = new Float32Array(M); for (let i = 0; i < M; i++) { const t = i / SR, I = 0.2 + 1.6 * Math.exp(-t / 0.25); y[i] = (Math.sin(TAU * hz * t + I * Math.sin(TAU * hz * t)) + 0.08 * Math.sin(TAU * hz * 14 * t) * Math.exp(-t / 0.03)) * Math.min(1, t / 0.004) * Math.exp(-t / 1.3) * (t < len ? 1 : Math.exp(-(t - len) / 0.12)); } return y; };
+  const guitar = (hz: number, len: number) => { const M = Math.round((len + 0.3) * SR), y = new Float32Array(M), P = Math.max(2, Math.round(SR / hz)), buf = new Float32Array(P); const lp = new Biquad('lp', 2600); for (let i = 0; i < P; i++) buf[i] = lp.run(rnd() * 2 - 1); let idx = 0, prev = 0; for (let i = 0; i < M; i++) { const v = buf[idx]; buf[idx] = 0.5 * (v + prev) * 0.9965; prev = v; idx = (idx + 1) % P; y[i] = v * (i / SR < len ? 1 : Math.exp(-(i / SR - len) / 0.06)); } return y; };
+  const strings = (hz: number, len: number) => { const M = Math.round((len + 0.8) * SR), y = new Float32Array(M), lp = new Biquad('lp', 1900, 0.7); for (let i = 0; i < M; i++) { const t = i / SR, vib = 1 + 0.003 * Math.sin(TAU * 5.2 * t); let v = 0; for (const d of [-0.004, 0.0, 0.005]) v += 2 * ((hz * vib * (1 + d) * t) % 1) - 1; y[i] = lp.run(v / 3) * Math.min(1, t / 0.35) * (t < len ? 1 : Math.exp(-(t - len) / 0.35)); } return y; };
+  const lead = (hz: number, len: number) => { const M = Math.round((len + 0.15) * SR), y = new Float32Array(M), lp = new Biquad('lp', 3800); for (let i = 0; i < M; i++) { const t = i / SR, vib = 1 + 0.006 * Math.sin(TAU * 5.5 * t) * Math.min(1, t / 0.25); const ph = TAU * hz * vib * t; y[i] = lp.run(Math.sin(ph) + 0.25 * Math.sin(2 * ph) + 0.1 * Math.sin(3 * ph) + (rnd() * 2 - 1) * 0.015) * Math.min(1, t / 0.03) * (t < len ? 1 : Math.exp(-(t - len) / 0.05)); } return y; };
+  const bassT = (hz: number, len: number) => { const M = Math.round((len + 0.08) * SR), y = new Float32Array(M), lp = new Biquad('lp', 700); for (let i = 0; i < M; i++) { const t = i / SR; y[i] = lp.run(Math.sin(TAU * hz * t) + 0.4 * Math.sin(TAU * hz * 2 * t) + 0.15 * Math.sin(TAU * hz * 3 * t)) * Math.min(1, t / 0.006) * Math.exp(-t / (len * 1.2)) * (t < len ? 1 : Math.exp(-(t - len) / 0.03)); } return y; };
+  const noiseHit = (f: number, q: number, a: number, d: number, len = 0.25) => { const M = Math.round(len * SR), y = new Float32Array(M), bp = new Biquad('bp', f, q); for (let i = 0; i < M; i++) y[i] = bp.run(rnd() * 2 - 1) * env(i / SR, a, d); return y; };
+  const kick = () => { const M = Math.round(0.3 * SR), y = new Float32Array(M); for (let i = 0; i < M; i++) { const t = i / SR; y[i] = Math.sin(TAU * 52 * t * (1 + 1.6 * Math.exp(-t / 0.025))) * Math.exp(-t / 0.14); } return y; };
+  const snap = () => { const y = noiseHit(2300, 3, 0.0008, 0.018, 0.12); for (let i = 0; i < 200; i++) y[i] += Math.sin(TAU * 1700 * i / SR) * Math.exp(-i / 60) * 0.6; return y; };
+  const chordOf = (deg: number) => def.sevenths ? [deg, deg + 2, deg + 4, deg + 6] : [deg, deg + 2, deg + 4];
+  const prog = def.progression.map(chordDegrees);
+  // ----- melody: a 2-bar motif from the seed; phrase plan A A' B A over 8 bars, phrase ends on the tonic
+  const rhythms = [[0, 1, 1.5, 2, 3], [0, 0.5, 1, 2, 2.5, 3], [0, 1.5, 2, 3.5], [0.5, 1, 1.5, 2.5, 3], [0, 2, 2.5, 3, 3.5]];
+  const motif = [0, 1].map(() => rhythms[Math.floor(rnd() * rhythms.length)]);
+  const contour = Array.from({ length: 12 }, () => Math.floor(rnd() * 5) - 2);
+  const melodyBar = (b: number, chord: number[]) => {
+    const phrase = Math.floor(b / 2) % 4, inBar = b % 2;
+    const r = phrase === 2 ? rhythms[(Math.floor(b / 2) + 2) % rhythms.length] : motif[inBar];
+    return r.map((pos, k) => {
+      const strong = pos === 0 || pos === 2;
+      let d = chord[2] + 7 + contour[(k + inBar * 5 + (phrase === 1 ? 2 : 0)) % contour.length];
+      if (strong) { const ct = chord.map(c => c + 7); d = ct.reduce((a, c) => Math.abs(c - d) < Math.abs(a - d) ? c : a, ct[0]); }
+      if (phrase === 3 && inBar === 1 && k === r.length - 1) d = chord[0] + 7;
+      return { pos, deg: d, len: Math.min((r[k + 1] ?? 4) - pos, 1.5) * beat * 0.92 };
+    });
+  };
+  const sting = def.form !== 'loop';
+  if (def.form === 'button') { // dominant stab, tonic stab: the classic sitcom button
+    const stab = (d: number, t: number, len: number) => {
+      for (const c of chordOf(d)) { if (has('keys')) add(t, keys(midiHz(note(c, 1)), len), 0.12); if (has('guitar') || has('pluck') || has('arp')) add(t, guitar(midiHz(note(c, 1)), len), 0.16); if (has('strings') || has('pad')) add(t, strings(midiHz(note(c, 1)), len), 0.06); }
+      add(t, bassT(midiHz(note(d, -1)), len), 0.35); add(t, kick(), 0.3);
+    };
+    stab(4, 0, beat * 0.4); stab(0, beat, Math.max(0.4, durationSec - beat * 1.2));
+    if (has('brushes') || has('drums')) add(beat, noiseHit(5000, 0.7, 0.002, 0.25, 0.6), 0.25);
+    if (has('lead')) { add(0, lead(midiHz(note(4 + 7, 0)), beat * 0.35), 0.1); add(beat, lead(midiHz(note(7, 0)), beat * 1.2), 0.1); }
+  }
+  const bars = def.form === 'button' ? 0 : sting ? Math.max(1, Math.round(durationSec / bar)) : Math.ceil(durationSec / bar);
+  for (let b = 0; b < bars; b++) {
+    const t0 = b * bar, lastBar = b === bars - 1, ringOut = sting && lastBar;
+    const deg = ringOut ? 0 : prog[b % prog.length];
+    const ch = chordOf(deg);
+    const section = Math.floor(b / 8) % 2; // B section every other 8 bars: a little more energy
+    if (has('pad')) for (const c of ch) add(t0, strings(midiHz(note(c, 1)), bar), 0.035, (c - deg - 2) * 0.15);
+    if (has('strings') && (section === 1 || sting)) for (const c of ch.slice(0, 3)) add(t0, strings(midiHz(note(c, 1)), bar * (ringOut ? 1.6 : 1)), 0.05, (c - deg - 2) * 0.2);
+    if (has('keys')) {
+      const hits = ringOut ? [[0, 0, 3.5]] : def.style === 'lounge' ? [[0, 0, 1.4], [1, 0.5, 0.6], [2, 0.5, 1.2]] : def.style === 'sitcom' ? [[0, 0.5, 0.3], [1, 0.5, 0.3], [2, 0.5, 0.3], [3, 0.5, 0.3]] : [[0, 0, 1.8], [2, 0, 1.8]];
+      for (const [bi, sub, len] of hits) for (const [k, c] of ch.entries()) add(at(t0, bi, sub) + k * 0.006, keys(midiHz(note(c, k === 0 ? 0 : 1)), len * beat), 0.07, k % 2 ? 0.25 : -0.2);
+    }
+    if (has('guitar')) {
+      // bossa comp on sixteenths (3+3+2 feel) over the upper chord tones
+      const pat = def.style === 'bossa' ? [0, 0.75, 1.5, 2.5, 3.25] : [0, 1, 2, 3];
+      if (ringOut) for (const [k, c] of ch.entries()) add(t0 + k * 0.035, guitar(midiHz(note(c, 1)), bar * 1.5), 0.13, 0.15);
+      else for (const p of pat) for (const [k, c] of ch.slice(1).entries()) add(t0 + p * beat + k * 0.008, guitar(midiHz(note(c, 1)), beat * 0.7), 0.1, 0.2);
+    }
+    if (has('arp') || has('pluck')) for (let s = 0; s < 8; s++) { if (ringOut && s > 0) break; const d = ch[[0, 1, 2, 1, 0, 2, 1, 2][s] % ch.length] + (s > 5 ? 7 : 0); add(at(t0, Math.floor(s / 2), s % 2 ? 0.5 : 0), guitar(midiHz(note(d, 1)), beat * 0.45), 0.07, s % 2 ? 0.35 : -0.35); }
+    if (has('bell') && (b % 2 === 0 || sting)) add(t0 + (ringOut ? 0 : beat * 2.5), keys(midiHz(note(ch[2], 2)), 1.6), 0.04, 0.3);
+    if (has('bass') || has('sub')) {
+      const line: [number, number, number][] = ringOut ? [[0, deg, 3.5]]
+        : def.style === 'bossa' ? [[0, deg, 1.4], [1.5, deg + 4, 0.45], [2, deg + 4, 1.4], [3.5, deg, 0.45]]
+          : def.style === 'lounge' ? [[0, deg, 0.9], [1, deg + 2, 0.9], [2, deg + 4, 0.9], [3, deg + 5, 0.9]]
+            : def.style === 'sitcom' ? [[0, deg, 0.4], [0.5 + swing * 0.5, deg + 7, 0.25], [1.5, deg + 4, 0.4], [2, deg, 0.4], [3, deg + 4, 0.3], [3.5, deg + 6, 0.3]]
+              : [[0, deg, 0.9], [1, deg, 0.9], [2, deg + 7, 0.9], [3, deg, 0.9]];
+      for (const [pos, d, len] of line) add(t0 + pos * beat, bassT(midiHz(note(d, -1)), len * beat), has('sub') ? 0.3 : 0.24);
+    }
+    if (has('lead')) {
+      if (ringOut) add(t0, lead(midiHz(note(ch[0] + 7, 0)), bar * 0.9), 0.08, 0.1);
+      else for (const m of melodyBar(b, ch)) add(t0 + m.pos * beat + (m.pos % 1 === 0.5 ? beat * 0.5 * swing : 0), lead(midiHz(note(m.deg, 0)), m.len), section ? 0.09 : 0.075, 0.1);
+    }
+    if (!ringOut) {
+      if (has('brushes')) for (let q = 0; q < 4; q++) { add(at(t0, q, 0), noiseHit(4200, 0.6, 0.03, 0.09, 0.3), q % 2 ? 0.07 : 0.04); add(at(t0, q, 0.5), noiseHit(6000, 0.8, 0.002, 0.03, 0.1), 0.03); }
+      if (has('snaps')) for (const q of [1, 3]) add(at(t0, q, 0), snap(), 0.16, q === 1 ? -0.3 : 0.3);
+      if (has('drums')) for (let q = 0; q < 4; q++) { if (q % 2 === 0 || (def.style === 'sitcom' && q === 3 && rnd() < 0.4)) add(at(t0, q, 0), kick(), 0.24); if (q % 2 === 1) add(at(t0, q, 0), noiseHit(1900, 0.9, 0.001, 0.07, 0.25), 0.16); add(at(t0, q, 0.5), noiseHit(8000, 1, 0.001, 0.012, 0.06), 0.05); }
+      if (def.style === 'bossa' && (has('brushes') || has('drums'))) for (const p of [0, 0.75, 1.5, 2.5, 3]) add(t0 + p * beat, noiseHit(1800, 6, 0.0005, 0.015, 0.06), 0.06, -0.2); // rim clave
+    } else if (has('drums') || has('brushes')) add(t0, noiseHit(5500, 0.6, 0.002, 0.5, 1.2), 0.12); // cymbal swell under the last chord
+  }
+  reverb(L, R, def.style === 'lounge' || def.style === 'bossa' ? 0.24 : 0.2);
+  const fadeOut = Math.min(N, Math.round(SR * (sting ? 0.6 : 2)));
+  for (let i = 0; i < fadeOut; i++) { const g = i / fadeOut; L[N - 1 - i] *= g; R[N - 1 - i] *= g; }
   let pk = 0; for (let i = 0; i < N; i++) pk = Math.max(pk, Math.abs(L[i]), Math.abs(R[i]));
   if (pk > 0) for (let i = 0; i < N; i++) { L[i] *= 0.7 / pk; R[i] *= 0.7 / pk; }
   return [L, R];

@@ -6,6 +6,7 @@ import type { Vec3 } from './math.ts';
 import { humanoidDims } from './humanoid.ts';
 import { SceneEvaluator, DEFAULT_WALK, walkProfile } from './pose.ts';
 import type { Action, DialogueLine, SceneV2, Locomotion, PropGeometry, Shot, SoundEvent } from './schema.ts';
+import { CameraSchema } from './schema.ts';
 import type { ActorTimeline, AssetLibrary, AudioCue, EffectInstance, HandInstance, PropTimeline, ResolvedScene, ResolvedShot, TargetRef, Step } from './timeline.ts';
 
 export interface SpeechInfo { duration: number; visemes: [number, string][]; file?: string; estimated?: boolean }
@@ -224,6 +225,7 @@ export function compileScene(scene: SceneV2, lib: AssetLibrary, opts: DirectorOp
   }
   const byId = new Map(items.map(i => [i.id, i]));
   for (const it of items) for (const ref of [it.after, it.with]) if (ref && !byId.has(ref)) throw new Error(`Referencia temporal desconocida en ${scene.id}/${it.id}: ${ref}`);
+  const untilFx: { ref: string; idx: number; src: string }[] = [];
   const pending = new Set(items);
   const startOf = (it: Item): number | null => {
     if (it.at !== undefined) return it.at + it.offset;
@@ -241,10 +243,11 @@ export function compileScene(scene: SceneV2, lib: AssetLibrary, opts: DirectorOp
     best.start = bestT;
     best.end = execute(best, bestT);
   }
+  for (const u of untilFx) { const ref = byId.get(u.ref); if (!ref) throw new Error(`Efecto ${u.src}: until desconocido ${u.ref}`); effects[u.idx].end = Math.max(effects[u.idx].start + 0.05, ref.start!); }
 
   function execute(it: Item, s: number): number {
     if (it.kind === 'shot') return s;
-    if (it.kind === 'sound') { const e = it.data as SoundEvent; audio.push({ id: it.id, kind: e.kind, sound: e.sound, start: s, duration: e.durationSec ?? -1, gainDb: e.gainDb, fadeIn: e.fadeIn, fadeOut: e.fadeOut, pan: e.pan, duck: e.duck ?? e.kind !== 'sfx' }); return s + (e.durationSec ?? 0); }
+    if (it.kind === 'sound') { const e = it.data as SoundEvent; audio.push({ id: it.id, kind: e.kind, sound: e.sound, start: s, duration: e.durationSec ?? -1, gainDb: e.gainDb, fadeIn: e.fadeIn, fadeOut: e.fadeOut, pan: e.pan, duck: e.duck ?? e.kind !== 'sfx', feature: e.kind === 'music' && e.gainDb >= -18 }); return s + (e.durationSec ?? 0); }
     if (it.kind === 'line') {
       const l = it.data as DialogueLine;
       actor(l.actor);
@@ -427,6 +430,7 @@ export function compileScene(scene: SceneV2, lib: AssetLibrary, opts: DirectorOp
       }
       case 'effect': {
         if (a.prop) prop(a.prop);
+        if (a.until) untilFx.push({ ref: a.until, idx: effects.length, src: it.id });
         effects.push({ effect: a.effect, start: s, end: s + a.durationSec, prop: a.prop, part: a.part, position: a.position as Vec3 | undefined, intensity: a.intensity, seed: Math.floor(hash01(scene.id, it.id) * 1e6) });
         if (a.sound) sfx(a.sound, s, -6, { duration: a.durationSec });
         return s + a.durationSec;
@@ -468,12 +472,132 @@ export function compileScene(scene: SceneV2, lib: AssetLibrary, opts: DirectorOp
     if (prev && prev.target.kind === 'actor' && prev.target.actor === target && start - prev.end < 1.2) { prev.end = Math.max(prev.end, endT); return; }
     tl.looks.push({ start, end: Math.min(endT, duration), target: { kind: 'actor', actor: target, bone: 'head' }, mode: 'head', fade: 0.35, source: 'auto' });
   }
+  // ---------------- automatic acting (speaker gestures + listener reactions)
+  if (scene.autoActing > 0) autoActing(scene.autoActing);
+  function autoActing(amount: number) {
+    const busy = (tl: ActorTimeline, a0: number, b0: number) =>
+      tl.root.some(r => r.kind === 'walk' && r.start < b0 && r.end > a0) ||
+      tl.clips.some(c => !c.source?.startsWith('auto:') && c.start < b0 + 0.3 && c.end > a0 - 0.3) ||
+      tl.hips.some(h => h.start < b0 && h.end > a0);
+    const holding = (id: string, t: number) => props.some(p => p.segments.some(s => s.kind === 'held' && s.actor === id && s.start <= t && s.end > t));
+    const lastAuto = new Map<string, string>();
+    const add = (tl: ActorTimeline, clip: string, start: number, end: number, weight: number, loop = false) => {
+      const c = charOf(tl.id).clips[clip]; if (!c) return;
+      // seated or crouched bodies only take arm/head/additive gestures (an upper-body clip would undo the sit pose)
+      if (!['arms', 'additive', 'head'].includes(c.layer) && tl.sits.some(x => x.start < end && x.end > start)) return;
+      const e = loop ? end : Math.min(end, start + c.duration);
+      tl.clips.push({ clip, start, end: e, speed: 1, fadeIn: Math.min(0.35, (e - start) / 3), fadeOut: Math.min(0.4, (e - start) / 3), loop: loop || c.loop, weight: Math.min(1, weight * amount), source: 'auto:' + clip });
+      lastAuto.set(tl.id, clip);
+    };
+    for (const l of scene.dialogue) {
+      const tl = actor(l.actor), sp = tl.speech.find(x => x.lineId === l.id); if (!sp) continue;
+      const s = sp.start, e = sp.end, d = e - s, txt = l.text.trim().toLowerCase(), emo = resolveEmotion(l.emotion) ?? 'neutral';
+      const h = hash01(l.id, 'act');
+      if (!l.gesture && !busy(tl, s, e)) {
+        const hands = !holding(l.actor, s) && !holding(l.actor, e);
+        let pick: { clip: string; loop?: boolean; w: number; at?: number } | null = null;
+        if (/^(no|nunca|ni hablar|para nada|qué va|ni de broma)\b/.test(txt)) pick = { clip: 'headshake', w: 0.9 };
+        else if (/^(sí|vale|claro|exacto|eso es|de acuerdo|hecho)\b/.test(txt)) pick = { clip: 'nod', w: 0.9 };
+        else if (!hands) pick = d > 1.2 ? { clip: h < 0.5 ? 'nod' : 'headshake', w: 0.45 } : null;
+        else if (emo === 'angry' && d > 0.9) pick = { clip: 'angry-gesture', w: 0.8, at: Math.min(0.6, d * 0.3) };
+        else if (emo === 'nervous' && d > 1.4) pick = { clip: 'nervous', loop: true, w: 0.7 };
+        else if (emo === 'thinking' && d > 1.2) pick = { clip: 'think', w: 0.85 };
+        else if ((emo === 'laugh' || /\b(ja ?ja|je ?je)\b/.test(txt)) && d > 0.8) pick = { clip: 'laugh-body', loop: true, w: 0.7 };
+        else if (txt.includes('?') && d > 1.0) pick = { clip: emo === 'surprise' || emo === 'worried' || h < 0.4 ? 'shrug' : 'present', w: 0.75, at: Math.max(0.2, d - 1.4) };
+        else if (/\b(mira|fíjate|toma|aquí|esto|este|esta)\b/.test(txt) && d > 1.0) pick = { clip: 'present', w: 0.8, at: 0.15 };
+        else if (/\b(da igual|bah|olvídalo|déjalo|tranquil[oa])\b/.test(txt) && d > 0.9) pick = { clip: 'dismiss', w: 0.8, at: 0.2 };
+        else if (d >= 1.8) pick = { clip: 'explain', loop: true, w: 0.45 + 0.3 * h };
+        if (pick && pick.clip === lastAuto.get(l.actor) && pick.clip !== 'explain' && !pick.loop) pick = d >= 1.8 && hands ? { clip: 'explain', loop: true, w: 0.5 } : null;
+        if (pick) {
+          const st = s + (pick.at ?? 0.12);
+          add(tl, pick.clip, st, pick.loop ? Math.max(st + 0.8, e - 0.1) : e + 0.6, pick.w * Math.min(1.2, l.intensity), pick.loop);
+          // a long explained line also gets an emphasis nod on its last stretch
+          if (pick.clip === 'explain' && d > 3.2) add(tl, 'nod', e - 1.1, e, 0.5);
+        }
+      }
+      // listeners: an agreeing nod late in long, non-hostile lines (deterministic: about half of them)
+      if (d >= 2.0 && !['angry', 'sad', 'fear', 'disgust'].includes(emo)) for (const other of actors) {
+        if (other.id === l.actor || (l.to && other.id !== l.to)) continue;
+        if (hash01(l.id, other.id) > 0.55 || busy(other, e - 1.2, e) || other.speech.some(x => x.start < e && x.end > e - 1.2)) continue;
+        add(other, 'nod', e - 1.0 - 0.3 * hash01(other.id, l.id), e + 0.2, 0.55);
+      }
+    }
+  }
   // explicit looks must win over automatic ones: evaluate auto first
   for (const a of actors) a.looks.sort((x, y) => (x.source === 'auto' ? 0 : 1) - (y.source === 'auto' ? 0 : 1) || x.start - y.start);
 
   // ---------------- shots
   const shotItems = items.filter(i => i.kind === 'shot').sort((a, b) => a.start! - b.start!);
   resolved.shots = shotItems.map((it, i): ResolvedShot => { const sh = it.data as Shot; return { id: sh.id, start: clamp(it.start!, 0, duration), end: i + 1 < shotItems.length ? clamp(shotItems[i + 1].start!, 0, duration) : duration, camera: sh.camera, transitionIn: sh.transitionIn }; }).filter(s => s.end - s.start > 1e-3);
+  if (scene.coverage === 'auto') resolved.shots = autoCoverage(resolved.shots, shotItems.map(i => i.data as Shot));
+  function autoCoverage(inserts: ResolvedShot[], src: Shot[]): ResolvedShot[] {
+    const ids = actors.map(a => a.id);
+    const at = (id: string, t: number) => rootStateAt(actor(id), t);
+    // which side of the A-B line the audience sits on: towards +z (the open side of the sets), consistently
+    const sideFor = (over: string, subj: string, t: number): 'left' | 'right' => {
+      const a = at(over, t), b = at(subj, t), ax = b[0] - a[0], az = b[2] - a[2];
+      const rx = az, rz = -ax; // camera.ts "right" for side=right
+      return (Math.abs(rz) > 1e-3 ? rz : rx) > 0 ? 'right' : 'left';
+    };
+    const singleSide = (subj: string, other: string | undefined, t: number): 'left' | 'right' => {
+      if (!other) return 'right';
+      // camera.ts puts a single at facing+22deg (right) or facing-22deg (left): pick the one on the audience side
+      const a = at(subj, t), b = at(other, t), yaw = Math.atan2(b[0] - a[0], b[2] - a[2]);
+      const zr = Math.cos(yaw + 22 * Math.PI / 180), zl = Math.cos(yaw - 22 * Math.PI / 180);
+      return zr >= zl ? 'right' : 'left';
+    };
+    const lines = scene.dialogue.map(l => ({ l, sp: actor(l.actor).speech.find(x => x.lineId === l.id)! })).filter(x => x.sp).sort((p, q) => p.sp.start - q.sp.start);
+    const out: ResolvedShot[] = [];
+    const push = (id: string, start: number, camera: Shot['camera'], transitionIn?: ResolvedShot['transitionIn']) => {
+      const prev = out[out.length - 1];
+      if (prev && start - prev.start < 1.4) { // never cut faster than 1.4 s: the short line shares the next shot
+        if (out.length === 1) return;
+        const before = out[out.length - 2].camera;
+        const jump = before.subject === camera.subject && before.framing === camera.framing && !before.over && !camera.over;
+        prev.camera = jump && ids.length > 1 ? CameraSchema.parse({ framing: 'two-shot', subjects: [...ids].sort().slice(0, 2), side: 'right' }) : camera; prev.id = id; return;
+      }
+      out.push({ id, start: Math.max(0, start), end: duration, camera, transitionIn });
+    };
+    const firstLine = lines[0]?.sp.start ?? duration;
+    const opening = inserts.find(s => s.start < 0.01);
+    if (!opening) push('auto-establishing', 0, CameraSchema.parse({ framing: ids.length > 1 ? 'wide' : 'full', subjects: ids.length > 1 ? ids : undefined, subject: ids.length === 1 ? ids[0] : undefined, move: { type: 'push-in', amount: 0.08 } }));
+    let n = 0, lastSpeaker = '';
+    for (const { l, sp } of lines) {
+      const s = sp.start - 0.12; // J-cut: picture changes just before the voice
+      if (s < Math.min(firstLine, 2.2) && out.length && !opening) { lastSpeaker = l.actor; continue; } // let the opening breathe
+      if (l.actor === lastSpeaker && sp.end - sp.start < 2.5) continue;
+      const other = l.to && ids.includes(l.to) ? l.to : ids.filter(x => x !== l.actor).sort((p, q) => dist2D(at(p, sp.start), at(l.actor, sp.start)) - dist2D(at(q, sp.start), at(l.actor, sp.start)))[0];
+      const walking = actor(l.actor).root.some(r => r.kind === 'walk' && r.start < sp.end && r.end > sp.start);
+      const emo = resolveEmotion(l.emotion) ?? 'neutral';
+      let cam: Record<string, unknown>;
+      if (walking) cam = { framing: 'medium', subject: l.actor, track: true, side: singleSide(l.actor, other, sp.start) };
+      else if (!other) cam = { framing: n % 2 ? 'medium-close' : 'medium', subject: l.actor };
+      else if (n % 5 === 4) cam = { framing: 'two-shot', subjects: [l.actor, other].sort(), side: 'right' };
+      else if (['surprise', 'angry', 'fear', 'sad'].includes(emo) && l.intensity >= 0.9) cam = { framing: 'close', subject: l.actor, side: singleSide(l.actor, other, sp.start), move: { type: 'push-in', amount: 0.06 } };
+      else if (n % 2 === 0 && dist2D(at(l.actor, sp.start), at(other, sp.start)) < 3) cam = { framing: 'over-shoulder', over: other, subject: l.actor, side: sideFor(other, l.actor, sp.start) };
+      else cam = { framing: 'medium-close', subject: l.actor, side: singleSide(l.actor, other, sp.start) };
+      // same subject and size twice in a row is a jump cut: change the size instead
+      const prev = out[out.length - 1]?.camera;
+      if (prev && prev.subject === cam.subject && prev.framing === cam.framing && !prev.over) cam = { ...cam, framing: cam.framing === 'medium-close' ? 'medium' : 'medium-close', move: undefined };
+      push(`auto-${l.id}`, s, CameraSchema.parse(cam));
+      lastSpeaker = l.actor; n++;
+    }
+    // hand-written shots are inserts: they interrupt coverage for their duration, then the current coverage resumes
+    for (const ins of inserts) {
+      const d = src.find(x => x.id === ins.id)?.durationSec ?? Math.max(1.5, Math.min(4, ins.end - ins.start));
+      const s = ins.start, e = Math.min(duration, s + d);
+      const resume = [...out].reverse().find(x => x.start <= e);
+      const keep = out.filter(x => x.start < s - 1e-6 || x.start >= e - 1e-6);
+      if (resume && resume.start < e && !keep.some(x => Math.abs(x.start - e) < 1e-6) && e < duration - 0.5) keep.push({ ...resume, id: resume.id + '-r', start: e });
+      out.splice(0, out.length, ...keep, { ...ins, start: s, end: e });
+      out.sort((p, q) => p.start - q.start);
+    }
+    // an automatic shot squeezed to a flash between two cuts (< 0.7 s) is dropped: the previous shot holds instead
+    const insertIds = new Set(inserts.map(x => x.id));
+    for (let i = out.length - 2; i >= 1; i--) if (!insertIds.has(out[i].id) && out[i + 1].start - out[i].start < 0.7) out.splice(i, 1);
+    for (let i = 0; i < out.length; i++) out[i].end = i + 1 < out.length ? out[i + 1].start : duration;
+    return out.filter(s => s.end - s.start > 1e-3);
+  }
   if (!resolved.shots.length || resolved.shots[0].start > 0.001) warnings.push(`La escena ${scene.id} no tiene plano en t=0`);
   for (const sh of resolved.shots) for (const ref of [sh.camera.subject, sh.camera.over, ...(sh.camera.subjects ?? [])]) if (ref && !actors.some(a => a.id === ref) && !props.some(p => p.id === ref)) throw new Error(`Plano ${sh.id}: sujeto desconocido ${ref}`);
   // ---------------- subtitles (max 2 lines x 42 chars per cue)

@@ -40,7 +40,7 @@ export interface PropJointAnim { joint: string; start: number; end: number; from
 export interface PropTimeline { id: string; propId: string; scale: number; segments: PropSegment[]; joints: PropJointAnim[] }
 export interface EffectInstance { effect: 'sparks' | 'smoke' | 'flicker' | 'glow' | 'off'; start: number; end: number; prop?: string; part?: string; position?: Vec3; intensity: number; seed: number }
 export interface ResolvedShot { id: string; start: number; end: number; camera: CameraSpec; transitionIn?: { type: 'cut' | 'dissolve' | 'fade' | 'iris' | 'wipe'; durationSec: number } }
-export interface AudioCue { id: string; kind: 'dialogue' | 'sfx' | 'ambience' | 'music'; sound: string; start: number; duration: number; gainDb: number; fadeIn: number; fadeOut: number; pan: number; duck: boolean; file?: string; actor?: string; text?: string; auto?: boolean }
+export interface AudioCue { id: string; kind: 'dialogue' | 'sfx' | 'ambience' | 'music'; sound: string; start: number; duration: number; gainDb: number; fadeIn: number; fadeOut: number; pan: number; duck: boolean; file?: string; actor?: string; text?: string; auto?: boolean; /** a foreground musical moment (theme, bumper, sting): not dead air */ feature?: boolean }
 
 export interface AssetLibrary {
   characters: Record<string, { geometry: CharacterGeometry; rigOffsets: Record<string, Vec3>; legacy?: unknown; clips: Record<string, ClipV2>; locomotion: Record<string, Locomotion>; expressions: Record<string, ExpressionV2> }>;
