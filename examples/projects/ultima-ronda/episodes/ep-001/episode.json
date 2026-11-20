@@ -1,0 +1,45 @@
+{
+  "schemaVersion": 2,
+  "id": "ep-001",
+  "type": "episode",
+  "name": "Punto dos",
+  "number": 1,
+  "scenes": [
+    "sc-001",
+    "sc-002",
+    "sc-003"
+  ],
+  "targetDurationSec": 150,
+  "score": {
+    "theme": {
+      "music": "sirena-tema",
+      "gainDb": -12,
+      "durationSec": 8,
+      "fadeOut": 3
+    },
+    "underscore": {
+      "music": "sirena-cama",
+      "gainDb": -21
+    },
+    "bumpers": {
+      "music": "sirena-cortinilla",
+      "gainDb": -12,
+      "durationSec": 4.2,
+      "leadSec": 0.35
+    },
+    "ending": {
+      "music": "sirena-tema",
+      "gainDb": -12,
+      "durationSec": 7,
+      "fadeOut": 2
+    }
+  },
+  "render": {
+    "width": 1920,
+    "height": 1080,
+    "fps": 24,
+    "sampleRate": 48000,
+    "loudnessLufs": -16
+  },
+  "status": "draft"
+}

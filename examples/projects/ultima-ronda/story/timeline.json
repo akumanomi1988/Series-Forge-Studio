@@ -1,0 +1,10 @@
+{
+  "schemaVersion": 1,
+  "events": [
+    {
+      "id": "reforma-sirena",
+      "episode": "canon",
+      "text": "Dani termina la reforma del Sirena."
+    }
+  ]
+}

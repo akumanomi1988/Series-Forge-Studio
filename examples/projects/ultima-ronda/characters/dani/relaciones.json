@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 2,
+  "relations": [
+    {
+      "characterId": "vera",
+      "type": "la dueña del bar",
+      "feeling": "enamorado en silencio",
+      "trust": 0.6,
+      "history": [
+        "Reformó el Sirena para ella."
+      ]
+    }
+  ]
+}

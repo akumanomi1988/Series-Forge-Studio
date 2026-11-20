@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 2,
+  "id": "sirena-cortinilla",
+  "kind": "music",
+  "generator": "procedural",
+  "license": {
+    "id": "procedural-original",
+    "source": "Series Forge procedural composer",
+    "commercialUse": "allowed"
+  },
+  "style": "lounge",
+  "form": "sting",
+  "tempo": 112,
+  "key": "F",
+  "mode": "dorian",
+  "sevenths": true,
+  "swing": 0.3,
+  "progression": [
+    "iv",
+    "v"
+  ],
+  "instruments": [
+    "keys",
+    "bass",
+    "brushes",
+    "lead",
+    "strings"
+  ],
+  "seed": 9,
+  "durationSec": 4.2,
+  "mood": "cortinilla entre escenas"
+}

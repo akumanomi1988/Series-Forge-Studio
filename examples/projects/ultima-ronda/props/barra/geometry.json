@@ -1,0 +1,129 @@
+{
+  "schemaVersion": 2,
+  "generator": "parts",
+  "material": "wood",
+  "parts": [
+    {
+      "id": "cuerpo",
+      "primitive": "box",
+      "size": [
+        0.5,
+        1,
+        2.8
+      ],
+      "position": [
+        0,
+        0.5,
+        0
+      ],
+      "color": "#3a1d14"
+    },
+    {
+      "id": "frente",
+      "primitive": "box",
+      "size": [
+        0.02,
+        0.86,
+        2.7
+      ],
+      "position": [
+        0.26,
+        0.5,
+        0
+      ],
+      "color": "#5a2c1e"
+    },
+    {
+      "id": "encimera",
+      "primitive": "roundedBox",
+      "size": [
+        0.62,
+        0.06,
+        2.92
+      ],
+      "position": [
+        0.03,
+        1.03,
+        0
+      ],
+      "color": "#1f0f0b"
+    },
+    {
+      "id": "led",
+      "primitive": "box",
+      "size": [
+        0.01,
+        0.025,
+        2.8
+      ],
+      "position": [
+        0.335,
+        0.97,
+        0
+      ],
+      "color": "#ffb36b",
+      "emissive": "#ffb36b",
+      "emissiveIntensity": 1.6,
+      "outline": false
+    },
+    {
+      "id": "reposapies",
+      "primitive": "cylinder",
+      "size": [
+        0.022,
+        2.7,
+        0.022
+      ],
+      "position": [
+        0.42,
+        0.22,
+        0
+      ],
+      "color": "#c9a24a",
+      "rotationDeg": [
+        90,
+        0,
+        0
+      ]
+    },
+    {
+      "id": "fregadero",
+      "primitive": "box",
+      "size": [
+        0.3,
+        0.02,
+        0.45
+      ],
+      "position": [
+        -0.08,
+        1.065,
+        -0.9
+      ],
+      "color": "#8a9096",
+      "outline": false
+    }
+  ],
+  "anchors": {
+    "top": {
+      "position": [
+        0.05,
+        1.06,
+        0
+      ]
+    },
+    "cliente": {
+      "position": [
+        0.12,
+        1.06,
+        0.55
+      ]
+    },
+    "vera": {
+      "position": [
+        -0.14,
+        1.06,
+        0.62
+      ]
+    }
+  }
+}

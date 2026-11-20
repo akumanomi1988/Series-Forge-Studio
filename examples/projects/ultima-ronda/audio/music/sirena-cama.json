@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 2,
+  "id": "sirena-cama",
+  "kind": "music",
+  "generator": "procedural",
+  "license": {
+    "id": "procedural-original",
+    "source": "Series Forge procedural composer",
+    "commercialUse": "allowed"
+  },
+  "style": "bossa",
+  "tempo": 118,
+  "key": "F",
+  "mode": "dorian",
+  "sevenths": true,
+  "progression": [
+    "i",
+    "iv",
+    "VII",
+    "III"
+  ],
+  "instruments": [
+    "guitar",
+    "bass",
+    "brushes",
+    "pad"
+  ],
+  "seed": 5,
+  "durationSec": 60,
+  "mood": "bossa suave bajo los diálogos"
+}

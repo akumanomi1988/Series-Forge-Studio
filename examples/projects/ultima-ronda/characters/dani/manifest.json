@@ -1,0 +1,13 @@
+{
+  "schemaVersion": 2,
+  "id": "dani",
+  "type": "character",
+  "name": "Dani Ferrer",
+  "rigType": "humanoid",
+  "age": 37,
+  "tags": [
+    "protagonista",
+    "arquitecto",
+    "cliente habitual"
+  ]
+}

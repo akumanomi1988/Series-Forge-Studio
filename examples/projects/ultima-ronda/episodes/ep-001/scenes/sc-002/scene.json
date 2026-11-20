@@ -1,0 +1,539 @@
+{
+  "schemaVersion": 2,
+  "id": "sc-002",
+  "name": "La lista",
+  "synopsis": "El elogio fallido, la servilleta leída en voz alta, el apagón y la retirada por la lámpara.",
+  "environmentId": "sirena",
+  "durationSec": "auto",
+  "tailSec": 0.6,
+  "autoLook": true,
+  "autoActing": 1,
+  "coverage": "auto",
+  "actors": [
+    {
+      "id": "vera",
+      "characterId": "vera",
+      "position": [
+        -1.78,
+        0,
+        0.32
+      ],
+      "yawDeg": 90,
+      "expression": "smirk",
+      "idle": "idle-relaxed"
+    },
+    {
+      "id": "dani",
+      "characterId": "dani",
+      "position": [
+        0.2,
+        0,
+        0.35
+      ],
+      "yawDeg": -90,
+      "expression": "nervous",
+      "idle": "idle"
+    }
+  ],
+  "props": [
+    {
+      "id": "copa",
+      "propId": "copa",
+      "on": {
+        "prop": "barra",
+        "anchor": "cliente"
+      }
+    },
+    {
+      "id": "coctelera",
+      "propId": "coctelera",
+      "position": [
+        -1.36,
+        1.06,
+        1
+      ]
+    },
+    {
+      "id": "servilleta",
+      "propId": "servilleta",
+      "position": [
+        -0.92,
+        1.06,
+        0
+      ]
+    },
+    {
+      "id": "vela-barra",
+      "propId": "vela",
+      "position": [
+        -1.2,
+        1.06,
+        -0.12
+      ]
+    }
+  ],
+  "shots": [
+    {
+      "id": "i-situacion",
+      "at": 0,
+      "durationSec": 2.2,
+      "camera": {
+        "type": "static",
+        "position": [
+          2.7,
+          1.95,
+          3.5
+        ],
+        "target": [
+          -1,
+          1.1,
+          -0.3
+        ],
+        "fov": 40
+      }
+    },
+    {
+      "id": "i-lee",
+      "with": "v10",
+      "offset": -0.1,
+      "durationSec": 2.6,
+      "camera": {
+        "type": "static",
+        "position": [
+          -0.75,
+          1.55,
+          1.15
+        ],
+        "target": [
+          -1.55,
+          1.32,
+          0.42
+        ],
+        "fov": 28
+      },
+      "notes": "Vera lee la servilleta."
+    },
+    {
+      "id": "i-apagon",
+      "with": "apagon-sala",
+      "offset": -0.05,
+      "durationSec": 2.4,
+      "camera": {
+        "type": "static",
+        "position": [
+          2.7,
+          1.95,
+          3.5
+        ],
+        "target": [
+          -1,
+          1.1,
+          -0.3
+        ],
+        "fov": 40
+      },
+      "notes": "El bar se queda a oscuras."
+    },
+    {
+      "id": "i-vela",
+      "with": "v13",
+      "offset": -0.1,
+      "durationSec": 3.2,
+      "camera": {
+        "type": "static",
+        "position": [
+          -0.95,
+          1.42,
+          2.1
+        ],
+        "target": [
+          -1.05,
+          1.28,
+          0.15
+        ],
+        "fov": 36,
+        "move": {
+          "type": "push-in",
+          "amount": 0.12
+        }
+      },
+      "notes": "Los dos a la luz de la vela."
+    }
+  ],
+  "actions": [
+    {
+      "id": "sentado",
+      "type": "sit",
+      "actor": "dani",
+      "at": 0,
+      "prop": "taburete-1",
+      "durationSec": 0.3
+    },
+    {
+      "id": "dani-coge",
+      "type": "pickUp",
+      "actor": "dani",
+      "at": 0.4,
+      "prop": "copa",
+      "hand": "right",
+      "durationSec": 1
+    },
+    {
+      "id": "bebe",
+      "type": "hold",
+      "actor": "dani",
+      "after": "dani-coge",
+      "hand": "right",
+      "pose": "raised",
+      "durationSec": 0.6
+    },
+    {
+      "id": "baja-copa",
+      "type": "hold",
+      "actor": "dani",
+      "after": "bebe",
+      "offset": 0.6,
+      "hand": "right",
+      "pose": "front",
+      "durationSec": 0.6
+    },
+    {
+      "id": "vera-coge-lista",
+      "type": "pickUp",
+      "actor": "vera",
+      "after": "v9",
+      "offset": 0.1,
+      "prop": "servilleta",
+      "hand": "left",
+      "durationSec": 1
+    },
+    {
+      "id": "vera-lee",
+      "type": "hold",
+      "actor": "vera",
+      "after": "vera-coge-lista",
+      "hand": "left",
+      "pose": "show",
+      "durationSec": 0.6
+    },
+    {
+      "id": "vera-mira-lista",
+      "type": "lookAt",
+      "actor": "vera",
+      "with": "vera-lee",
+      "target": {
+        "actor": "vera",
+        "bone": "leftHand"
+      },
+      "mode": "head",
+      "durationSec": 2.6
+    },
+    {
+      "id": "dani-tapa",
+      "type": "play",
+      "actor": "dani",
+      "with": "d10",
+      "clip": "facepalm",
+      "durationSec": 1.6
+    },
+    {
+      "id": "click-apagon",
+      "type": "effect",
+      "effect": "flicker",
+      "prop": "lampara-1",
+      "after": "v11",
+      "offset": 0.15,
+      "durationSec": 0.35
+    },
+    {
+      "id": "apagon-sala",
+      "type": "effect",
+      "effect": "off",
+      "after": "v11",
+      "offset": 0.5,
+      "durationSec": 600
+    },
+    {
+      "id": "apagon-lampara-1",
+      "type": "effect",
+      "effect": "off",
+      "prop": "lampara-1",
+      "after": "v11",
+      "offset": 0.5,
+      "durationSec": 600
+    },
+    {
+      "id": "apagon-lampara-2",
+      "type": "effect",
+      "effect": "off",
+      "prop": "lampara-2",
+      "after": "v11",
+      "offset": 0.5,
+      "durationSec": 600
+    },
+    {
+      "id": "apagon-neon-borde",
+      "type": "effect",
+      "effect": "off",
+      "prop": "neon",
+      "part": "borde",
+      "after": "v11",
+      "offset": 0.5,
+      "durationSec": 600
+    },
+    {
+      "id": "apagon-neon-caliz-l",
+      "type": "effect",
+      "effect": "off",
+      "prop": "neon",
+      "part": "caliz-l",
+      "after": "v11",
+      "offset": 0.5,
+      "durationSec": 600
+    },
+    {
+      "id": "apagon-neon-caliz-r",
+      "type": "effect",
+      "effect": "off",
+      "prop": "neon",
+      "part": "caliz-r",
+      "after": "v11",
+      "offset": 0.5,
+      "durationSec": 600
+    },
+    {
+      "id": "apagon-neon-tallo",
+      "type": "effect",
+      "effect": "off",
+      "prop": "neon",
+      "part": "tallo",
+      "after": "v11",
+      "offset": 0.5,
+      "durationSec": 600
+    },
+    {
+      "id": "apagon-neon-pie",
+      "type": "effect",
+      "effect": "off",
+      "prop": "neon",
+      "part": "pie",
+      "after": "v11",
+      "offset": 0.5,
+      "durationSec": 600
+    },
+    {
+      "id": "apagon-neon-aceituna",
+      "type": "effect",
+      "effect": "off",
+      "prop": "neon",
+      "part": "aceituna",
+      "after": "v11",
+      "offset": 0.5,
+      "durationSec": 600
+    },
+    {
+      "id": "apagon-led",
+      "type": "effect",
+      "effect": "off",
+      "prop": "barra",
+      "part": "led",
+      "after": "v11",
+      "offset": 0.5,
+      "durationSec": 600
+    },
+    {
+      "id": "apagon-botellero",
+      "type": "effect",
+      "effect": "off",
+      "prop": "botellero",
+      "part": "fondo",
+      "after": "v11",
+      "offset": 0.5,
+      "durationSec": 600
+    },
+    {
+      "id": "vera-se-acerca",
+      "type": "walk",
+      "actor": "vera",
+      "after": "d11",
+      "offset": 0.1,
+      "to": [
+        -1.62,
+        0,
+        0.2
+      ],
+      "faceTo": "dani",
+      "gait": "walk"
+    },
+    {
+      "id": "vera-suelta-lista",
+      "type": "place",
+      "actor": "vera",
+      "with": "vera-se-acerca",
+      "prop": "servilleta",
+      "on": [
+        -1.25,
+        1.06,
+        0.2
+      ],
+      "durationSec": 0.8
+    },
+    {
+      "id": "vera-decepcion",
+      "type": "expression",
+      "actor": "vera",
+      "with": "v14",
+      "expression": "sad",
+      "intensity": 0.7,
+      "durationSec": 1.4
+    }
+  ],
+  "dialogue": [
+    {
+      "id": "d7",
+      "actor": "dani",
+      "text": "Esto es increíble. Es dulce y luego te da una bofetada.",
+      "emotion": "joy",
+      "to": "vera",
+      "after": "bebe",
+      "offset": 0.3
+    },
+    {
+      "id": "v7",
+      "actor": "vera",
+      "text": "Como yo.",
+      "emotion": "smirk",
+      "to": "dani",
+      "intensity": 1.3
+    },
+    {
+      "id": "d8",
+      "actor": "dani",
+      "text": "¡Ja! Sí. No. Quiero decir... Hace buena noche, ¿eh? Fresquita.",
+      "emotion": "nervous",
+      "to": "vera",
+      "intensity": 1.2
+    },
+    {
+      "id": "v9",
+      "actor": "vera",
+      "text": "¿Eso es una lista?",
+      "emotion": "surprise",
+      "to": "dani",
+      "intensity": 0.6
+    },
+    {
+      "id": "d9",
+      "actor": "dani",
+      "text": "No. Es una servilleta.",
+      "emotion": "fear",
+      "to": "vera"
+    },
+    {
+      "id": "v10",
+      "actor": "vera",
+      "text": "Punto tres: no hablar del tiempo. Llevas cuatro segundos incumpliéndolo.",
+      "emotion": "smirk",
+      "to": "dani",
+      "after": "vera-lee",
+      "offset": -0.2
+    },
+    {
+      "id": "d10",
+      "actor": "dani",
+      "text": "Que me trague el suelo. El suelo que yo mismo diseñé.",
+      "emotion": "sad",
+      "to": "vera"
+    },
+    {
+      "id": "v11",
+      "actor": "vera",
+      "text": "Lo diseñaste muy bien. ¿Y el punto dos?",
+      "emotion": "smirk",
+      "to": "dani",
+      "intensity": 1.2
+    },
+    {
+      "id": "d11",
+      "actor": "dani",
+      "text": "¿Eso... lo he hecho yo?",
+      "emotion": "surprise",
+      "to": "vera",
+      "with": "apagon-sala",
+      "offset": 0.7
+    },
+    {
+      "id": "v12",
+      "actor": "vera",
+      "text": "Salta el automático cada vez que alguien tarda demasiado en decir algo.",
+      "emotion": "smirk",
+      "to": "dani",
+      "direction": "en voz baja"
+    },
+    {
+      "id": "d12",
+      "actor": "dani",
+      "text": "A oscuras es más fácil. No te veo la cara de saber lo que voy a decir.",
+      "emotion": "thinking",
+      "to": "vera",
+      "direction": "en voz baja"
+    },
+    {
+      "id": "v13",
+      "actor": "vera",
+      "text": "Entonces dilo antes de que vuelva la luz.",
+      "emotion": "smirk",
+      "to": "dani",
+      "direction": "susurrando",
+      "intensity": 1.3
+    },
+    {
+      "id": "d13",
+      "actor": "dani",
+      "text": "Vale. Vera. Hace tres meses que vengo a revisar la iluminación porque...",
+      "emotion": "nervous",
+      "to": "vera"
+    },
+    {
+      "id": "d14",
+      "actor": "dani",
+      "text": "...porque la lámpara de la izquierda zumba. Mañana te la cambio.",
+      "emotion": "nervous",
+      "to": "vera",
+      "pauseAfter": 0.5
+    },
+    {
+      "id": "v14",
+      "actor": "vera",
+      "text": "La lámpara. Claro.",
+      "emotion": "sad",
+      "to": "dani",
+      "intensity": 0.8
+    }
+  ],
+  "sound": [
+    {
+      "id": "ambiente",
+      "kind": "ambience",
+      "sound": "room-tone",
+      "at": 0,
+      "gainDb": -27,
+      "fadeIn": 0.3,
+      "fadeOut": 0.3
+    },
+    {
+      "id": "clic",
+      "kind": "sfx",
+      "sound": "click",
+      "with": "apagon-sala",
+      "gainDb": -4
+    },
+    {
+      "id": "zumbido-muere",
+      "kind": "sfx",
+      "sound": "whoosh",
+      "with": "apagon-sala",
+      "gainDb": -16
+    }
+  ]
+}

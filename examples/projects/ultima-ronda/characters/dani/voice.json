@@ -1,0 +1,50 @@
+{
+  "schemaVersion": 2,
+  "provider": "kokoro",
+  "voice": "em_santa",
+  "language": "es-ES",
+  "rate": 1,
+  "pitchSemitones": 0,
+  "formantPreserve": true,
+  "gainDb": 0,
+  "eq": {
+    "lowDb": 1,
+    "midDb": 0,
+    "highDb": 0
+  },
+  "emotionProsody": true,
+  "instruct": "Friendly male voice, a bit shy and self-deprecating",
+  "alternatives": {
+    "voicebox": {
+      "voice": "Dani",
+      "engine": "qwen",
+      "instruct": "Friendly male voice, a bit shy and self-deprecating",
+      "license": {
+        "id": "depende-del-motor",
+        "commercialUse": "unknown",
+        "notes": "Voicebox (MIT): la licencia depende del motor y de la muestra de voz. Usa solo muestras propias o con permiso."
+      }
+    },
+    "windows-onecore": {
+      "voice": "Microsoft Pablo",
+      "rate": 1,
+      "pitchSemitones": -1,
+      "license": {
+        "id": "windows-onecore-voices",
+        "commercialUse": "unknown",
+        "notes": "Voz del sistema Windows: revisar términos antes de uso comercial."
+      }
+    }
+  },
+  "emotions": {
+    "nervous": {
+      "rate": 1.08,
+      "instruct": "nervous, rushing the words"
+    }
+  },
+  "license": {
+    "id": "Apache-2.0",
+    "commercialUse": "allowed",
+    "notes": "Kokoro-82M (hexgrad/Kokoro-82M, Apache-2.0) vía kokoro-onnx (MIT). Mezcla de estilos de voz incluida en el modelo."
+  }
+}

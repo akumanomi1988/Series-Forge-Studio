@@ -1,0 +1,37 @@
+{
+  "schemaVersion": 2,
+  "id": "sirena-tema",
+  "kind": "music",
+  "generator": "procedural",
+  "license": {
+    "id": "procedural-original",
+    "source": "Series Forge procedural composer",
+    "commercialUse": "allowed"
+  },
+  "style": "lounge",
+  "tempo": 96,
+  "key": "F",
+  "mode": "dorian",
+  "sevenths": true,
+  "swing": 0.33,
+  "progression": [
+    "i",
+    "iv",
+    "VII",
+    "III",
+    "VI",
+    "ii",
+    "v",
+    "i"
+  ],
+  "instruments": [
+    "keys",
+    "bass",
+    "brushes",
+    "snaps",
+    "lead"
+  ],
+  "seed": 21,
+  "durationSec": 40,
+  "mood": "lounge nocturno, coqueto"
+}

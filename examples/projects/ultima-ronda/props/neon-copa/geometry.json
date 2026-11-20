@@ -1,0 +1,135 @@
+{
+  "schemaVersion": 2,
+  "generator": "parts",
+  "material": "glass",
+  "parts": [
+    {
+      "id": "borde",
+      "primitive": "torus",
+      "size": [
+        0.32,
+        0.018,
+        0
+      ],
+      "position": [
+        0,
+        0.55,
+        0
+      ],
+      "color": "#ff4fa8",
+      "rotationDeg": [
+        90,
+        0,
+        0
+      ],
+      "emissive": "#ff4fa8",
+      "emissiveIntensity": 3,
+      "outline": false
+    },
+    {
+      "id": "caliz-l",
+      "primitive": "cylinder",
+      "size": [
+        0.018,
+        0.5,
+        0.018
+      ],
+      "position": [
+        -0.15,
+        0.33,
+        0
+      ],
+      "color": "#ff4fa8",
+      "rotationDeg": [
+        0,
+        0,
+        -34
+      ],
+      "emissive": "#ff4fa8",
+      "emissiveIntensity": 3,
+      "outline": false
+    },
+    {
+      "id": "caliz-r",
+      "primitive": "cylinder",
+      "size": [
+        0.018,
+        0.5,
+        0.018
+      ],
+      "position": [
+        0.15,
+        0.33,
+        0
+      ],
+      "color": "#ff4fa8",
+      "rotationDeg": [
+        0,
+        0,
+        34
+      ],
+      "emissive": "#ff4fa8",
+      "emissiveIntensity": 3,
+      "outline": false
+    },
+    {
+      "id": "tallo",
+      "primitive": "cylinder",
+      "size": [
+        0.018,
+        0.34,
+        0.018
+      ],
+      "position": [
+        0,
+        -0.04,
+        0
+      ],
+      "color": "#ff4fa8",
+      "emissive": "#ff4fa8",
+      "emissiveIntensity": 3,
+      "outline": false
+    },
+    {
+      "id": "pie",
+      "primitive": "cylinder",
+      "size": [
+        0.018,
+        0.34,
+        0.018
+      ],
+      "position": [
+        0,
+        -0.21,
+        0
+      ],
+      "color": "#ff4fa8",
+      "rotationDeg": [
+        0,
+        0,
+        90
+      ],
+      "emissive": "#ff4fa8",
+      "emissiveIntensity": 3,
+      "outline": false
+    },
+    {
+      "id": "aceituna",
+      "primitive": "sphere",
+      "size": [
+        0.06,
+        0.06,
+        0.06
+      ],
+      "position": [
+        0.08,
+        0.5,
+        0
+      ],
+      "color": "#7dff8a",
+      "emissive": "#7dff8a",
+      "emissiveIntensity": 2.5,
+      "outline": false
+    }
+  ]
+}

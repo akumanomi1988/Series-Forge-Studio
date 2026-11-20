@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 2,
+  "id": "sirena-romance",
+  "kind": "music",
+  "generator": "procedural",
+  "license": {
+    "id": "procedural-original",
+    "source": "Series Forge procedural composer",
+    "commercialUse": "allowed"
+  },
+  "style": "lounge",
+  "tempo": 76,
+  "key": "A#",
+  "mode": "major",
+  "sevenths": true,
+  "swing": 0.2,
+  "progression": [
+    "I",
+    "vi",
+    "ii",
+    "V"
+  ],
+  "instruments": [
+    "keys",
+    "strings",
+    "bass",
+    "lead"
+  ],
+  "seed": 33,
+  "durationSec": 30,
+  "mood": "momento romántico"
+}

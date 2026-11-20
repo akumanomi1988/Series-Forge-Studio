@@ -1,0 +1,69 @@
+{
+  "schemaVersion": 1,
+  "facts": [
+    {
+      "id": "sirena",
+      "text": "Vera Montero es la dueña del bar de cócteles Sirena, que cierra a las dos.",
+      "since": "canon",
+      "status": "canon",
+      "amended": []
+    },
+    {
+      "id": "reforma",
+      "text": "Dani Ferrer, arquitecto, reformó el Sirena hace tres meses.",
+      "since": "canon",
+      "status": "canon",
+      "amended": []
+    },
+    {
+      "id": "doce-menos-cinco",
+      "text": "Desde la reforma, Dani llega al Sirena cada noche a las doce menos cinco.",
+      "since": "canon",
+      "status": "canon",
+      "amended": []
+    }
+  ],
+  "characters": {
+    "vera": {
+      "knows": [
+        "sirena",
+        "reforma",
+        "doce-menos-cinco"
+      ],
+      "emotionalState": "curiosa",
+      "goals": [
+        "Que Dani se atreva de una vez"
+      ],
+      "arc": []
+    },
+    "dani": {
+      "knows": [
+        "sirena",
+        "reforma",
+        "doce-menos-cinco"
+      ],
+      "emotionalState": "nervioso",
+      "goals": [
+        "Invitar a Vera a cenar"
+      ],
+      "arc": []
+    }
+  },
+  "relationships": [
+    {
+      "a": "vera",
+      "b": "dani",
+      "type": "clienta y cliente que se gustan",
+      "trust": 0.55,
+      "history": []
+    },
+    {
+      "a": "dani",
+      "b": "vera",
+      "type": "cliente enamorado",
+      "trust": 0.6,
+      "history": []
+    }
+  ],
+  "confirmedEpisodes": []
+}

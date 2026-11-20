@@ -1,0 +1,15 @@
+{
+  "schemaVersion": 2,
+  "relations": [
+    {
+      "characterId": "dani",
+      "type": "cliente habitual",
+      "feeling": "curiosidad y ganas",
+      "trust": 0.55,
+      "history": [
+        "Dani reformó el Sirena.",
+        "Lleva tres meses viniendo a las doce menos cinco."
+      ]
+    }
+  ]
+}

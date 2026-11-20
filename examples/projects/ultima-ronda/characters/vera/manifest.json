@@ -1,0 +1,13 @@
+{
+  "schemaVersion": 2,
+  "id": "vera",
+  "type": "character",
+  "name": "Vera Montero",
+  "rigType": "humanoid",
+  "age": 34,
+  "tags": [
+    "protagonista",
+    "coctelera",
+    "dueña del Sirena"
+  ]
+}

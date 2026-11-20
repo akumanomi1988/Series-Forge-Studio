@@ -1,0 +1,59 @@
+{
+  "schemaVersion": 2,
+  "provider": "kokoro",
+  "voice": "ef_dora:0.8+af_nicole:0.2",
+  "language": "es-ES",
+  "rate": 0.95,
+  "pitchSemitones": -0.8,
+  "formantPreserve": true,
+  "gainDb": 0,
+  "eq": {
+    "lowDb": 1.5,
+    "midDb": 0,
+    "highDb": -1
+  },
+  "emotionProsody": true,
+  "instruct": "Warm, low, slightly husky female voice; confident, amused and teasing",
+  "alternatives": {
+    "voicebox": {
+      "voice": "Vera",
+      "engine": "qwen",
+      "instruct": "Warm, low, slightly husky female voice; confident, amused and teasing",
+      "license": {
+        "id": "depende-del-motor",
+        "commercialUse": "unknown",
+        "notes": "Voicebox (MIT): la licencia depende del motor y de la muestra de voz. Usa solo muestras propias o con permiso."
+      }
+    },
+    "windows-onecore": {
+      "voice": "Microsoft Laura",
+      "rate": 0.98,
+      "pitchSemitones": -1,
+      "license": {
+        "id": "windows-onecore-voices",
+        "commercialUse": "unknown",
+        "notes": "Voz del sistema Windows: revisar términos antes de uso comercial."
+      }
+    }
+  },
+  "emotions": {
+    "smirk": {
+      "voice": "ef_dora:0.72+af_nicole:0.28",
+      "rate": 0.9,
+      "instruct": "teasing, half-smiling, unhurried, a little breathy"
+    },
+    "joy": {
+      "rate": 1,
+      "pitchSemitones": 0.6
+    },
+    "surprise": {
+      "rate": 1.02,
+      "pitchSemitones": 1
+    }
+  },
+  "license": {
+    "id": "Apache-2.0",
+    "commercialUse": "allowed",
+    "notes": "Kokoro-82M (hexgrad/Kokoro-82M, Apache-2.0) vía kokoro-onnx (MIT). Mezcla de estilos de voz incluida en el modelo."
+  }
+}

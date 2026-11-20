@@ -1,0 +1,470 @@
+{
+  "schemaVersion": 2,
+  "id": "sc-003",
+  "name": "Punto dos",
+  "synopsis": "Dani se va, Vera le frena; la invitación, la confesión, vuelve la luz y el nombre del cóctel.",
+  "environmentId": "sirena",
+  "durationSec": "auto",
+  "tailSec": 0.6,
+  "autoLook": true,
+  "autoActing": 1,
+  "coverage": "auto",
+  "actors": [
+    {
+      "id": "vera",
+      "characterId": "vera",
+      "position": [
+        -1.62,
+        0,
+        0.2
+      ],
+      "yawDeg": 80,
+      "expression": "sad",
+      "idle": "idle-relaxed"
+    },
+    {
+      "id": "dani",
+      "characterId": "dani",
+      "position": [
+        0.2,
+        0,
+        0.35
+      ],
+      "yawDeg": -90,
+      "expression": "nervous",
+      "idle": "idle"
+    }
+  ],
+  "props": [
+    {
+      "id": "copa",
+      "propId": "copa",
+      "on": {
+        "prop": "barra",
+        "anchor": "cliente"
+      }
+    },
+    {
+      "id": "coctelera",
+      "propId": "coctelera",
+      "position": [
+        -1.36,
+        1.06,
+        1
+      ]
+    },
+    {
+      "id": "servilleta",
+      "propId": "servilleta",
+      "position": [
+        -1.25,
+        1.06,
+        0.2
+      ]
+    },
+    {
+      "id": "vela-barra",
+      "propId": "vela",
+      "position": [
+        -1.2,
+        1.06,
+        -0.12
+      ]
+    }
+  ],
+  "shots": [
+    {
+      "id": "i-oscuro",
+      "at": 0,
+      "durationSec": 2.2,
+      "camera": {
+        "type": "static",
+        "position": [
+          -0.95,
+          1.42,
+          2.1
+        ],
+        "target": [
+          -1.05,
+          1.28,
+          0.15
+        ],
+        "fov": 36
+      }
+    },
+    {
+      "id": "i-se-va",
+      "with": "dani-se-va",
+      "offset": 0.3,
+      "durationSec": 2.4,
+      "camera": {
+        "type": "static",
+        "position": [
+          2.7,
+          1.95,
+          3.5
+        ],
+        "target": [
+          -1,
+          1.1,
+          -0.3
+        ],
+        "fov": 40
+      },
+      "notes": "Dani camina hacia la puerta."
+    },
+    {
+      "id": "i-luz",
+      "with": "luz-vuelve",
+      "offset": -0.05,
+      "durationSec": 2,
+      "camera": {
+        "type": "static",
+        "position": [
+          1.2,
+          1.55,
+          0.6
+        ],
+        "target": [
+          0.6,
+          2,
+          -3.1
+        ],
+        "fov": 30
+      },
+      "notes": "Vuelve el neón."
+    },
+    {
+      "id": "i-final",
+      "with": "v19",
+      "offset": -0.2,
+      "durationSec": 6,
+      "camera": {
+        "type": "static",
+        "position": [
+          -0.9,
+          1.5,
+          2.9
+        ],
+        "target": [
+          -1,
+          1.22,
+          0.2
+        ],
+        "fov": 38,
+        "move": {
+          "type": "pull-out",
+          "amount": 0.25
+        }
+      },
+      "notes": "Remate."
+    }
+  ],
+  "actions": [
+    {
+      "id": "sentado",
+      "type": "sit",
+      "actor": "dani",
+      "at": 0,
+      "prop": "taburete-1",
+      "durationSec": 0.3
+    },
+    {
+      "id": "oscuro-sala",
+      "type": "effect",
+      "effect": "off",
+      "at": 0,
+      "until": "luz-vuelve"
+    },
+    {
+      "id": "oscuro-lampara-1",
+      "type": "effect",
+      "effect": "off",
+      "prop": "lampara-1",
+      "at": 0,
+      "until": "luz-vuelve"
+    },
+    {
+      "id": "oscuro-lampara-2",
+      "type": "effect",
+      "effect": "off",
+      "prop": "lampara-2",
+      "at": 0,
+      "until": "luz-vuelve"
+    },
+    {
+      "id": "oscuro-neon-borde",
+      "type": "effect",
+      "effect": "off",
+      "prop": "neon",
+      "part": "borde",
+      "at": 0,
+      "until": "luz-vuelve"
+    },
+    {
+      "id": "oscuro-neon-caliz-l",
+      "type": "effect",
+      "effect": "off",
+      "prop": "neon",
+      "part": "caliz-l",
+      "at": 0,
+      "until": "luz-vuelve"
+    },
+    {
+      "id": "oscuro-neon-caliz-r",
+      "type": "effect",
+      "effect": "off",
+      "prop": "neon",
+      "part": "caliz-r",
+      "at": 0,
+      "until": "luz-vuelve"
+    },
+    {
+      "id": "oscuro-neon-tallo",
+      "type": "effect",
+      "effect": "off",
+      "prop": "neon",
+      "part": "tallo",
+      "at": 0,
+      "until": "luz-vuelve"
+    },
+    {
+      "id": "oscuro-neon-pie",
+      "type": "effect",
+      "effect": "off",
+      "prop": "neon",
+      "part": "pie",
+      "at": 0,
+      "until": "luz-vuelve"
+    },
+    {
+      "id": "oscuro-neon-aceituna",
+      "type": "effect",
+      "effect": "off",
+      "prop": "neon",
+      "part": "aceituna",
+      "at": 0,
+      "until": "luz-vuelve"
+    },
+    {
+      "id": "oscuro-led",
+      "type": "effect",
+      "effect": "off",
+      "prop": "barra",
+      "part": "led",
+      "at": 0,
+      "until": "luz-vuelve"
+    },
+    {
+      "id": "oscuro-botellero",
+      "type": "effect",
+      "effect": "off",
+      "prop": "botellero",
+      "part": "fondo",
+      "at": 0,
+      "until": "luz-vuelve"
+    },
+    {
+      "id": "dani-se-levanta",
+      "type": "stand",
+      "actor": "dani",
+      "with": "d15",
+      "offset": 0.1,
+      "durationSec": 0.9
+    },
+    {
+      "id": "dani-se-va",
+      "type": "walk",
+      "actor": "dani",
+      "after": "dani-se-levanta",
+      "to": [
+        1.15,
+        0,
+        0
+      ]
+    },
+    {
+      "id": "dani-se-para",
+      "type": "turn",
+      "actor": "dani",
+      "after": "v15",
+      "offset": -0.4,
+      "towards": "vera",
+      "durationSec": 0.8
+    },
+    {
+      "id": "dani-vuelve",
+      "type": "walk",
+      "actor": "dani",
+      "after": "dani-se-para",
+      "offset": 0.2,
+      "to": [
+        -0.15,
+        0,
+        0.45
+      ],
+      "faceTo": "vera"
+    },
+    {
+      "id": "vera-sonrie",
+      "type": "expression",
+      "actor": "vera",
+      "with": "d16",
+      "offset": 0.8,
+      "expression": "smile",
+      "intensity": 1
+    },
+    {
+      "id": "luz-vuelve",
+      "type": "effect",
+      "effect": "flicker",
+      "prop": "lampara-2",
+      "after": "v17",
+      "offset": 0.3,
+      "durationSec": 0.4
+    },
+    {
+      "id": "dani-rie",
+      "type": "expression",
+      "actor": "dani",
+      "with": "d19",
+      "expression": "laugh",
+      "intensity": 0.8,
+      "durationSec": 2.5
+    },
+    {
+      "id": "vera-guino",
+      "type": "expression",
+      "actor": "vera",
+      "with": "v19",
+      "offset": 0.6,
+      "expression": "smirk",
+      "intensity": 1.2
+    }
+  ],
+  "dialogue": [
+    {
+      "id": "d15",
+      "actor": "dani",
+      "text": "Debería irme. Es tarde.",
+      "emotion": "sad",
+      "to": "vera",
+      "at": 0.5
+    },
+    {
+      "id": "v15",
+      "actor": "vera",
+      "text": "Dani. La lista. Punto dos.",
+      "emotion": "determined",
+      "to": "dani",
+      "after": "dani-se-va",
+      "offset": -0.9,
+      "intensity": 1.1
+    },
+    {
+      "id": "d16",
+      "actor": "dani",
+      "text": "¿Cenarías conmigo? Mañana. Sin lámparas.",
+      "emotion": "determined",
+      "to": "vera",
+      "after": "dani-vuelve",
+      "offset": -0.3
+    },
+    {
+      "id": "v16",
+      "actor": "vera",
+      "text": "Llevo tres meses poniéndote poco hielo para que te quedes más rato.",
+      "emotion": "smirk",
+      "to": "dani",
+      "intensity": 1.2
+    },
+    {
+      "id": "d17",
+      "actor": "dani",
+      "text": "¿Y por qué no me lo preguntaste tú?",
+      "emotion": "surprise",
+      "to": "vera"
+    },
+    {
+      "id": "v17",
+      "actor": "vera",
+      "text": "Porque el cóctel no tenía nombre. Le faltaba alguien que se atreviera a pedirlo.",
+      "emotion": "smirk",
+      "to": "dani",
+      "direction": "en voz baja"
+    },
+    {
+      "id": "d18",
+      "actor": "dani",
+      "text": "¿Y cómo se llama?",
+      "emotion": "joy",
+      "to": "vera",
+      "after": "luz-vuelve",
+      "offset": 0.5
+    },
+    {
+      "id": "v18",
+      "actor": "vera",
+      "text": "Punto dos.",
+      "emotion": "smirk",
+      "to": "dani",
+      "intensity": 1.3
+    },
+    {
+      "id": "d19",
+      "actor": "dani",
+      "text": "¿Y el punto tres? No hablar del tiempo.",
+      "emotion": "laugh",
+      "to": "vera"
+    },
+    {
+      "id": "v19",
+      "actor": "vera",
+      "text": "Pues mañana... va a hacer mucho calor.",
+      "emotion": "smirk",
+      "to": "dani",
+      "intensity": 1.4,
+      "pauseAfter": 0.2
+    }
+  ],
+  "sound": [
+    {
+      "id": "ambiente",
+      "kind": "ambience",
+      "sound": "room-tone",
+      "at": 0,
+      "gainDb": -27,
+      "fadeIn": 0.3,
+      "fadeOut": 0.3
+    },
+    {
+      "id": "romance",
+      "kind": "music",
+      "sound": "sirena-romance",
+      "with": "d16",
+      "offset": -0.3,
+      "durationSec": 14,
+      "gainDb": -17,
+      "fadeIn": 1.5,
+      "fadeOut": 2.5,
+      "duck": true
+    },
+    {
+      "id": "clic-luz",
+      "kind": "sfx",
+      "sound": "click",
+      "with": "luz-vuelve",
+      "gainDb": -5
+    },
+    {
+      "id": "remate",
+      "kind": "music",
+      "sound": "sirena-remate",
+      "after": "v19",
+      "offset": 0.05,
+      "durationSec": 1.8,
+      "gainDb": -9,
+      "duck": false
+    }
+  ]
+}

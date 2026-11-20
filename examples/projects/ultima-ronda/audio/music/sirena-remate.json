@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 2,
+  "id": "sirena-remate",
+  "kind": "music",
+  "generator": "procedural",
+  "license": {
+    "id": "procedural-original",
+    "source": "Series Forge procedural composer",
+    "commercialUse": "allowed"
+  },
+  "style": "sitcom",
+  "form": "button",
+  "tempo": 120,
+  "key": "F",
+  "mode": "major",
+  "instruments": [
+    "keys",
+    "bass",
+    "drums",
+    "lead"
+  ],
+  "seed": 3,
+  "durationSec": 1.8,
+  "mood": "remate cómico"
+}
