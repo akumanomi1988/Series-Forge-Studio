@@ -14,7 +14,7 @@ import type { Alignment, WordTiming } from './align.ts';
 import { estimateSpeech } from './phonetics-es.ts';
 import { REPO_ROOT } from '../pipeline/project.ts';
 
-export const TTS_VERSION = 7;
+export const TTS_VERSION = 8;
 export interface SpeechRequest { text: string; voice: VoiceProfile; emotion?: string; intensity?: number; direction?: string; rate?: number; pitchSemitones?: number }
 export interface SpeechResult { file: string; duration: number; alignment: Alignment; cached: boolean; provider: string; key: string; trimmedLead: number }
 
@@ -53,7 +53,8 @@ export function buildSsml(req: SpeechRequest, emotionId?: string): string {
     .replace(/\.\.\.|…/g, '…<break time="350ms"/>')
     .replace(/\s—\s/g, ' <break time="250ms"/> ');
   const vol = whisper ? 'x-soft' : shout ? 'x-loud' : pr.volume;
-  body = `<prosody rate="${Math.round(rate * 100)}%" pitch="${pr.pitch >= 0 ? '+' : ''}${pr.pitch.toFixed(0)}%" volume="${vol}">${body}</prosody>`;
+  // rate as a plain multiplier: Windows engines read "96%" as +96 % (double speed), "0.96" correctly
+  body = `<prosody rate="${Math.max(0.5, Math.min(2, rate)).toFixed(2)}" pitch="${pr.pitch >= 0 ? '+' : ''}${pr.pitch.toFixed(0)}%" volume="${vol}">${body}</prosody>`;
   return `<speak version="1.0" xmlns="http://www.w3.org/2001/10/synthesis" xml:lang="${req.voice.language}">${body}</speak>`;
 }
 

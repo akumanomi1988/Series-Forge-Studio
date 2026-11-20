@@ -26,6 +26,7 @@ import { runProcess } from '../audio/tts.ts';
 import { buildBrowser } from '../../scripts/build.ts';
 import type { SoundEvent } from '../engine/schema.ts';
 
+async function renameRetry(a: string, b: string) { for (let i = 0; ; i++) { try { await rename(a, b); return; } catch (e) { if (i >= 5 || !['EPERM', 'EBUSY'].includes((e as NodeJS.ErrnoException).code ?? '')) throw e; await new Promise(r => setTimeout(r, 400)); } } }
 export type Progress = (ev: Record<string, unknown>) => void;
 const sha = (x: unknown) => createHash('sha256').update(typeof x === 'string' ? x : JSON.stringify(x)).digest('hex');
 export interface RenderSettings { width: number; height: number; fps: number; maxSeconds?: number; crf?: number; preset?: string; scenes?: string[]; speech?: 'tts' | 'estimate' }
@@ -290,13 +291,21 @@ export async function renderEpisode(project: string, episode: string, settings: 
     // ------------------------------------------------ subtitles + mux
     const srtFile = join(outDir, 'subtitulos.srt');
     await writeFile(srtFile, srt(plan.subtitles), 'utf8');
-    const finalMp4 = join(outDir, 'episodio.mp4');
+    let finalMp4 = join(outDir, 'episodio.mp4');
     await runProcess('ffmpeg', ['-nostdin', '-hide_banner', '-loglevel', 'error', '-y', '-i', videoOnly, '-i', audioMaster, '-i', srtFile, '-map', '0:v:0', '-map', '1:a:0', '-map', '2:s:0', '-c:v', 'copy', '-c:a', 'aac', '-b:a', '192k', '-ar', '48000', '-c:s', 'mov_text', '-metadata:s:s:0', 'language=spa', '-metadata:s:a:0', 'language=spa', '-metadata', `title=${plan.name}`, '-movflags', '+faststart', finalMp4 + '.part.mp4'], { timeoutMs: 1_200_000 });
-    await rename(finalMp4 + '.part.mp4', finalMp4);
+    const part = finalMp4 + '.part.mp4';
+    try { await renameRetry(part, finalMp4); }
+    catch (e) {
+      // the previous episodio.mp4 is open in a player (Windows locks it): keep both, never lose the new render
+      if (!['EPERM', 'EBUSY', 'EACCES'].includes((e as NodeJS.ErrnoException).code ?? '')) throw e;
+      finalMp4 = join(outDir, `episodio-${new Date().toISOString().slice(0, 16).replace(/[-:T]/g, '')}.mp4`);
+      await rename(part, finalMp4);
+      progress({ stage: 'warning', message: 'episodio.mp4 está abierto en otro programa; el nuevo vídeo se guardó como ' + finalMp4 });
+    }
     await rm(videoOnly, { force: true }); await rm(list, { force: true });
     const stats = { totalMs: Date.now() - t0, chunksRendered: rendered, chunksReused: reused, renderMs, retries, hostRecycles: recycles, framesTotal: plan.frames, peakRssMB: Math.round(memPeak.rss / 1048576), gpu: host ? (host as RenderHost).info.renderer : null, lufsBeforeNorm: before, normGainDb: gainDb, limiterPeakIn: peakIn };
     const metadata = join(outDir, 'metadata.json');
-    await writeFile(metadata, JSON.stringify({ schemaVersion: 2, project, episode, name: plan.name, settings, durationSec: plan.durationSec, frames: plan.frames, scenes: plan.scenes.map(s => ({ id: s.id, name: s.name, start: s.start, duration: s.duration, warnings: s.warnings })), shots: plan.shots.map(s => ({ id: s.id, scene: s.scene, start: s.start, end: s.end, hash: s.hash })), speech: plan.speech, audioCues: plan.audio.length, mix: mixReport, stats, licenses: licenseReport(p), generatedAt: new Date().toISOString() }, null, 2));
+    await writeFile(metadata, JSON.stringify({ schemaVersion: 2, project, episode, name: plan.name, video: finalMp4.split(/[\\/]/).pop(), settings, durationSec: plan.durationSec, frames: plan.frames, scenes: plan.scenes.map(s => ({ id: s.id, name: s.name, start: s.start, duration: s.duration, warnings: s.warnings })), shots: plan.shots.map(s => ({ id: s.id, scene: s.scene, start: s.start, end: s.end, hash: s.hash })), speech: plan.speech, audioCues: plan.audio.length, mix: mixReport, stats, licenses: licenseReport(p), generatedAt: new Date().toISOString() }, null, 2));
     progress({ stage: 'done', output: finalMp4, ...stats });
     return { output: outDir, video: finalMp4, audio: audioMaster, srt: srtFile, metadata, storyboard: story, plan, stats };
   } finally { if (host) await (host as RenderHost).close().catch(() => {}); }

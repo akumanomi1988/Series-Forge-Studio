@@ -27,7 +27,8 @@ export async function validateEpisode(project: string, episode: string): Promise
   const ep = p.episodes[episode];
   const out = join(p.root, ep.dir, 'output');
   const plan = JSON.parse(await readFile(join(p.root, ep.dir, 'generated', 'episode-plan.json'), 'utf8')) as EpisodePlan;
-  const video = join(out, 'episodio.mp4'), master = join(out, 'audio-master.wav'), srtFile = join(out, 'subtitulos.srt');
+  const meta = existsSync(join(out, 'metadata.json')) ? JSON.parse(await readFile(join(out, 'metadata.json'), 'utf8')) as { video?: string } : {};
+  const video = join(out, meta.video && /^episodio[\w-]*\.mp4$/.test(meta.video) ? meta.video : 'episodio.mp4'), master = join(out, 'audio-master.wav'), srtFile = join(out, 'subtitulos.srt');
   const checks: Check[] = [];
   const add = (id: string, ok: boolean, detail: unknown, severity: 'error' | 'warning' = 'error') => checks.push({ id, ok, detail, severity });
   for (const f of [video, master, srtFile, join(out, 'metadata.json')]) add(`exists:${f.split(/[\\/]/).pop()}`, existsSync(f), f);

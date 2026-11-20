@@ -77,3 +77,18 @@ test('TTS offline en español (OneCore) con caché, alineación y lip-sync ≤ 6
   const other = await synthesize({ text: 'El turno acabó hace una hora, Bruno.', voice: { ...voice, voice: 'Microsoft Laura', pitchSemitones: 0 } }, dir);
   assert.notEqual(other.key, r.key, 'otra voz = otra entrada de caché');
 });
+
+test('la velocidad de la voz respeta el multiplicador (regresión: "96%" se leía como +96 %)', async t => {
+  if (!hasOneCore() || !hasFfmpeg()) { t.skip('requiere Windows con voces OneCore es-ES y FFmpeg'); return; }
+  const { synthesize, buildSsml } = await import('../src/audio/tts.ts');
+  const dir = mkdtempSync(join(tmpdir(), 'sf-rate-'));
+  const base = VoiceSchema.parse({ schemaVersion: 2, provider: 'windows-onecore', voice: 'Microsoft Pablo', rate: 1, license: { id: 'x', commercialUse: 'unknown' } });
+  const text = 'Sí, sí. Estaba ajustando unos tornillos. Nada grave.';
+  assert.match(buildSsml({ text, voice: { ...base, rate: 0.96 } }), /rate="0\.96"/);
+  const normal = await synthesize({ text, voice: base }, dir);
+  const slow = await synthesize({ text, voice: { ...base, rate: 0.8 } }, dir);
+  const wps = 8 / normal.duration;
+  assert.ok(wps > 1.2 && wps < 2.6, `palabras/segundo naturales (medido ${wps.toFixed(2)})`);
+  const ratio = slow.duration / normal.duration;
+  assert.ok(ratio > 1.12 && ratio < 1.4, `rate 0.8 alarga ~25 % (medido ${ratio.toFixed(2)})`);
+});
