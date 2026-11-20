@@ -1,10 +1,10 @@
 {
   "schemaVersion": 2,
-  "provider": "windows-onecore",
-  "voice": "Microsoft Laura",
+  "provider": "kokoro",
+  "voice": "ef_dora",
   "language": "es-ES",
-  "rate": 1.04,
-  "pitchSemitones": 0.5,
+  "rate": 1,
+  "pitchSemitones": 0,
   "formantPreserve": true,
   "gainDb": 0,
   "eq": {
@@ -13,9 +13,31 @@
     "highDb": 1
   },
   "emotionProsody": true,
+  "alternatives": {
+    "windows-onecore": {
+      "voice": "Microsoft Laura",
+      "rate": 1.04,
+      "pitchSemitones": 0.5,
+      "license": {
+        "id": "windows-onecore-voices",
+        "commercialUse": "unknown",
+        "notes": "Voz del sistema Windows. Revisar términos antes de distribución comercial."
+      }
+    },
+    "voicebox": {
+      "voice": "Lara",
+      "engine": "qwen",
+      "license": {
+        "id": "depende-del-motor",
+        "commercialUse": "unknown",
+        "notes": "Voicebox (MIT). La licencia depende del motor elegido y de la muestra de voz clonada: usa solo muestras propias o con permiso."
+      }
+    }
+  },
+  "emotions": {},
   "license": {
-    "id": "windows-onecore-voices",
-    "commercialUse": "unknown",
-    "notes": "Voz del sistema Windows. Revisar términos antes de distribución comercial."
+    "id": "Apache-2.0",
+    "commercialUse": "allowed",
+    "notes": "Kokoro-82M (hexgrad/Kokoro-82M, Apache-2.0) vía kokoro-onnx (MIT). Fonemizador espeak-ng (GPL-3.0) solo como herramienta."
   }
 }

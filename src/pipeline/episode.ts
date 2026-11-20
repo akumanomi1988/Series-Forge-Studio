@@ -14,7 +14,7 @@ import type { SpeechInfo } from '../engine/director.ts';
 import type { ResolvedScene, AudioCue, AssetLibrary } from '../engine/timeline.ts';
 import { SceneEvaluator } from '../engine/pose.ts';
 import { evaluateShots } from '../engine/camera.ts';
-import { synthesize } from '../audio/tts.ts';
+import { synthesize, resolveVoice } from '../audio/tts.ts';
 import { estimateSpeech } from '../audio/phonetics-es.ts';
 import { mixSegment, blockPowers, loudnessFromPowers, limit } from '../audio/mixer.ts';
 import type { MixContext } from '../audio/mixer.ts';
@@ -29,7 +29,7 @@ import type { SoundEvent } from '../engine/schema.ts';
 async function renameRetry(a: string, b: string) { for (let i = 0; ; i++) { try { await rename(a, b); return; } catch (e) { if (i >= 5 || !['EPERM', 'EBUSY'].includes((e as NodeJS.ErrnoException).code ?? '')) throw e; await new Promise(r => setTimeout(r, 400)); } } }
 export type Progress = (ev: Record<string, unknown>) => void;
 const sha = (x: unknown) => createHash('sha256').update(typeof x === 'string' ? x : JSON.stringify(x)).digest('hex');
-export interface RenderSettings { width: number; height: number; fps: number; maxSeconds?: number; crf?: number; preset?: string; scenes?: string[]; speech?: 'tts' | 'estimate' }
+export interface RenderSettings { width: number; height: number; fps: number; maxSeconds?: number; crf?: number; preset?: string; scenes?: string[]; speech?: 'tts' | 'estimate'; voiceProvider?: string }
 export interface PlanShot { id: string; scene: string; sceneIndex: number; start: number; end: number; frame0: number; frame1: number; localFrame0: number; hash: string; chunks: { f0: number; f1: number; hash: string }[] }
 export interface EpisodePlan {
   schemaVersion: 2; project: string; episode: string; name: string; settings: RenderSettings; durationSec: number; frames: number;
@@ -83,6 +83,8 @@ export async function compileEpisode(project: string, episode: string, settings:
   const resolvedAll: ResolvedScene[] = [];
   let frame = 0;
   const maxFrames = settings.maxSeconds ? Math.round(settings.maxSeconds * fps) : Infinity;
+  // voice engine: --voice-provider > episode.json voiceProvider > project.json voiceProvider > each voice.json
+  const voiceProvider = settings.voiceProvider ?? ep.episode.voiceProvider ?? (p.meta.voiceProvider as string | undefined) ?? 'auto';
   for (const sid of sceneIds) {
     if (frame >= maxFrames) break;
     const scene = ep.scenes[sid];
@@ -95,7 +97,8 @@ export async function compileEpisode(project: string, episode: string, settings:
       if (settings.speech === 'estimate' || !ch.voice) { const e = estimateSpeech(line.text, ch.voice?.rate ?? 1); speech[line.id] = { ...e, estimated: true }; continue; }
       const emo = resolveEmotion(line.emotion);
       progress({ stage: 'tts', scene: sid, line: line.id });
-      const r = await synthesize({ text: line.text, voice: ch.voice, emotion: emo, intensity: line.intensity, direction: line.direction, rate: line.rate, pitchSemitones: line.pitchSemitones }, voiceCache, emo);
+      const voice = resolveVoice(ch.voice, voiceProvider);
+      const r = await synthesize({ text: line.text, voice, emotion: emo, intensity: line.intensity, direction: line.direction, rate: line.rate, pitchSemitones: line.pitchSemitones }, voiceCache, emo);
       speech[line.id] = { duration: r.duration, visemes: r.alignment.visemes, file: r.file };
       plan.speech[line.id] = { file: r.file, duration: r.duration, cached: r.cached, provider: r.provider, method: r.alignment.method, key: r.key };
     }
@@ -305,14 +308,14 @@ export async function renderEpisode(project: string, episode: string, settings: 
     await rm(videoOnly, { force: true }); await rm(list, { force: true });
     const stats = { totalMs: Date.now() - t0, chunksRendered: rendered, chunksReused: reused, renderMs, retries, hostRecycles: recycles, framesTotal: plan.frames, peakRssMB: Math.round(memPeak.rss / 1048576), gpu: host ? (host as RenderHost).info.renderer : null, lufsBeforeNorm: before, normGainDb: gainDb, limiterPeakIn: peakIn };
     const metadata = join(outDir, 'metadata.json');
-    await writeFile(metadata, JSON.stringify({ schemaVersion: 2, project, episode, name: plan.name, video: finalMp4.split(/[\\/]/).pop(), settings, durationSec: plan.durationSec, frames: plan.frames, scenes: plan.scenes.map(s => ({ id: s.id, name: s.name, start: s.start, duration: s.duration, warnings: s.warnings })), shots: plan.shots.map(s => ({ id: s.id, scene: s.scene, start: s.start, end: s.end, hash: s.hash })), speech: plan.speech, audioCues: plan.audio.length, mix: mixReport, stats, licenses: licenseReport(p), generatedAt: new Date().toISOString() }, null, 2));
+    await writeFile(metadata, JSON.stringify({ schemaVersion: 2, project, episode, name: plan.name, video: finalMp4.split(/[\\/]/).pop(), settings, durationSec: plan.durationSec, frames: plan.frames, scenes: plan.scenes.map(s => ({ id: s.id, name: s.name, start: s.start, duration: s.duration, warnings: s.warnings })), shots: plan.shots.map(s => ({ id: s.id, scene: s.scene, start: s.start, end: s.end, hash: s.hash })), speech: plan.speech, audioCues: plan.audio.length, mix: mixReport, stats, licenses: licenseReport(p, settings.voiceProvider ?? p.episodes[episode]?.episode.voiceProvider), generatedAt: new Date().toISOString() }, null, 2));
     progress({ stage: 'done', output: finalMp4, ...stats });
     return { output: outDir, video: finalMp4, audio: audioMaster, srt: srtFile, metadata, storyboard: story, plan, stats };
   } finally { if (host) await (host as RenderHost).close().catch(() => {}); }
 }
-export function licenseReport(p: LoadedProject) {
+export function licenseReport(p: LoadedProject, voiceProvider?: string) {
   return {
-    voices: Object.values(p.characters).filter(c => c.voice).map(c => ({ character: c.id, provider: c.voice!.provider, voice: c.voice!.voice, license: c.voice!.license })),
+    voices: Object.values(p.characters).filter(c => c.voice).map(c => { const v = resolveVoice(c.voice!, voiceProvider ?? (p.meta.voiceProvider as string | undefined)); return { character: c.id, provider: v.provider, voice: v.voice, license: v.license }; }),
     sfx: Object.values(p.sfx).map(s => ({ id: s.id, license: s.license })), music: Object.values(p.music).map(m => ({ id: m.id, license: m.license })),
     visuals: 'Todos los personajes, escenarios y objetos son geometría procedural generada por Series Forge (sin assets externos).'
   };

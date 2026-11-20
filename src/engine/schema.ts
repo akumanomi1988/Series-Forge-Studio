@@ -103,10 +103,27 @@ export const RigSchema = z.object({
   jointLimits: z.record(z.string(), z.object({ min: vec3, max: vec3 })).default({})
 }).strict();
 
+export const VOICE_PROVIDERS = ['kokoro', 'voicebox', 'windows-onecore', 'windows-sapi', 'piper', 'silent'] as const;
+/** Per-emotion delivery: overrides applied on top of the voice (Kokoro: blend/rate/pitch; Voicebox: instruct). */
+const VoiceDelivery = z.object({
+  voice: z.string().min(1).max(160).optional(),
+  rate: num(0.5, 2).optional(),
+  pitchSemitones: num(-12, 12).optional(),
+  gainDb: num(-24, 12).optional(),
+  instruct: z.string().max(500).optional()
+}).strict();
 export const VoiceSchema = z.object({
   schemaVersion: z.literal(2),
-  provider: z.enum(['windows-onecore', 'windows-sapi', 'piper', 'silent']),
+  provider: z.enum(VOICE_PROVIDERS),
   voice: z.string().min(1).max(160),
+  /** Voicebox only: engine id (qwen, qwen_custom_voice, chatterbox, kokoro…) and base delivery instruction. */
+  engine: z.string().max(40).optional(),
+  instruct: z.string().max(500).optional(),
+  seed: z.number().int().min(0).optional(),
+  /** Same character on other engines, so a project can switch engine without rewriting voices. */
+  alternatives: z.partialRecord(z.enum(VOICE_PROVIDERS), VoiceDelivery.extend({ engine: z.string().max(40).optional(), license: z.object({ id: z.string(), commercialUse: z.enum(['allowed', 'restricted', 'unknown']), notes: z.string().optional() }).strict().optional() }).strict()).default({}),
+  /** Emotion id (joy, angry, sad, smirk…) -> delivery overrides. */
+  emotions: z.record(z.string().max(40), VoiceDelivery).default({}),
   language: z.string().regex(/^[a-z]{2}-[A-Z]{2}$/).default('es-ES'),
   rate: num(0.5, 2).default(1),
   pitchSemitones: num(-12, 12).default(0),
@@ -346,6 +363,8 @@ export const EpisodeSchema = z.object({
   scenes: z.array(z.string().regex(/^sc-\d{3,4}$/)).min(1).max(500),
   targetDurationSec: num(1, 7200).optional(),
   music: z.array(SoundEventSchema).default([]),
+  /** Voice engine for every character of this episode (uses voice.json alternatives); 'auto' = each voice.json provider. */
+  voiceProvider: z.enum(['auto', ...VOICE_PROVIDERS]).optional(),
   render: z.object({ width: z.number().int().min(160).max(3840).default(1920), height: z.number().int().min(90).max(2160).default(1080), fps: z.number().int().min(1).max(60).default(24), sampleRate: z.literal(48000).default(48000), loudnessLufs: num(-30, -8).default(-16) }).strict().default({ width: 1920, height: 1080, fps: 24, sampleRate: 48000, loudnessLufs: -16 }),
   status: z.enum(['draft', 'approved', 'published']).default('draft')
 }).passthrough();

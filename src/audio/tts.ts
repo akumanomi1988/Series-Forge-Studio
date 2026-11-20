@@ -1,6 +1,7 @@
 /** Offline TTS with persistent per-character voices, cache by (text, voice, prosody), retries and post-processing.
- * Providers: windows-onecore (WinRT voices, word timings), windows-sapi (System.Speech), piper (local binary + model),
- * silent (test-only placeholder that is flagged in reports). No cloud, no API keys. */
+ * Providers: kokoro (Kokoro-82M, local Python worker), voicebox (local Voicebox app API), windows-onecore (WinRT voices,
+ * word timings), windows-sapi (System.Speech), piper (local binary + model), silent (test-only placeholder flagged in
+ * reports). No cloud, no API keys. */
 import { spawn } from 'node:child_process';
 import { mkdir, readFile, writeFile, rm, stat, rename } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
@@ -13,8 +14,9 @@ import { alignSpeech } from './align.ts';
 import type { Alignment, WordTiming } from './align.ts';
 import { estimateSpeech } from './phonetics-es.ts';
 import { REPO_ROOT } from '../pipeline/project.ts';
+import { synthKokoro, synthVoicebox } from './providers.ts';
 
-export const TTS_VERSION = 10;
+export const TTS_VERSION = 11;
 export interface SpeechRequest { text: string; voice: VoiceProfile; emotion?: string; intensity?: number; direction?: string; rate?: number; pitchSemitones?: number }
 export interface SpeechResult { file: string; duration: number; alignment: Alignment; cached: boolean; provider: string; key: string; trimmedLead: number }
 
@@ -41,6 +43,38 @@ export function prosodyFor(emotion?: string, intensity = 1): { rate: number; pit
   const v = emotion ? table[emotion] : undefined;
   if (!v) return { rate: 1, pitch: 0, volume: 'medium' };
   return { rate: 1 + (v[0] - 1) * k, pitch: v[1] * k, volume: v[2] };
+}
+/** The voice actually used: the character's main voice, or its `alternatives[provider]` when a project/episode
+ * selects another engine. Unknown alternatives keep the main voice (reported by the caller). */
+export function resolveVoice(v: VoiceProfile, provider?: string | null): VoiceProfile {
+  if (!provider || provider === 'auto' || provider === v.provider) return v;
+  const alt = v.alternatives[provider as keyof typeof v.alternatives];
+  if (!alt) return v;
+  const { license, ...rest } = alt;
+  return { ...v, ...rest, provider: provider as VoiceProfile['provider'], voice: alt.voice ?? v.voice, license: license ?? v.license, engine: alt.engine ?? (provider === 'voicebox' ? v.engine : undefined), alternatives: v.alternatives };
+}
+/** Delivery for one line: per-emotion overrides from voice.json on top of the default emotion prosody. */
+export interface Delivery { voice: string; rate: number; semitones: number; gainDb: number; instruct: string }
+const INSTRUCT: Record<string, string> = {
+  joy: 'cheerful and bright, smiling while speaking', laugh: 'amused, laughing lightly between words', angry: 'irritated and sharp, clipped words',
+  sad: 'sad and quiet, slower, with a heavy voice', fear: 'scared and tense, slightly breathless', surprise: 'surprised, rising intonation',
+  nervous: 'nervous and hesitant, a little fast', thinking: 'thoughtful, unhurried', smirk: 'playful and teasing, with a knowing smile',
+  worried: 'worried, softer voice', determined: 'firm and confident', disgust: 'disgusted, dismissive', smile: 'warm and friendly', neutral: 'natural and conversational'
+};
+export function deliveryFor(req: SpeechRequest, emotionId?: string): Delivery {
+  const v = req.voice, d = (emotionId && v.emotions[emotionId]) || {};
+  const pr = v.emotionProsody ? prosodyFor(emotionId, req.intensity) : { rate: 1, pitch: 0, volume: 'medium' };
+  const whisper = /susurr|en voz baja|whisper/i.test(req.direction ?? ''), shout = /grit|shout/i.test(req.direction ?? '');
+  const semis = 12 * Math.log2(1 + pr.pitch / 100) * 0.6; // SSML-less engines: a gentler version of the SSML pitch shift
+  const instruct = [v.instruct, d.instruct ?? (emotionId ? INSTRUCT[emotionId] : undefined), whisper ? 'whispering' : shout ? 'shouting' : undefined, req.direction]
+    .filter(Boolean).join('. ');
+  return {
+    voice: d.voice ?? v.voice,
+    rate: (req.rate ?? d.rate ?? v.rate) * pr.rate,
+    semitones: (req.pitchSemitones ?? 0) + (d.pitchSemitones ?? semis),
+    gainDb: (d.gainDb ?? 0) + (pr.volume === 'loud' ? 1 : pr.volume === 'soft' ? -2 : 0),
+    instruct
+  };
 }
 /** Builds SSML: pauses from "..." / "—" / "[pausa 0.6]", whisper direction lowers volume. */
 export function buildSsml(req: SpeechRequest, emotionId?: string): string {
@@ -86,7 +120,7 @@ async function synthPiper(text: string, voice: VoiceProfile, wav: string, rate: 
 }
 
 /** Post-process: pitch (formant-preserving), EQ, gain, resample to 48 kHz mono float. */
-async function postProcess(src: string, dst: string, v: VoiceProfile, extraSemitones: number): Promise<void> {
+async function postProcess(src: string, dst: string, v: VoiceProfile, extraSemitones: number, extraGainDb = 0): Promise<void> {
   const st = v.pitchSemitones + extraSemitones;
   const filters: string[] = [];
   if (Math.abs(st) > 0.01) filters.push(`rubberband=pitch=${Math.pow(2, st / 12).toFixed(5)}:formant=${v.formantPreserve ? 'preserved' : 'shifted'}`);
@@ -95,7 +129,7 @@ async function postProcess(src: string, dst: string, v: VoiceProfile, extraSemit
   if (v.eq.midDb) filters.push(`equalizer=f=1800:t=q:w=1:g=${v.eq.midDb}`);
   if (v.eq.highDb) filters.push(`highshelf=f=6000:g=${v.eq.highDb}`);
   filters.push('highpass=f=70');
-  if (v.gainDb) filters.push(`volume=${v.gainDb}dB`);
+  if (v.gainDb + extraGainDb) filters.push(`volume=${(v.gainDb + extraGainDb).toFixed(2)}dB`);
   await runProcess('ffmpeg', ['-nostdin', '-hide_banner', '-loglevel', 'error', '-y', '-i', src, '-af', filters.join(','), '-ac', '1', '-ar', '48000', '-c:a', 'pcm_f32le', dst], { timeoutMs: 120_000 });
 }
 
@@ -179,14 +213,18 @@ export async function synthesize(req: SpeechRequest, cacheDir: string, emotionId
     try {
       let words: WordTiming[] = [];
       const ssml = buildSsml(req, emotionId);
+      const dl = deliveryFor(req, emotionId);
+      let extraSemis = req.pitchSemitones ?? 0, extraGain = 0;
       switch (req.voice.provider) {
+        case 'kokoro': await synthKokoro(req.text, dl.voice, req.voice.language, dl.rate, raw); extraSemis = dl.semitones; extraGain = dl.gainDb; break;
+        case 'voicebox': await synthVoicebox(req.text, { voice: dl.voice, language: req.voice.language, engine: req.voice.engine, instruct: dl.instruct, seed: req.voice.seed }, raw); extraSemis = req.pitchSemitones ?? 0; extraGain = dl.gainDb; break;
         case 'windows-onecore': words = await synthOneCore(ssml, req.voice.voice, raw); break;
         case 'windows-sapi': words = await synthSapi(ssml, req.voice.voice, raw); break;
         case 'piper': words = await synthPiper(req.text, req.voice, raw, (req.rate ?? req.voice.rate) * prosodyFor(emotionId, req.intensity).rate); break;
         case 'silent': { const est = estimateSpeech(req.text, req.voice.rate); await writeWavAtomic(raw, { sampleRate: 48000, channels: [new Float32Array(Math.round(est.duration * 48000))] }, 16); break; }
       }
       if ((await stat(raw)).size < 100) throw new Error('Audio TTS vacío');
-      await postProcess(raw, proc, req.voice, req.pitchSemitones ?? 0);
+      await postProcess(raw, proc, req.voice, extraSemis, extraGain);
       const audio = await readWav(proc);
       let x = mono(audio);
       // trim leading silence (keep 30 ms) and trailing silence (keep 120 ms); shift word timings accordingly
