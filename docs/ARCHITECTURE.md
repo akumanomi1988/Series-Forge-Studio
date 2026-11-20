@@ -62,7 +62,8 @@ TypeScript se ejecuta directamente con Node 24 (*type stripping*, solo sintaxis 
 
 ## Rendimiento medido (GTX 660 Ti 2 GB, Chrome 142, Windows 10)
 
-- 640×360: ~40–50 fps de render; 1920×1080: ~7–11 fps (WebGL2/ANGLE D3D11).
+- 640×360: ~40–50 fps de render; 1920×1080: ~7–11 fps (WebGL2/ANGLE D3D11). El navegador se recicla cada ≈ 720 fotogramas 1080p (escalado por resolución): evita bloqueos de Chromium en renders largos.
+- Audio: compresor de diálogo, nivelado de cada línea, ducking de camas, **normalización anclada al diálogo** (la voz llega al objetivo, por defecto −16 LUFS; la mezcla nunca supera objetivo + 1 LU) y limitador con anticipación a −1 dBFS.
 - Memoria del proceso Node durante el render: 160–230 MB; el navegador se reutiliza entre planos.
 - Ver `docs/IMPLEMENTATION_STATUS.md` para la prueba de 20 minutos.
 

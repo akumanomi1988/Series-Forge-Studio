@@ -9,6 +9,7 @@ import { loadProject } from './project.ts';
 import { ffprobe, extractFrames } from './media.ts';
 import { runProcess } from '../audio/tts.ts';
 import { readWav, mono } from '../audio/wav.ts';
+import { blockPowers, loudnessFromPowers } from '../audio/mixer.ts';
 import { lipSyncLag, features } from '../audio/align.ts';
 import { visemeAt } from '../engine/face.ts';
 import type { EpisodePlan } from './episode.ts';
@@ -76,10 +77,16 @@ export async function validateEpisode(project: string, episode: string): Promise
   const r128 = await ffmpegLog(['-i', video, '-vn', '-af', 'ebur128=peak=true']);
   const I = Number(/I:\s+([-\d.]+) LUFS/.exec(r128.slice(r128.lastIndexOf('Summary')))?.[1] ?? NaN), TP = Number(/Peak:\s+([-\d.]+) dBFS/.exec(r128.slice(r128.lastIndexOf('Summary')))?.[1] ?? NaN);
   const target = ep.episode.render.loudnessLufs;
-  add('audio.loudness', Math.abs(I - target) <= 1.5, { integratedLufs: I, target });
+  // dialogue-gated loudness of the master (speech regions only) must match the target; the full mix may be lower
+  const mst = await readWav(master);
+  const bpw = blockPowers({ L: mst.channels[0], R: mst.channels[1] ?? mst.channels[0] });
+  const spans = plan.audio.filter(c => c.kind === 'dialogue').map(c => [c.start, c.start + c.duration]);
+  const dlg = bpw.filter((_, i) => { const c = i * 0.1 + 0.2; return spans.some(([a0, a1]) => c >= a0 && c <= a1); });
+  const dialogueLufs = dlg.length > 20 ? loudnessFromPowers(dlg) : I;
+  add('audio.loudness', Math.abs(dialogueLufs - target) <= 1.5 && I <= target + 1.5, { integratedLufs: I, dialogueGatedLufs: +dialogueLufs.toFixed(1), target });
   add('audio.truePeak', TP <= -0.5, { truePeakDbfs: TP });
   // dialogue presence & placement in the master: each line's source must correlate with the master at its timeline position
-  const m = await readWav(master); const mm = mono(m);
+  const mm = mono(mst);
   const lines = plan.audio.filter(c => c.kind === 'dialogue' && c.file);
   const placement: { line: string; expected: number; measuredOffsetMs: number; corr: number; rmsDb: number }[] = [];
   const lags: { line: string; lagMs: number; corr: number }[] = [];

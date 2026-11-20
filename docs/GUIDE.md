@@ -61,6 +61,7 @@ Copia un clip de `library/humanoid/animations/` a `characters/<id>/animations/` 
 ## 7. Historial, migración y licencias
 
 - Cada guardado del editor y cada cambio válido de un agente detectado por el servidor se guarda en `generated/history/`. `npm run studio -- history <proyecto> <ruta>` lista versiones y `npm run studio -- revert <proyecto> <ruta> <versión>` restaura (en el editor: desplegable *Historial…* del inspector).
+- Exportar geometría a Blender u otras herramientas: `npm run studio -- export character <proyecto> <id>` (GLB con esqueleto).
 - Proyectos de v0.2–v0.4: `npm run studio -- migrate <proyecto>` (deja copias `.v1.json`).
 - `output/metadata.json` incluye un informe de licencias (voces, SFX, música). Las voces de Windows quedan marcadas `commercialUse: "unknown"`: revísalo antes de distribuir.
 

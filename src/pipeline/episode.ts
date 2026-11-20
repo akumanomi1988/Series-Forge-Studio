@@ -246,21 +246,28 @@ export async function renderEpisode(project: string, episode: string, settings: 
     await runProcess('ffmpeg', ['-nostdin', '-hide_banner', '-loglevel', 'error', '-y', '-f', 'concat', '-safe', '0', '-i', list, '-c', 'copy', '-movflags', '+faststart', videoOnly], { timeoutMs: 600_000 });
     // ------------------------------------------------ audio master (per scene mix, episode loudness, limiter)
     const mixCtx: MixContext = { sfx: p.sfx, music: p.music, cacheDir: join(p.root, 'generated', 'cache', 'audio') };
-    const stems: string[] = []; const powers: number[] = [];
+    const stems: string[] = []; const powers: number[] = []; const dialoguePowers: number[] = [];
+    const dialogueSpans = plan.audio.filter(c => c.kind === 'dialogue').map(c => [c.start, c.start + c.duration] as [number, number]);
     const mixReport: unknown[] = [];
     const audioDir = join(p.root, ep.dir, 'generated', 'audio'); await mkdir(audioDir, { recursive: true });
     for (const sc of plan.scenes) {
       const cues = plan.audio.filter(c => c.start < sc.start + sc.duration && (c.duration < 0 ? c.start + 3 : c.start + c.duration) > sc.start);
-      const key = sha({ cues, sc: [sc.start, sc.duration], files: cues.filter(c => c.file).map(c => c.file), v: 3 }).slice(0, 20);
+      const key = sha({ cues, sc: [sc.start, sc.duration], files: cues.filter(c => c.file).map(c => c.file), v: 5 }).slice(0, 20);
       const stem = join(audioDir, `${sc.id}-${key}.wav`);
       if (!existsSync(stem)) { const { mix, report } = await mixSegment(cues, sc.start, sc.duration, mixCtx); await writeWavAtomic(stem, { sampleRate: SR, channels: [mix.L, mix.R] }, 32); mixReport.push({ scene: sc.id, cues: report }); }
       const a = await readWav(stem);
-      powers.push(...blockPowers({ L: a.channels[0], R: a.channels[1] }));
+      const bp = blockPowers({ L: a.channels[0], R: a.channels[1] });
+      powers.push(...bp);
+      // dialogue-gated blocks (block centre inside a dialogue line) for dialogue-anchored normalisation
+      bp.forEach((p, i) => { const c = sc.start + i * 0.1 + 0.2; if (dialogueSpans.some(([a0, a1]) => c >= a0 && c <= a1)) dialoguePowers.push(p); });
       stems.push(stem);
     }
     const before = loudnessFromPowers(powers);
     const target = p.episodes[episode].episode.render.loudnessLufs;
-    const gainDb = Math.max(-30, Math.min(24, target - before));
+    // Dialogue-anchored loudness (as in broadcast dialogue gating): speech sits at the target even in sparse episodes,
+    // the full mix may be quieter but never louder than target + 1 LU.
+    const dialogueLufs = dialoguePowers.length > 20 ? loudnessFromPowers(dialoguePowers) : before;
+    const gainDb = Math.max(-30, Math.min(24, target - dialogueLufs, target + 1 - before));
     const audioMaster = join(outDir, 'audio-master.wav');
     const totalSamples = Math.round(plan.durationSec * SR);
     const fd = openSync(audioMaster + '.part', 'w');
@@ -279,7 +286,7 @@ export async function renderEpisode(project: string, episode: string, settings: 
     }
     if (written < totalSamples) writeSync(fd, Buffer.alloc((totalSamples - written) * 4));
     closeSync(fd); await rename(audioMaster + '.part', audioMaster);
-    progress({ stage: 'audio', lufsBefore: +before.toFixed(2), gainDb: +gainDb.toFixed(2), limitedSamples: limited });
+    progress({ stage: 'audio', lufsBefore: +before.toFixed(2), dialogueLufsBefore: +dialogueLufs.toFixed(2), gainDb: +gainDb.toFixed(2), limitedSamples: limited });
     // ------------------------------------------------ subtitles + mux
     const srtFile = join(outDir, 'subtitulos.srt');
     await writeFile(srtFile, srt(plan.subtitles), 'utf8');

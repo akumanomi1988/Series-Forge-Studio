@@ -35,6 +35,21 @@ export async function musicSamples(def: MusicDef, duration: number, ctx: MixCont
   else { out = def.generator === 'file' && def.file ? await (async () => { const a = await readWav(def.file!); return [a.channels[0], a.channels[1] ?? a.channels[0]] as [Float32Array, Float32Array]; })() : generateMusic(def, Math.ceil(duration)); await mkdir(join(ctx.cacheDir, 'music'), { recursive: true }); await writeWavAtomic(file, { sampleRate: SR, channels: out }, 32); }
   memo.set(key, out); return out;
 }
+/** Feed-forward dialogue compressor (peak envelope, soft knee): lowers speech crest factor before loudness normalisation. */
+export function compressDialogue(x: Float32Array, thresholdDb = -26, ratio = 3.5, attackMs = 4, releaseMs = 120): Float32Array {
+  const out = new Float32Array(x.length);
+  const att = Math.exp(-1 / (attackMs / 1000 * SR)), rel = Math.exp(-1 / (releaseMs / 1000 * SR));
+  let env = 0;
+  const knee = 6;
+  for (let i = 0; i < x.length; i++) {
+    const a = Math.abs(x[i]); env = a > env ? a + (env - a) * att : a + (env - a) * rel;
+    const db = 20 * Math.log10(env + 1e-9), over = db - thresholdDb;
+    let red = 0;
+    if (over > knee / 2) red = over * (1 - 1 / ratio); else if (over > -knee / 2) red = (1 - 1 / ratio) * (over + knee / 2) ** 2 / (2 * knee);
+    out[i] = x[i] * Math.pow(10, -red / 20);
+  }
+  return out;
+}
 const panGains = (pan: number) => { const a = (Math.max(-1, Math.min(1, pan)) + 1) * Math.PI / 4; return [Math.cos(a) * Math.SQRT2, Math.sin(a) * Math.SQRT2]; };
 function fadeGain(i: number, len: number, fi: number, fo: number) { let g = 1; if (fi > 0 && i < fi) g *= i / fi; if (fo > 0 && i > len - fo) g *= Math.max(0, (len - i) / fo); return g; }
 
@@ -50,11 +65,11 @@ export async function mixSegment(cues: AudioCue[], segStart: number, duration: n
     const [pl, pr] = panGains(c.pan);
     if (c.kind === 'dialogue') {
       if (!c.file || !existsSync(c.file)) { report.push({ id: c.id, kind: c.kind, start: c.start, duration: c.duration, peak: 0, missing: true }); continue; }
-      const x = mono(await readWav(c.file));
-      // dialogue leveling: active-speech RMS to -20 dBFS so every line sits at the same level in the mix
+      const x = compressDialogue(mono(await readWav(c.file)));
+      // dialogue leveling: active-speech RMS to -17 dBFS (dialogue is the anchor of the mix) so every line sits at the same level in the mix
       let se = 0, sn = 0; for (let i = 0; i < x.length; i += 4) { const v = x[i] * x[i]; if (v > 1e-5) { se += v; sn++; } }
       const lineRms = Math.sqrt(se / Math.max(1, sn));
-      const level = lineRms > 1e-5 ? Math.min(dbToGain(18), dbToGain(-20) / lineRms) : 1;
+      const level = lineRms > 1e-5 ? Math.min(dbToGain(18), dbToGain(-17) / lineRms) : 1;
       let pk = 0;
       for (let i = 0; i < x.length; i++) { const j = s0 + i; if (j < 0 || j >= N) continue; const v = x[i] * g * level; dl[j] += v * pl; dr[j] += v * pr; dialogue[j] += v; pk = Math.max(pk, Math.abs(v)); }
       report.push({ id: c.id, kind: c.kind, start: c.start, duration: x.length / SR, peak: pk });

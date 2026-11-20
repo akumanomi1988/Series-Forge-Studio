@@ -6,7 +6,7 @@ Leyenda: ✅ hecho y probado (test automático y/o inspección de fotogramas/aud
 
 ## Pruebas automáticas
 
-`npm test`: **51 pruebas, 50 superadas, 1 omitida** (crear un enlace simbólico requiere privilegios en este equipo); `npm run typecheck` sin errores. Suites:
+`npm test`: **53 pruebas, 52 superadas, 1 omitida** (crear un enlace simbólico requiere privilegios en este equipo); `npm run typecheck` sin errores. Suites:
 
 | Suite | Cubre |
 |---|---|
@@ -24,8 +24,8 @@ Leyenda: ✅ hecho y probado (test automático y/o inspección de fotogramas/aud
 
 - duración exacta, fotogramas = esperados, A/V ±1 ms; sin negros fuera de fundidos; todos los planos con detalle;
 - paridad editor/exportación: PSNR mínimo 30,2 dB (media ≈ 44 dB) entre el fotograma renderizado por la Stage y el decodificado del MP4;
-- −16,1 LUFS integrados, pico −0,9 dBTP; 17 líneas de diálogo colocadas con desfase **0 ms** (correlación de forma de onda);
-- lip-sync: desfase boca/voz **0–10 ms** en las 17 líneas (aviso: correlación mínima 0,47 en una frase con vocales cerradas).
+- diálogo −16,7 LUFS (anclado al diálogo), mezcla −15,1 LUFS, pico −0,9 dBTP; 17 líneas de diálogo colocadas con desfase **0 ms** (correlación de forma de onda);
+- lip-sync: desfase boca/voz **≤ 10 ms** en las 17 líneas (correlación mínima 0,47).
 
 Contenido verificado viendo fotogramas reales del MP4: dos personajes procedurales distintos y reconocibles; taller reutilizable; robot articulado averiado (panel, cabeza, chispas, ojo parpadeante); dos voces españolas diferenciadas (Pablo −2,5 st con EQ grave; Laura); emociones (preocupación, miedo, nervios, enfado, ironía, sonrisa); entrar caminando por la puerta y detenerse; **giro corporal de 35°**; miradas automáticas entre personajes y a objetos; Bruno sujeta, esconde y deja caer el fusible (cae con rebotes y sonido metálico); Lara se acerca, lo recoge y lo muestra; planos generales, medios, primeros planos, contraplanos por encima del hombro, inserto; **encadenado** y fundidos; ambiente de taller, puerta, chispas, servo, pitidos, pasos, impactos; música procedural con ducking; subtítulos.
 
@@ -56,7 +56,7 @@ Tiempo: render completo 1080p del piloto ≈ 2,5 min (≈ 8–11 fps de render e
 | Exportación MP4/WAV/SRT/metadata/storyboard/validación | ✅ | |
 | Caché por huella de estado, reanudación | ✅ | |
 | Producción de 20 minutos | ver abajo | |
-| GLB/glTF compilado | ⏳ | la geometría se genera en tiempo de carga; no se exporta GLB |
+| GLB/glTF compilado | ✅ | `studio export character|prop` → `compiled/<id>.glb` con mallas con skinning y esqueleto de 22 huesos (test de ida y vuelta con GLTFLoader); el render sigue generando la geometría desde los parámetros |
 | Remotion | descartado | no aporta ventaja: la Stage de Three.js ya es determinista por fotograma y se captura directamente |
 | Director IA dentro de la app | no se implementa por diseño | lo hacen agentes externos con el CLI y los formatos |
 
@@ -64,9 +64,26 @@ Tiempo: render completo 1080p del piloto ≈ 2,5 min (≈ 8–11 fps de render e
 
 Episodio técnico generado con `node scripts/bench-long.ts el-ultimo-turno 20 ep-larga`: 20 escenas × 60 s, 160 líneas de diálogo con TTS real, caminatas, giros, gestos, recogidas y 180 planos, 1920×1080 a 24 fps (28 800 fotogramas). **No es una prueba de calidad narrativa.**
 
-Resultados: *(se completan al terminar la ejecución; ver sección siguiente)*.
+Resultados (verificados con `validate episode`, informe en `output/validation-report.json`):
+
+| Medida | Resultado |
+|---|---|
+| Vídeo | H.264 1920×1080, **28 800 fotogramas exactos**, 1199,99 s; audio AAC 48 kHz 1200,00 s; 160 subtítulos |
+| Tiempo de render | 50,8 min para 233 fragmentos (≈ 8,7 fps medios) + 27 fragmentos reutilizados de una ejecución interrumpida |
+| Estabilidad | 0 reintentos tras introducir el reciclado del navegador (39 reciclados, cada ≈ 720 fotogramas); memoria del proceso Node ≤ 403 MB; memoria de GPU ≤ 1 428 / 2 048 MiB |
+| Recuperación | ejecución detenida a mano a mitad → al relanzar se reutilizaron los 27 fragmentos completos y se descartaron los parciales |
+| Caché | re-ejecución sin cambios: 260/260 fragmentos reutilizados, episodio reensamblado y remezclado en 84–104 s |
+| Sincronía | 160 líneas colocadas con desfase 0 ms; lip-sync ≤ 50 ms; A/V 11 ms |
+| Paridad editor/exportación | PSNR mínimo 43,2 dB en los 180 planos |
+| Sonoridad | diálogo −16,0 LUFS (normalización anclada al diálogo), mezcla −21,7 LUFS integrados, pico −0,9 dBTP |
+| Edición | la API del editor compila cualquier escena del episodio para el visor; la timeline muestra sus 9 planos |
+
+Hallazgos corregidos gracias a esta prueba: bloqueos de Chromium tras ~1 000 fotogramas 1080p consecutivos (ahora se recicla el navegador y cada lote tiene un tiempo límite de 45 s), un fallo `EBUSY` en la ruta de reintento que ocultaba la causa, y una normalización de sonoridad que comprimía la voz en episodios con pocos diálogos (ahora compresor de diálogo + normalización anclada al diálogo).
 
 ## Limitaciones conocidas
+
+- En algún plano con cámara de seguimiento baja un objeto grande puede tapar parcialmente la acción (piloto: Lara recoge el fusible tras el robot); el agente debe revisar el storyboard y ajustar el plano.
+- El adaptador Piper está implementado pero no probado (no hay binario ni modelo de licencia verificada instalados).
 
 - Estética «toon procedural»: personajes de cartón piedra estilizados, sin deformaciones faciales, sin pelo/tela con simulación secundaria, sin dedos animados individualmente (solo cierre de mano).
 - La navegación de personajes evita a otros personajes, pero no a muebles (las rutas las decide el autor de la escena).
