@@ -6,10 +6,13 @@ import type { CharacterGeometry } from '../engine/schema.ts';
 import type { RigInstance, ActorPose } from '../engine/pose.ts';
 import type { FaceState } from '../engine/face.ts';
 import { toon, flat, withOutline, shade, mix } from './toon.ts';
+import type { NecklineSpec } from './toon.ts';
 import { clamp, lerp, DEG } from '../engine/math.ts';
 
 type W = [string, number][];
-interface Ring { y: number; rx: number; rz: number; x: number; z: number; color: string; w: W }
+interface Ring { y: number; rx: number; rz: number; x: number; z: number; color: string; w: W; gloss?: number; /** depth below the neck base (torso only: per-pixel neckline) */ neck?: number }
+/** Specular strength of each fabric (toon highlight + sheen). */
+export const FABRIC_GLOSS: Record<string, number> = { matte: 0, satin: 0.55, silk: 0.75, leather: 0.45, sequin: 0.95 };
 
 function tubeGeometry(input: Ring[], boneIndex: Map<string, number>, seg = 18, capTop = true, capBottom = true): THREE.BufferGeometry {
   const rings: Ring[] = [];
@@ -21,23 +24,24 @@ function tubeGeometry(input: Ring[], boneIndex: Map<string, number>, seg = 18, c
       rings.push(m(0.0008), m(-0.0008));
     }
   }
-  const pos: number[] = [], col: number[] = [], si: number[] = [], sw: number[] = [], idx: number[] = [];
+  const pos: number[] = [], col: number[] = [], si: number[] = [], sw: number[] = [], idx: number[] = [], gl: number[] = [], nk: number[] = [];
+  const hasNeck = input.some(r => r.neck !== undefined);
   const c = new THREE.Color();
-  const pushV = (x: number, y: number, z: number, color: string, w: W) => {
-    pos.push(x, y, z); c.set(color); col.push(c.r, c.g, c.b);
+  const pushV = (x: number, y: number, z: number, color: string, w: W, gloss = 0) => {
+    pos.push(x, y, z); c.set(color); col.push(c.r, c.g, c.b); gl.push(gloss);
     const ws = [...w].sort((a, b) => b[1] - a[1]).slice(0, 4); const tot = ws.reduce((s, x) => s + x[1], 0) || 1;
     for (let k = 0; k < 4; k++) { si.push(ws[k] ? boneIndex.get(ws[k][0]) ?? 0 : 0); sw.push(ws[k] ? ws[k][1] / tot : 0); }
   };
-  for (const r of rings) for (let i = 0; i <= seg; i++) { const a = (i / seg) * Math.PI * 2; pushV(r.x + Math.sin(a) * r.rx, r.y, r.z + Math.cos(a) * r.rz, r.color, r.w); }
+  for (const r of rings) for (let i = 0; i <= seg; i++) { const a = (i / seg) * Math.PI * 2; pushV(r.x + Math.sin(a) * r.rx, r.y, r.z + Math.cos(a) * r.rz, r.color, r.w, r.gloss ?? 0); if (hasNeck) nk.push(Math.sin(a), Math.cos(a), r.neck ?? -1); }
   for (let j = 0; j < rings.length - 1; j++) for (let i = 0; i < seg; i++) {
     const a = j * (seg + 1) + i, b = a + seg + 1;
     // rings ordered top->bottom: wind so normals face outward
     idx.push(a, b, a + 1, a + 1, b, b + 1);
   }
   const cap = (r: Ring, top: boolean) => {
-    const center = pos.length / 3; pushV(r.x, r.y + (top ? r.rx * 0.35 : -r.rx * 0.35), r.z, r.color, r.w);
+    const center = pos.length / 3; pushV(r.x, r.y + (top ? r.rx * 0.35 : -r.rx * 0.35), r.z, r.color, r.w, r.gloss ?? 0); if (hasNeck) nk.push(0, -1, -1);
     const base = pos.length / 3;
-    for (let i = 0; i <= seg; i++) { const a = (i / seg) * Math.PI * 2; pushV(r.x + Math.sin(a) * r.rx, r.y, r.z + Math.cos(a) * r.rz, r.color, r.w); }
+    for (let i = 0; i <= seg; i++) { const a = (i / seg) * Math.PI * 2; pushV(r.x + Math.sin(a) * r.rx, r.y, r.z + Math.cos(a) * r.rz, r.color, r.w, r.gloss ?? 0); if (hasNeck) nk.push(0, -1, -1); }
     for (let i = 0; i < seg; i++) top ? idx.push(center, base + i, base + i + 1) : idx.push(center, base + i + 1, base + i);
   };
   if (capTop) cap(rings[0], true);
@@ -47,6 +51,8 @@ function tubeGeometry(input: Ring[], boneIndex: Map<string, number>, seg = 18, c
   g.setAttribute('color', new THREE.Float32BufferAttribute(col, 3));
   g.setAttribute('skinIndex', new THREE.Uint16BufferAttribute(si, 4));
   g.setAttribute('skinWeight', new THREE.Float32BufferAttribute(sw, 4));
+  if (gl.some(v => v > 0) || hasNeck) { g.setAttribute('gloss', new THREE.Float32BufferAttribute(gl, 1)); g.userData.gloss = true; }
+  if (hasNeck) g.setAttribute('neck', new THREE.Float32BufferAttribute(nk, 3));
   g.setIndex(idx);
   g.computeVertexNormals();
   return g;
@@ -107,6 +113,17 @@ export class CharacterVisual {
       [hipsY - 0.07 * s, d.hipRx * 0.92, d.chestRz * 0.85],
       [hipsY - 0.11 * s, d.hipRx * 0.55, d.chestRz * 0.55]
     ];
+    const skinG = b.skinGloss, topG = FABRIC_GLOSS[top.fabric] ?? 0, botG = FABRIC_GLOSS[bottom.fabric] ?? 0;
+    const glossOf = (c: string) => c === skin ? skinG : c === pants && top.type !== 'overalls' ? botG : topG;
+    // neckline: a skin region on the front of the torso (a = 0 is the front), shaped per type, with a soft cleavage shadow
+    const neckBase = neckY - 0.02 * s, NECK: Record<string, number> = { v: 0.13, scoop: 0.1, plunge: 0.21, 'off-shoulder': 0.05 };
+    const depth = (NECK[top.neckline] ?? 0) * s;
+    const neckSpec: NecklineSpec | undefined = depth > 0 ? { kind: top.neckline as NecklineSpec['kind'], depth, offDepth: neckBase - (shoulderY - 0.045 * s), scale: s, skin, skinGloss: skinG, cleavage: b.chest >= 0.35 } : undefined;
+    if (depth > 0) for (const y of [neckBase + 0.004 * s, neckBase - depth * 0.5, neckBase - depth - 0.01 * s]) { // a few rings so the torso follows the cut smoothly
+      const i = torsoProfile.findIndex(p => p[0] < y); if (i <= 0) continue;
+      const p0 = torsoProfile[i - 1], p1 = torsoProfile[i], u = (p0[0] - y) / Math.max(1e-6, p0[0] - p1[0]);
+      torsoProfile.splice(i, 0, [y, lerp(p0[1], p1[1], u), lerp(p0[2], p1[2], u)]);
+    }
     const rings: Ring[] = [];
     for (let i = 0; i < torsoProfile.length; i++) {
       const [y, rx, rz] = torsoProfile[i];
@@ -120,16 +137,17 @@ export class CharacterVisual {
         rings.push({ y: by + 0.001, rx: brx * 1.03, rz: brz * 1.03, x: 0, z: 0, color: torsoColor(prev[0]), w: tw(by) });
         rings.push({ y: by - 0.001, rx: brx, rz: brz, x: 0, z: 0, color, w: tw(by) });
       }
-      rings.push({ y, rx: rx * k, rz: rz * k, x: 0, z: 0.0, color, w: tw(y) });
+      const neckColor = depth > 0 && y > neckY - 0.005 * s ? skin : color;
+      rings.push({ y, rx: rx * k, rz: rz * k, x: 0, z: 0.0, color: neckColor, w: tw(y), gloss: glossOf(neckColor), neck: depth > 0 ? neckBase - y : undefined });
     }
-    this.addSkinned(tubeGeometry(rings, boneIndex, 28), skeleton, 'torso');
+    this.addSkinned(tubeGeometry(rings, boneIndex, depth > 0 ? 40 : 28), skeleton, 'torso', neckSpec);
     // neck
     const headY = this.boneWorldY('head').y;
-    this.addSkinned(tubeGeometry([
+    this.addSkinned(tubeGeometry(([
       { y: headY + d.headRy * 0.4, rx: d.headRx * 0.38, rz: d.headRz * 0.38, x: 0, z: -0.01 * s, color: skin, w: [['head', 1]] },
       { y: headY, rx: d.headRx * 0.36, rz: d.headRz * 0.38, x: 0, z: -0.01 * s, color: skin, w: [['head', 0.5], ['neck', 0.5]] },
       { y: neckY - 0.02 * s, rx: d.headRx * 0.42, rz: d.headRz * 0.42, x: 0, z: -0.01 * s, color: skin, w: [['neck', 0.5], ['chest', 0.5]] }
-    ], boneIndex, 14, false, false), skeleton, 'neck');
+    ] as Ring[]).map(r => ({ ...r, gloss: skinG })), boneIndex, 14, false, false), skeleton, 'neck');
     // arms
     const sleeve = top.type === 'tanktop' || top.type === 'dress' ? 0 : top.type === 'tshirt' || top.type === 'vest' || top.type === 'overalls' ? 0.45 : 1.0;
     const sleeveColor = top.type === 'vest' || top.type === 'overalls' ? under : topColor;
@@ -149,6 +167,9 @@ export class CharacterVisual {
         const inSleeve = u <= sleeveEnd / len + 1e-6 && sleeve > 0;
         pushArm(u, rf, inSleeve ? sleeveColor : skin, inSleeve ? coat * (sleeve === 1 ? 1.04 : 1.06) : 1);
       }
+      // off-shoulder: the sleeve starts below the shoulder, the shoulder itself is bare
+      if (top.neckline === 'off-shoulder') for (const r of arm) if (r.y > up.y - 0.05 * s) r.color = skin;
+      for (const r of arm) r.gloss = r.color === skin ? skinG : topG;
       this.addSkinned(tubeGeometry(arm, boneIndex, 18, true, true), skeleton, `${side}Arm`);
       // legs
       const th = this.boneWorldY(`${side}Thigh`), kn = this.boneWorldY(`${side}Shin`), an = this.boneWorldY(`${side}Foot`);
@@ -166,6 +187,7 @@ export class CharacterVisual {
         const color = u >= bootTop ? g.outfit.shoes.color : inPants ? pants : skin;
         leg.push({ y, rx: d.legR * rf * (inPants ? 1.04 : 0.92) * (u < 0 ? 1.2 : 1), rz: d.legR * rf * (inPants ? 1.04 : 0.92), x: th.x * (u < 0 ? 0.7 : 1), z: 0, color, w: lw(y) });
       }
+      for (const r of leg) r.gloss = r.color === skin ? skinG : r.color === pants ? botG : 0;
       this.addSkinned(tubeGeometry(leg, boneIndex, 18, false, true), skeleton, `${side}Leg`);
     }
     // clothing details (rigid on bones)
@@ -201,15 +223,15 @@ export class CharacterVisual {
       const color = bottom.type === 'skirt' ? pants : topColor;
       const len = top.type === 'labcoat' ? d.legLen * 0.62 : bottom.type === 'skirt' ? d.legLen * 0.42 : d.legLen * 0.5;
       const open = top.type === 'labcoat' ? 0.5 : 0;
-      const skirt = new THREE.Mesh(new THREE.CylinderGeometry(d.hipRx * 1.12, d.hipRx * 1.6, len, 24, 1, true, open / 2 + Math.PI, Math.PI * 2 - open), toon(color, { side: THREE.DoubleSide }));
+      const skirt = new THREE.Mesh(new THREE.CylinderGeometry(d.hipRx * 1.12, d.hipRx * 1.6, len, 48, 1, true, open / 2 + Math.PI, Math.PI * 2 - open), toon(color, { side: THREE.DoubleSide, gloss: (bottom.type === 'skirt' ? FABRIC_GLOSS[bottom.fabric] : FABRIC_GLOSS[top.fabric]) * 0.6, shininess: 45 }));
       skirt.scale.z = (d.chestRz * 1.1) / (d.hipRx * 1.12) + 0.2;
       skirt.position.copy(toLocal(hips, new THREE.Vector3(0, waistY - 0.02 * s - len / 2, 0)));
       skirt.rotation.y = Math.PI;
       hips.add(withOutline(skirt, 0.005 * s));
     }
   }
-  private addSkinned(geo: THREE.BufferGeometry, skeleton: THREE.Skeleton, name: string) {
-    const mesh = new THREE.SkinnedMesh(geo, toon('#ffffff', { vertexColors: true }));
+  private addSkinned(geo: THREE.BufferGeometry, skeleton: THREE.Skeleton, name: string, neckline?: NecklineSpec) {
+    const mesh = new THREE.SkinnedMesh(geo, toon('#ffffff', geo.userData.gloss ? { vertexColors: true, glossAttr: true, shininess: 70, neckline } : { vertexColors: true }));
     mesh.name = name; mesh.frustumCulled = false;
     mesh.bind(skeleton, new THREE.Matrix4());
     this.rig.group.add(mesh);
@@ -352,6 +374,7 @@ export class CharacterVisual {
     this.buildHair(H, rx, ry, rz);
   }
   private buildHair(H: THREE.Group, rx: number, ry: number, rz: number) {
+    const hairGloss = this.geo.hair.shine > 0 ? { gloss: this.geo.hair.shine * 0.45, shininess: 80 } : {};
     const g = this.geo, s = this.d.scale, hc = g.hair.color, v = g.hair.volume;
     const ow = 0.007 * s;
     const add = (m: THREE.Mesh, outline = true) => { H.add(outline ? withOutline(m, ow) : m); return m; };
@@ -365,15 +388,15 @@ export class CharacterVisual {
     switch (g.hair.style) {
       case 'bald': break;
       case 'buzz': cap(Math.PI * 0.42, 1.015, -0.48, mix(hc, g.body.skinColor, 0.35)); break;
-      case 'short': cap(Math.PI * 0.5); { const fr = new THREE.Mesh(new THREE.SphereGeometry(1, 16, 10), toon(hc)); fr.scale.set(rx * 0.7, ry * 0.18, rz * 0.35); fr.position.set(rx * 0.12, ry * 0.68, rz * 0.62); fr.rotation.z = -0.25; add(fr); } break;
-      case 'sidepart': cap(Math.PI * 0.52); { const sw = new THREE.Mesh(new THREE.SphereGeometry(1, 20, 12), toon(hc)); sw.scale.set(rx * 0.75, ry * 0.32, rz * 0.62); sw.position.set(rx * 0.32, ry * 0.72, rz * 0.32); sw.rotation.z = -0.35; add(sw); } break;
-      case 'spiky': { cap(Math.PI * 0.48); for (let i = 0; i < 9; i++) { const a = (i / 9) * Math.PI * 2, el = 0.45 + 0.25 * ((i * 37) % 5) / 5; const c = new THREE.Mesh(new THREE.ConeGeometry(rx * 0.22, ry * 0.55 * v, 8), toon(hc)); const dir = new THREE.Vector3(Math.sin(a) * Math.cos(el) * 0.8, Math.sin(el) + 0.3, Math.cos(a) * Math.cos(el) * 0.6 - 0.25).normalize(); c.position.set(dir.x * rx * 0.85, dir.y * ry * 0.85, dir.z * rz * 0.85); c.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), dir); add(c); } break; }
-      case 'mohawk': { cap(Math.PI * 0.45, 1.01, -0.48, mix(hc, g.body.skinColor, 0.55)); for (let i = 0; i < 6; i++) { const a = -0.4 + i * 0.32; const c = new THREE.Mesh(new THREE.ConeGeometry(rx * 0.12, ry * 0.5 * v, 6), toon(hc)); c.scale.z = 2.2; const dir = new THREE.Vector3(0, Math.cos(a), Math.sin(a) * 1.1).normalize(); c.position.set(0, dir.y * ry, dir.z * rz); c.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), dir); add(c); } break; }
-      case 'bob': { cap(Math.PI * 0.62, 1.1, -0.42); const back = new THREE.Mesh(new THREE.CylinderGeometry(rx * 1.1, rx * 1.18, ry * 1.05, 28, 1, true, Math.PI * 0.62, Math.PI * 1.76), toon(hc, { side: THREE.DoubleSide })); back.scale.z = rz / rx * 1.05; back.position.y = -ry * 0.2; add(back); const bang = new THREE.Mesh(new THREE.SphereGeometry(1, 20, 10, 0, Math.PI * 2, 0, Math.PI / 2), toon(hc)); bang.scale.set(rx * 0.95, ry * 0.3, rz * 0.5); bang.position.set(0, ry * 0.5, rz * 0.62); bang.rotation.x = 0.5; add(bang); break; }
-      case 'long': { cap(Math.PI * 0.58, 1.08, -0.5); const back = new THREE.Mesh(new THREE.CylinderGeometry(rx * 1.05, rx * 1.15, ry * 2.3 * v, 28, 1, true, Math.PI * 0.7, Math.PI * 1.6), toon(hc, { side: THREE.DoubleSide })); back.scale.z = rz / rx; back.position.set(0, -ry * 0.75, -rz * 0.08); add(back); break; }
-      case 'ponytail': { cap(Math.PI * 0.55, 1.07, -0.58); const tie = new THREE.Mesh(new THREE.SphereGeometry(rx * 0.16, 12, 8), toon(shade(hc, 0.7))); tie.position.set(0, ry * 0.35, -rz * 1.02); add(tie); const tail = new THREE.Mesh(new THREE.CapsuleGeometry(rx * 0.2, ry * 1.1 * v, 6, 12), toon(hc)); tail.position.set(0, -ry * 0.25, -rz * 1.18); tail.rotation.x = -0.25; tail.name = 'ponytail'; add(tail); break; }
-      case 'bun': { cap(Math.PI * 0.55, 1.07, -0.58); const bun = new THREE.Mesh(new THREE.SphereGeometry(rx * 0.38 * v, 16, 12), toon(hc)); bun.position.set(0, ry * 0.85, -rz * 0.55); add(bun); break; }
-      case 'curly': { for (let i = 0; i < 46; i++) { const u = ((i * 0.618034) % 1), vv = (i / 46); const th = Math.acos(1 - vv * 1.15), ph = u * Math.PI * 2; if (Math.cos(th) < -0.05) continue; const dir = new THREE.Vector3(Math.sin(th) * Math.cos(ph), Math.cos(th), Math.sin(th) * Math.sin(ph)); if (dir.z > 0.55 && dir.y < 0.55) continue; const b = new THREE.Mesh(new THREE.SphereGeometry(rx * 0.24 * v, 10, 8), toon(hc)); b.position.set(dir.x * rx * 1.02, dir.y * ry * 1.02 + ry * 0.05, dir.z * rz * 1.02); add(b, false); } cap(Math.PI * 0.5, 1.04, -0.48); break; }
+      case 'short': cap(Math.PI * 0.5); { const fr = new THREE.Mesh(new THREE.SphereGeometry(1, 16, 10), toon(hc, hairGloss)); fr.scale.set(rx * 0.7, ry * 0.18, rz * 0.35); fr.position.set(rx * 0.12, ry * 0.68, rz * 0.62); fr.rotation.z = -0.25; add(fr); } break;
+      case 'sidepart': cap(Math.PI * 0.52); { const sw = new THREE.Mesh(new THREE.SphereGeometry(1, 20, 12), toon(hc, hairGloss)); sw.scale.set(rx * 0.75, ry * 0.32, rz * 0.62); sw.position.set(rx * 0.32, ry * 0.72, rz * 0.32); sw.rotation.z = -0.35; add(sw); } break;
+      case 'spiky': { cap(Math.PI * 0.48); for (let i = 0; i < 9; i++) { const a = (i / 9) * Math.PI * 2, el = 0.45 + 0.25 * ((i * 37) % 5) / 5; const c = new THREE.Mesh(new THREE.ConeGeometry(rx * 0.22, ry * 0.55 * v, 8), toon(hc, hairGloss)); const dir = new THREE.Vector3(Math.sin(a) * Math.cos(el) * 0.8, Math.sin(el) + 0.3, Math.cos(a) * Math.cos(el) * 0.6 - 0.25).normalize(); c.position.set(dir.x * rx * 0.85, dir.y * ry * 0.85, dir.z * rz * 0.85); c.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), dir); add(c); } break; }
+      case 'mohawk': { cap(Math.PI * 0.45, 1.01, -0.48, mix(hc, g.body.skinColor, 0.55)); for (let i = 0; i < 6; i++) { const a = -0.4 + i * 0.32; const c = new THREE.Mesh(new THREE.ConeGeometry(rx * 0.12, ry * 0.5 * v, 6), toon(hc, hairGloss)); c.scale.z = 2.2; const dir = new THREE.Vector3(0, Math.cos(a), Math.sin(a) * 1.1).normalize(); c.position.set(0, dir.y * ry, dir.z * rz); c.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), dir); add(c); } break; }
+      case 'bob': { cap(Math.PI * 0.62, 1.1, -0.42); const back = new THREE.Mesh(new THREE.CylinderGeometry(rx * 1.1, rx * 1.18, ry * 1.05, 28, 1, true, Math.PI * 0.3, Math.PI * 1.4), toon(hc, { side: THREE.DoubleSide, ...hairGloss })); back.scale.z = rz / rx * 1.05; back.position.y = -ry * 0.2; add(back); const bang = new THREE.Mesh(new THREE.SphereGeometry(1, 20, 10, 0, Math.PI * 2, 0, Math.PI / 2), toon(hc, hairGloss)); bang.scale.set(rx * 0.95, ry * 0.3, rz * 0.5); bang.position.set(0, ry * 0.5, rz * 0.62); bang.rotation.x = 0.5; add(bang); break; }
+      case 'long': { cap(Math.PI * 0.58, 1.08, -0.5); const back = new THREE.Mesh(new THREE.CylinderGeometry(rx * 1.05, rx * 1.15, ry * 2.3 * v, 28, 1, true, Math.PI * 0.32, Math.PI * 1.36), toon(hc, { side: THREE.DoubleSide, ...hairGloss })); back.scale.z = rz / rx; back.position.set(0, -ry * 0.75, -rz * 0.08); add(back); break; }
+      case 'ponytail': { cap(Math.PI * 0.55, 1.07, -0.58); const tie = new THREE.Mesh(new THREE.SphereGeometry(rx * 0.16, 12, 8), toon(shade(hc, 0.7))); tie.position.set(0, ry * 0.35, -rz * 1.02); add(tie); const tail = new THREE.Mesh(new THREE.CapsuleGeometry(rx * 0.2, ry * 1.1 * v, 6, 12), toon(hc, hairGloss)); tail.position.set(0, -ry * 0.25, -rz * 1.18); tail.rotation.x = -0.25; tail.name = 'ponytail'; add(tail); break; }
+      case 'bun': { cap(Math.PI * 0.55, 1.07, -0.58); const bun = new THREE.Mesh(new THREE.SphereGeometry(rx * 0.38 * v, 16, 12), toon(hc, hairGloss)); bun.position.set(0, ry * 0.85, -rz * 0.55); add(bun); break; }
+      case 'curly': { for (let i = 0; i < 46; i++) { const u = ((i * 0.618034) % 1), vv = (i / 46); const th = Math.acos(1 - vv * 1.15), ph = u * Math.PI * 2; if (Math.cos(th) < -0.05) continue; const dir = new THREE.Vector3(Math.sin(th) * Math.cos(ph), Math.cos(th), Math.sin(th) * Math.sin(ph)); if (dir.z > 0.55 && dir.y < 0.55) continue; const b = new THREE.Mesh(new THREE.SphereGeometry(rx * 0.24 * v, 10, 8), toon(hc, hairGloss)); b.position.set(dir.x * rx * 1.02, dir.y * ry * 1.02 + ry * 0.05, dir.z * rz * 1.02); add(b, false); } cap(Math.PI * 0.5, 1.04, -0.48); break; }
     }
     // beard
     const bc = g.beard.color ?? hc;

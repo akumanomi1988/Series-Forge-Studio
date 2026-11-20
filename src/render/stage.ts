@@ -144,10 +144,13 @@ export class Stage {
     const baseEm = mat && 'emissiveIntensity' in mat ? mat.emissiveIntensity : 0;
     if (def.effect === 'off') {
       // switch a device off: its lights go dark and the given part (screen, bulb…) loses its glow
-      const lights = (pv?.lights ?? []).map(l => ({ l, base: l.intensity }));
+      // no prop and no part: a blackout of the set (environment lights and ambient), practical lights stay on
+      const blackout = !def.prop && !def.part;
+      const envLights = blackout && this.env ? [...this.env.lights.map(x => x.light), ...this.env.group.children.filter(c => (c as THREE.HemisphereLight).isHemisphereLight) as THREE.Light[]] : [];
+      const lights = [...(pv?.lights ?? []), ...envLights].map(l => ({ l, base: l.intensity, keep: (l as THREE.HemisphereLight).isHemisphereLight ? 0.4 : 0.12 }));
       return { def, obj: new THREE.Group(), update: t => {
         const w = intervalWeight(t, def.start, def.end, 0.04, 0.08) * Math.min(1, def.intensity);
-        for (const { l, base } of lights) l.intensity = base * (1 - w);
+        for (const { l, base, keep } of lights) l.intensity = base * (1 - w * (blackout ? 1 - keep : 1));
         if (mat && baseColor) { mat.color.copy(baseColor).multiplyScalar(1 - 0.85 * w); if ('emissiveIntensity' in mat) mat.emissiveIntensity = baseEm * (1 - w); }
       } };
     }

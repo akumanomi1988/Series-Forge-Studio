@@ -150,6 +150,11 @@ export function buildProp(raw: PropGeometry): PropVisual {
     default: break;
   }
   for (const p of geo.parts) { const m = primitiveMesh(p); const parent = parentFor(p.pivot); if (parent !== group) m.position.sub(parent.position); parent.add(m); parts.set(p.id, m); }
+  // any prop can emit light (candles, neon, practical lamps): params.lightIntensity / lightColor / lightY / lightDistance
+  if (num(geo, 'lightIntensity', 0) > 0 && geo.generator !== 'lamp' && geo.generator !== 'streetlamp') {
+    const l = new THREE.PointLight(new THREE.Color(str(geo, 'lightColor', '#ffcf8a')), num(geo, 'lightIntensity', 1), num(geo, 'lightDistance', 3), 1.8);
+    l.position.set(0, num(geo, 'lightY', 0.2), 0); group.add(l); lights.push(l);
+  }
   return { group, joints, parts, lights };
 }
 export function applyJoints(v: PropVisual, values: Record<string, number>): void {

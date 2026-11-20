@@ -12,12 +12,66 @@ export function toonGradient(): THREE.DataTexture {
   return gradient;
 }
 const cache = new Map<string, THREE.Material>();
-export function toon(color: string | number, opts: { vertexColors?: boolean; emissive?: string; emissiveIntensity?: number; transparent?: boolean; opacity?: number; side?: THREE.Side } = {}): THREE.MeshToonMaterial {
+/** Neckline drawn per pixel on the torso (crisp anti-aliased edge at any distance). The torso carries a "neck"
+ * attribute (sin a, cos a, depth below the neck base); the shader paints skin inside the neckline shape. */
+export interface NecklineSpec { kind: 'v' | 'scoop' | 'plunge' | 'off-shoulder'; depth: number; offDepth: number; scale: number; skin: string; skinGloss: number; cleavage: boolean }
+const NECK_KIND = { v: 1, scoop: 2, plunge: 3, 'off-shoulder': 4 } as const;
+/** Cel-shaded specular: a hard-edged highlight (Blinn-Phong thresholded into one band) from every directional, point
+ * and spot light, plus a fresnel rim sheen. Strength comes from a uniform or from a per-vertex "gloss" attribute. */
+function addGloss(m: THREE.MeshToonMaterial, gloss: number, perVertex: boolean, shininess: number, neck?: NecklineSpec) {
+  m.onBeforeCompile = shader => {
+    shader.uniforms.sfGloss = { value: gloss }; shader.uniforms.sfShininess = { value: shininess };
+    if (neck) Object.assign(shader.uniforms, {
+      sfNeckKind: { value: NECK_KIND[neck.kind] }, sfNeckDepth: { value: neck.depth }, sfOffDepth: { value: neck.offDepth }, sfScale: { value: neck.scale },
+      sfSkin: { value: new THREE.Color(neck.skin) }, sfSkinGloss: { value: neck.skinGloss }, sfCleave: { value: neck.cleavage ? 1 : 0 }
+    });
+    shader.vertexShader = shader.vertexShader
+      .replace('#include <common>', `#include <common>\n${perVertex ? 'attribute float gloss;' : ''}\nvarying float vGloss;\nuniform float sfGloss;${neck ? '\nattribute vec3 neck;\nvarying vec3 vNeck;' : ''}`)
+      .replace('#include <begin_vertex>', `#include <begin_vertex>\nvGloss = ${perVertex ? 'gloss' : 'sfGloss'};${neck ? '\nvNeck = neck;' : ''}`);
+    shader.fragmentShader = shader.fragmentShader
+      .replace('#include <common>', `#include <common>\nvarying float vGloss;\nuniform float sfShininess;${neck ? `
+varying vec3 vNeck;
+uniform int sfNeckKind; uniform float sfNeckDepth, sfOffDepth, sfScale, sfSkinGloss, sfCleave; uniform vec3 sfSkin;
+float sfNeckMask(out float shadow) {
+  float aa = abs(degrees(atan(vNeck.x, vNeck.y))), db = vNeck.z;
+  float wa = fwidth(aa) + 0.01, wd = fwidth(db) + 1e-5;
+  shadow = 0.0;
+  if (sfNeckKind == 4) return 1.0 - smoothstep(sfOffDepth - wd, sfOffDepth + wd, db);
+  float above = (1.0 - smoothstep(-wd, wd, db)) * (1.0 - smoothstep(80.0 - wa, 80.0 + wa, aa));
+  float t = clamp(db / sfNeckDepth, 0.0, 1.0);
+  float ha = sfNeckKind == 2 ? 62.0 * sqrt(max(0.0, 1.0 - t * t)) : sfNeckKind == 3 ? 44.0 * pow(1.0 - t, 0.8) : 52.0 * (1.0 - t);
+  float inside = smoothstep(-wd, wd, db) * (1.0 - smoothstep(ha - wa, ha + wa, aa)) * (1.0 - smoothstep(sfNeckDepth - wd, sfNeckDepth + wd, db));
+  shadow = sfCleave * (1.0 - smoothstep(1.5, 4.0, aa)) * smoothstep(sfNeckDepth - 0.055 * sfScale, sfNeckDepth - 0.035 * sfScale, db) * inside;
+  return max(above, inside);
+}` : ''}`)
+      .replace('#include <color_fragment>', `#include <color_fragment>\nfloat sfG = vGloss;${neck ? `
+{ float sh; float mk = sfNeckMask(sh); diffuseColor.rgb = mix(diffuseColor.rgb, sfSkin * (1.0 - 0.28 * sh), mk); sfG = mix(sfG, sfSkinGloss, mk); }` : ''}`)
+      .replace('#include <opaque_fragment>', `
+      if (sfG > 0.001) {
+        vec3 sfN = normalize(normal), sfV = normalize(vViewPosition), sfSpec = vec3(0.0);
+        #if NUM_DIR_LIGHTS > 0
+        for (int i = 0; i < NUM_DIR_LIGHTS; i++) { vec3 H = normalize(directionalLights[i].direction + sfV); sfSpec += directionalLights[i].color * smoothstep(0.42, 0.48, pow(max(dot(sfN, H), 0.0), sfShininess)); }
+        #endif
+        #if NUM_POINT_LIGHTS > 0
+        for (int i = 0; i < NUM_POINT_LIGHTS; i++) { vec3 lv = pointLights[i].position + vViewPosition; float dl = length(lv); vec3 H = normalize(lv / dl + sfV); sfSpec += pointLights[i].color * getDistanceAttenuation(dl, pointLights[i].distance, pointLights[i].decay) * smoothstep(0.42, 0.48, pow(max(dot(sfN, H), 0.0), sfShininess)); }
+        #endif
+        #if NUM_SPOT_LIGHTS > 0
+        for (int i = 0; i < NUM_SPOT_LIGHTS; i++) { vec3 lv = spotLights[i].position + vViewPosition; float dl = length(lv); vec3 L = lv / dl; float sc = getSpotAttenuation(spotLights[i].coneCos, spotLights[i].penumbraCos, dot(L, spotLights[i].direction)); vec3 H = normalize(L + sfV); sfSpec += spotLights[i].color * sc * getDistanceAttenuation(dl, spotLights[i].distance, spotLights[i].decay) * smoothstep(0.42, 0.48, pow(max(dot(sfN, H), 0.0), sfShininess)); }
+        #endif
+        float sfRim = smoothstep(0.6, 0.8, 1.0 - max(dot(sfN, sfV), 0.0));
+        outgoingLight += sfG * (min(sfSpec, vec3(1.0)) * 0.4 + sfRim * 0.2 * (diffuseColor.rgb + 0.2));
+      }
+      #include <opaque_fragment>`);
+  };
+  m.customProgramCacheKey = () => `sfgloss|${perVertex}|${neck ? 'neck' : ''}`;
+}
+export function toon(color: string | number, opts: { vertexColors?: boolean; emissive?: string; emissiveIntensity?: number; transparent?: boolean; opacity?: number; side?: THREE.Side; gloss?: number; glossAttr?: boolean; shininess?: number; neckline?: NecklineSpec } = {}): THREE.MeshToonMaterial {
   const key = JSON.stringify([color, opts]);
   const hit = cache.get(key);
   if (hit) return hit as THREE.MeshToonMaterial;
   const m = new THREE.MeshToonMaterial({ color: new THREE.Color(color), gradientMap: toonGradient(), vertexColors: !!opts.vertexColors, transparent: !!opts.transparent, opacity: opts.opacity ?? 1, side: opts.side ?? THREE.FrontSide });
   if (opts.emissive) { m.emissive = new THREE.Color(opts.emissive); m.emissiveIntensity = opts.emissiveIntensity ?? 1; }
+  if (opts.glossAttr || (opts.gloss ?? 0) > 0 || opts.neckline) addGloss(m, opts.gloss ?? 0, !!opts.glossAttr, opts.shininess ?? 40, opts.neckline);
   cache.set(key, m);
   return m;
 }
