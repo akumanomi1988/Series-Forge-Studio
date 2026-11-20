@@ -97,13 +97,13 @@ Generadores: `parts, robot, workbench, chair, stool, door, shelf, toolbox, crate
 ## Escena (`episodes/<ep>/scenes/sc-NNN/scene.json`)
 
 ```json
-{ "schemaVersion": 2, "id": "sc-001", "name": "…", "environmentId": "taller", "durationSec": "auto", "tailSec": 1.2, "autoLook": true,
+{ "schemaVersion": 2, "id": "sc-001", "name": "…", "environmentId": "taller", "durationSec": "auto", "tailSec": 0.8, "autoLook": true,
   "actors":  [ { "id": "bruno", "characterId": "bruno", "position": [-0.55,0,-0.5], "yawDeg": 72, "expression": "worried", "idle": "idle" } ],
   "props":   [ { "id": "fusible", "propId": "fusible-nucleo", "heldBy": { "actor": "bruno", "hand": "right" } } ],
   "actions": [ … ], "dialogue": [ … ], "shots": [ … ], "sound": [ … ], "transitionOut": { "type": "fade", "durationSec": 0.6 } }
 ```
 
-**Tiempo relativo** (en acciones, diálogos, planos y sonidos): `at` (absoluto) | `after: "<id>"` (al terminar) | `with: "<id>"` (al empezar), más `offset`. Un diálogo sin tiempo va detrás del anterior (+ su `pauseAfter`); una acción sin tiempo va detrás de la acción anterior del mismo actor. Las duraciones reales de voz salen del TTS, así que el montaje se ajusta solo.
+**Tiempo relativo** (en acciones, diálogos, planos y sonidos): `at` (absoluto) | `after: "<id>"` (al terminar) | `with: "<id>"` (al empezar), más `offset`. Un diálogo sin tiempo va detrás del anterior (+ su `pauseAfter`, 0,25 s por defecto: ritmo de conversación); una acción sin tiempo va detrás de la acción anterior del mismo actor. Las duraciones reales de voz salen del TTS, así que el montaje se ajusta solo.
 
 Acciones (`type`):
 | tipo | campos clave |
@@ -116,9 +116,9 @@ Acciones (`type`):
 | `pickUp` / `drop` / `place` / `give` / `hold` | `prop`, `hand`; `hold.pose`: front/behind/raised/show/side; `place.on`; `give.to`. `drop` simula caída con rebotes y genera foley de impacto. |
 | `sit` / `stand` | `prop` con anclaje `seat` |
 | `propJoint` | `prop`, `joint`, `toDeg`, `fromDeg`, `durationSec`, `sound` (abrir puertas, cabeza del robot…) |
-| `effect` | `effect`: sparks/smoke/flicker/glow; `prop`+`part` o `position`; `sound` |
+| `effect` | `effect`: sparks/smoke/flicker/glow/off; `prop`+`part` o `position`; `sound`. `off` apaga un aparato (sus luces y el brillo de la parte indicada, p. ej. `screen`) mientras dura; no alarga la escena, así que admite duraciones largas |
 
-Diálogo: `{ "id", "actor", "text", "to", "emotion", "intensity", "direction", "gesture", "pauseAfter", "rate", "pitchSemitones", "knowledge": [hechos que debe conocer], "reveals": [hechos que revela] }`. `emotion` acepta ids o sinónimos españoles (enfado, alegría, ironía…). `direction` con «susurrando/en voz baja» o «gritando» modifica la prosodia. Con `autoLook` el que escucha mira al que habla.
+Diálogo: `{ "id", "actor", "text", "to", "emotion", "intensity", "direction", "gesture", "pauseAfter", "rate", "pitchSemitones", "knowledge": [hechos que debe conocer], "reveals": [hechos que revela] }`. `emotion` acepta ids o sinónimos españoles (enfado, alegría, ironía…). `direction` con «susurrando/en voz baja» o «gritando» modifica la prosodia. `[pausa 0.8]` dentro del texto inserta un silencio intencionado (no aparece en subtítulos); el resto de silencios internos de la voz se acortan a ≤ 0,36 s (0,5 s con «...»). Con `autoLook` el que escucha mira al que habla.
 
 Planos: `{ "id", "at|after|with", "camera": {…}, "transitionIn": { "type": "cut|dissolve|fade|iris|wipe", "durationSec" } }`. Cámara `static` (`position`, `target`, `fov`) o por encuadre: `framing` = establishing/wide/full/medium/medium-close/close/extreme-close/two-shot/over-shoulder/insert con `subject`/`subjects`/`over`, `azimuthDeg`, `elevationDeg`, `side`, `track`, `move` (`push-in`, `pull-out`, `orbit`, `truck`, `crane`, `dolly` + `amount`), `handheld` 0–1. El encuadre usa la dirección real de la cara durante el plano, evita que otro actor o un objeto grande tape al sujeto y no atraviesa paredes.
 

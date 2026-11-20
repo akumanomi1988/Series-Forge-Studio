@@ -1,0 +1,1022 @@
+{
+  "schemaVersion": 2,
+  "id": "sc-004",
+  "name": "Tornillos",
+  "environmentId": "taller",
+  "durationSec": "auto",
+  "tailSec": 0.9,
+  "autoLook": true,
+  "synopsis": "Desenlace. Cambian el fusible por el de la consola; el R-7 vuelve a fallar; la causa era un tornillo suelto. El R-7 vive. Tag: el módulo del café.",
+  "actors": [
+    {
+      "id": "bruno",
+      "characterId": "bruno",
+      "position": [
+        2.6,
+        0,
+        -1.482
+      ],
+      "yawDeg": 0,
+      "expression": "worried",
+      "idle": "idle"
+    },
+    {
+      "id": "lara",
+      "characterId": "lara",
+      "position": [
+        1.651,
+        0,
+        -1.032
+      ],
+      "yawDeg": 115.4,
+      "expression": "determined",
+      "idle": "idle"
+    }
+  ],
+  "props": [
+    {
+      "id": "robot",
+      "propId": "robot-r7",
+      "position": [
+        0.25,
+        0,
+        -0.85
+      ],
+      "yawDeg": -35
+    },
+    {
+      "id": "fusible",
+      "propId": "fusible-nucleo",
+      "heldBy": {
+        "actor": "lara",
+        "hand": "right"
+      }
+    },
+    {
+      "id": "fusible-consola",
+      "propId": "fusible-nucleo",
+      "on": {
+        "prop": "consola",
+        "anchor": "top"
+      }
+    }
+  ],
+  "actions": [
+    {
+      "id": "panel",
+      "type": "propJoint",
+      "prop": "robot",
+      "joint": "panel",
+      "at": 0,
+      "fromDeg": 95,
+      "toDeg": 95,
+      "durationSec": 0.05
+    },
+    {
+      "id": "cabeza-baja",
+      "type": "propJoint",
+      "prop": "robot",
+      "joint": "headTilt",
+      "at": 0,
+      "fromDeg": 22,
+      "toDeg": 22,
+      "durationSec": 0.05
+    },
+    {
+      "id": "lara-sujeta",
+      "type": "hold",
+      "actor": "lara",
+      "at": 0,
+      "hand": "right",
+      "pose": "side",
+      "durationSec": 0.05
+    },
+    {
+      "id": "lara-a-consola",
+      "type": "walk",
+      "actor": "lara",
+      "at": 0.2,
+      "to": {
+        "prop": "consola",
+        "anchor": "top",
+        "distance": 0.55
+      },
+      "faceTo": {
+        "prop": "consola",
+        "anchor": "top"
+      }
+    },
+    {
+      "id": "bruno-al-robot",
+      "type": "walk",
+      "actor": "bruno",
+      "with": "b13",
+      "offset": 1.2,
+      "to": [
+        -0.45,
+        0,
+        -0.42
+      ],
+      "faceTo": {
+        "prop": "robot",
+        "anchor": "panel"
+      }
+    },
+    {
+      "id": "lara-deja",
+      "type": "place",
+      "actor": "lara",
+      "after": "lara-a-consola",
+      "prop": "fusible",
+      "on": [
+        3.42,
+        1.13,
+        -1.12
+      ],
+      "durationSec": 1.1
+    },
+    {
+      "id": "lara-coge",
+      "type": "pickUp",
+      "actor": "lara",
+      "after": "lara-deja",
+      "prop": "fusible-consola",
+      "hand": "right",
+      "durationSec": 1.3
+    },
+    {
+      "id": "consola-off",
+      "type": "effect",
+      "effect": "off",
+      "prop": "consola",
+      "part": "screen",
+      "with": "lara-coge",
+      "offset": 0.6,
+      "durationSec": 600,
+      "sound": "click"
+    },
+    {
+      "id": "consola-off-2",
+      "type": "effect",
+      "effect": "off",
+      "prop": "consola",
+      "part": "display",
+      "with": "consola-off",
+      "durationSec": 600
+    },
+    {
+      "id": "bruno-luto",
+      "type": "expression",
+      "actor": "bruno",
+      "with": "b14",
+      "expression": "sad",
+      "intensity": 0.8
+    },
+    {
+      "id": "lara-vuelve",
+      "type": "walk",
+      "actor": "lara",
+      "after": "lara-coge",
+      "offset": 0.05,
+      "to": [
+        -0.85,
+        0,
+        0.25
+      ],
+      "gait": "walk-brisk",
+      "faceTo": "bruno"
+    },
+    {
+      "id": "lara-da",
+      "type": "give",
+      "actor": "lara",
+      "after": "lara-vuelve",
+      "prop": "fusible-consola",
+      "to": "bruno",
+      "durationSec": 1.3
+    },
+    {
+      "id": "bruno-al-panel",
+      "type": "turn",
+      "actor": "bruno",
+      "after": "lara-da",
+      "towards": {
+        "prop": "robot",
+        "anchor": "panel"
+      },
+      "durationSec": 0.5
+    },
+    {
+      "id": "bruno-pone",
+      "type": "place",
+      "actor": "bruno",
+      "after": "bruno-al-panel",
+      "prop": "fusible-consola",
+      "on": {
+        "prop": "robot",
+        "anchor": "panel"
+      },
+      "durationSec": 1.3
+    },
+    {
+      "id": "arranque",
+      "type": "effect",
+      "effect": "glow",
+      "prop": "robot",
+      "part": "antennaTip",
+      "after": "bruno-pone",
+      "offset": 0.1,
+      "durationSec": 1.2,
+      "intensity": 2.2
+    },
+    {
+      "id": "ojos-1",
+      "type": "effect",
+      "effect": "glow",
+      "prop": "robot",
+      "part": "eyeL",
+      "with": "arranque",
+      "durationSec": 1.4,
+      "intensity": 1.5
+    },
+    {
+      "id": "ojos-2",
+      "type": "effect",
+      "effect": "glow",
+      "prop": "robot",
+      "part": "eyeR",
+      "with": "arranque",
+      "durationSec": 1.4,
+      "intensity": 1.5
+    },
+    {
+      "id": "robot-levanta",
+      "type": "propJoint",
+      "prop": "robot",
+      "joint": "headTilt",
+      "with": "arranque",
+      "offset": 0.1,
+      "toDeg": 0,
+      "durationSec": 0.6,
+      "sound": "servo"
+    },
+    {
+      "id": "bruno-ilusion",
+      "type": "expression",
+      "actor": "bruno",
+      "with": "arranque",
+      "expression": "joy"
+    },
+    {
+      "id": "chispas-2",
+      "type": "effect",
+      "effect": "sparks",
+      "prop": "robot",
+      "part": "cavity",
+      "after": "b15",
+      "offset": 0.05,
+      "durationSec": 0.8,
+      "intensity": 1.1,
+      "sound": "sparks"
+    },
+    {
+      "id": "robot-recae",
+      "type": "propJoint",
+      "prop": "robot",
+      "joint": "headTilt",
+      "with": "chispas-2",
+      "offset": 0.3,
+      "toDeg": 22,
+      "durationSec": 0.6,
+      "sound": "servo"
+    },
+    {
+      "id": "bruno-miedo",
+      "type": "expression",
+      "actor": "bruno",
+      "with": "chispas-2",
+      "expression": "fear"
+    },
+    {
+      "id": "bruno-retrocede",
+      "type": "play",
+      "actor": "bruno",
+      "with": "chispas-2",
+      "clip": "shrug",
+      "speed": 1.4
+    },
+    {
+      "id": "lara-se-acerca",
+      "type": "walk",
+      "actor": "lara",
+      "with": "b16",
+      "offset": 0.2,
+      "to": [
+        -0.18,
+        0,
+        0.08
+      ],
+      "faceTo": {
+        "prop": "robot",
+        "anchor": "panel"
+      }
+    },
+    {
+      "id": "lara-mira-dentro",
+      "type": "lookAt",
+      "actor": "lara",
+      "after": "b16",
+      "offset": -0.3,
+      "target": {
+        "prop": "robot",
+        "anchor": "panel"
+      },
+      "mode": "chest",
+      "durationSec": 2.8
+    },
+    {
+      "id": "lara-piensa",
+      "type": "expression",
+      "actor": "lara",
+      "with": "lara-mira-dentro",
+      "expression": "thinking"
+    },
+    {
+      "id": "lara-gira-lenta",
+      "type": "turn",
+      "actor": "lara",
+      "after": "l16",
+      "offset": 0.1,
+      "towards": "bruno",
+      "durationSec": 1.1
+    },
+    {
+      "id": "lara-ironia",
+      "type": "expression",
+      "actor": "lara",
+      "with": "l17",
+      "expression": "smirk",
+      "intensity": 1
+    },
+    {
+      "id": "lara-rie",
+      "type": "expression",
+      "actor": "lara",
+      "after": "b17",
+      "offset": 0.1,
+      "expression": "laugh",
+      "durationSec": 1.6
+    },
+    {
+      "id": "bruno-aprieta",
+      "type": "play",
+      "actor": "bruno",
+      "after": "l18",
+      "offset": 0.05,
+      "clip": "point",
+      "target": {
+        "prop": "robot",
+        "anchor": "panel"
+      },
+      "durationSec": 1.1
+    },
+    {
+      "id": "bruno-mira-panel",
+      "type": "lookAt",
+      "actor": "bruno",
+      "with": "bruno-aprieta",
+      "target": {
+        "prop": "robot",
+        "anchor": "panel"
+      },
+      "durationSec": 1.2
+    },
+    {
+      "id": "arranque-2",
+      "type": "effect",
+      "effect": "glow",
+      "prop": "robot",
+      "part": "antennaTip",
+      "after": "bruno-aprieta",
+      "offset": -0.1,
+      "durationSec": 3,
+      "intensity": 2.6
+    },
+    {
+      "id": "ojos-3",
+      "type": "effect",
+      "effect": "glow",
+      "prop": "robot",
+      "part": "eyeL",
+      "with": "arranque-2",
+      "durationSec": 3.5,
+      "intensity": 1.8
+    },
+    {
+      "id": "ojos-4",
+      "type": "effect",
+      "effect": "glow",
+      "prop": "robot",
+      "part": "eyeR",
+      "with": "arranque-2",
+      "durationSec": 3.5,
+      "intensity": 1.8
+    },
+    {
+      "id": "robot-vive",
+      "type": "propJoint",
+      "prop": "robot",
+      "joint": "headTilt",
+      "with": "arranque-2",
+      "toDeg": -6,
+      "durationSec": 0.5,
+      "sound": "servo"
+    },
+    {
+      "id": "robot-mira-1",
+      "type": "propJoint",
+      "prop": "robot",
+      "joint": "head",
+      "with": "arranque-2",
+      "offset": 0.6,
+      "toDeg": -25,
+      "durationSec": 0.4
+    },
+    {
+      "id": "robot-mira-2",
+      "type": "propJoint",
+      "prop": "robot",
+      "joint": "head",
+      "with": "arranque-2",
+      "offset": 1.2,
+      "toDeg": 22,
+      "durationSec": 0.45
+    },
+    {
+      "id": "robot-brazo-l",
+      "type": "propJoint",
+      "prop": "robot",
+      "joint": "armL",
+      "with": "arranque-2",
+      "offset": 1,
+      "toDeg": -150,
+      "durationSec": 0.5,
+      "sound": "servo"
+    },
+    {
+      "id": "robot-brazo-r",
+      "type": "propJoint",
+      "prop": "robot",
+      "joint": "armR",
+      "with": "arranque-2",
+      "offset": 1,
+      "toDeg": -150,
+      "durationSec": 0.5
+    },
+    {
+      "id": "bruno-euforia",
+      "type": "expression",
+      "actor": "bruno",
+      "with": "arranque-2",
+      "offset": 0.3,
+      "expression": "joy"
+    },
+    {
+      "id": "lara-alegria",
+      "type": "expression",
+      "actor": "lara",
+      "with": "arranque-2",
+      "offset": 0.5,
+      "expression": "joy",
+      "intensity": 0.8
+    },
+    {
+      "id": "bruno-salta",
+      "type": "play",
+      "actor": "bruno",
+      "with": "b18",
+      "offset": 0.2,
+      "clip": "laugh-body",
+      "durationSec": 2.2
+    },
+    {
+      "id": "robot-a-lara",
+      "type": "propJoint",
+      "prop": "robot",
+      "joint": "head",
+      "after": "b18",
+      "offset": -0.2,
+      "toDeg": 32,
+      "durationSec": 0.45,
+      "sound": "servo"
+    },
+    {
+      "id": "robot-baja-l",
+      "type": "propJoint",
+      "prop": "robot",
+      "joint": "armL",
+      "after": "b18",
+      "offset": -0.4,
+      "toDeg": 0,
+      "durationSec": 0.6
+    },
+    {
+      "id": "robot-baja-r",
+      "type": "propJoint",
+      "prop": "robot",
+      "joint": "armR",
+      "after": "b18",
+      "offset": -0.4,
+      "toDeg": 0,
+      "durationSec": 0.6
+    },
+    {
+      "id": "robot-pena",
+      "type": "propJoint",
+      "prop": "robot",
+      "joint": "headTilt",
+      "after": "l19",
+      "offset": 0.1,
+      "toDeg": 18,
+      "durationSec": 0.6,
+      "sound": "servo"
+    },
+    {
+      "id": "bruno-rie",
+      "type": "expression",
+      "actor": "bruno",
+      "after": "robot-pena",
+      "offset": 0.1,
+      "expression": "laugh",
+      "durationSec": 2.2
+    },
+    {
+      "id": "lara-rie-2",
+      "type": "expression",
+      "actor": "lara",
+      "after": "robot-pena",
+      "offset": 0.2,
+      "expression": "laugh",
+      "durationSec": 2.1
+    },
+    {
+      "id": "bruno-risa",
+      "type": "play",
+      "actor": "bruno",
+      "after": "robot-pena",
+      "offset": 0.1,
+      "clip": "laugh-body",
+      "durationSec": 1.8
+    }
+  ],
+  "dialogue": [
+    {
+      "id": "b13",
+      "actor": "bruno",
+      "text": "Con cuidado, que esa consola es más vieja que tú.",
+      "to": "lara",
+      "emotion": "worried",
+      "with": "lara-a-consola",
+      "offset": 0.3
+    },
+    {
+      "id": "l13",
+      "actor": "lara",
+      "text": "Y tiene mejor carácter.",
+      "emotion": "smirk"
+    },
+    {
+      "id": "b14",
+      "actor": "bruno",
+      "text": "Adiós, contabilidad.",
+      "emotion": "sad",
+      "intensity": 0.7,
+      "with": "consola-off",
+      "offset": 0.35
+    },
+    {
+      "id": "b14b",
+      "actor": "bruno",
+      "text": "¿Y si no es el mismo modelo?",
+      "to": "lara",
+      "emotion": "worried",
+      "with": "lara-vuelve",
+      "offset": 0.5
+    },
+    {
+      "id": "l14a",
+      "actor": "lara",
+      "text": "Entonces mañana vendemos el robot por piezas.",
+      "to": "bruno",
+      "emotion": "smirk",
+      "intensity": 0.7
+    },
+    {
+      "id": "l14",
+      "actor": "lara",
+      "text": "Toma. Y esta vez, sin sorpresas.",
+      "to": "bruno",
+      "emotion": "determined",
+      "intensity": 0.6,
+      "with": "lara-da",
+      "offset": -0.3
+    },
+    {
+      "id": "b15",
+      "actor": "bruno",
+      "text": "¡Eso es, campeón!",
+      "emotion": "joy",
+      "with": "arranque",
+      "offset": 0.35
+    },
+    {
+      "id": "b16",
+      "actor": "bruno",
+      "text": "¡No, no, no! ¡Otra vez no!",
+      "emotion": "fear",
+      "intensity": 0.9,
+      "after": "chispas-2",
+      "offset": -0.2
+    },
+    {
+      "id": "l16",
+      "actor": "lara",
+      "text": "Espera. Aquí hay un tornillo suelto tocando el núcleo.",
+      "emotion": "thinking",
+      "reveals": [
+        "tornillo-suelto"
+      ]
+    },
+    {
+      "id": "l17",
+      "actor": "lara",
+      "text": "Un tornillo, Bruno. Un tornillo.",
+      "to": "bruno",
+      "emotion": "smirk",
+      "after": "lara-gira-lenta",
+      "offset": -0.2
+    },
+    {
+      "id": "b17",
+      "actor": "bruno",
+      "text": "Te dije que estaba ajustando tornillos.",
+      "to": "lara",
+      "emotion": "smirk",
+      "gesture": "shrug",
+      "pauseAfter": 0.5
+    },
+    {
+      "id": "l18",
+      "actor": "lara",
+      "text": "Anda, apriétalo, genio.",
+      "to": "bruno",
+      "emotion": "laugh",
+      "intensity": 0.7
+    },
+    {
+      "id": "b18",
+      "actor": "bruno",
+      "text": "¡Diez pasitos, campeón! ¡Mañana, diez pasitos!",
+      "emotion": "joy",
+      "intensity": 1.1,
+      "with": "arranque-2",
+      "offset": 1.3
+    },
+    {
+      "id": "b19",
+      "actor": "bruno",
+      "text": "Y ahora... el módulo del café.",
+      "to": "lara",
+      "emotion": "smile",
+      "gesture": "explain",
+      "after": "robot-a-lara",
+      "offset": 0.35
+    },
+    {
+      "id": "l19",
+      "actor": "lara",
+      "text": "Ni se te ocurra.",
+      "to": "bruno",
+      "emotion": "smirk",
+      "intensity": 1,
+      "gesture": "point"
+    }
+  ],
+  "shots": [
+    {
+      "id": "sh-01",
+      "at": 0,
+      "camera": {
+        "type": "static",
+        "position": [
+          -0.6,
+          1.7,
+          3.3
+        ],
+        "target": [
+          2.6,
+          1,
+          -1.4
+        ],
+        "fov": 42
+      },
+      "notes": "Lara va hacia la consola."
+    },
+    {
+      "id": "sh-02",
+      "with": "l13",
+      "offset": -0.1,
+      "camera": {
+        "framing": "medium",
+        "subject": "lara",
+        "fov": 32,
+        "azimuthDeg": 35
+      }
+    },
+    {
+      "id": "sh-03",
+      "with": "lara-coge",
+      "offset": -0.1,
+      "camera": {
+        "type": "static",
+        "position": [
+          3.85,
+          1.5,
+          0.45
+        ],
+        "target": [
+          3.4,
+          1,
+          -1.2
+        ],
+        "fov": 36
+      },
+      "notes": "La consola se apaga."
+    },
+    {
+      "id": "sh-04",
+      "with": "b14",
+      "offset": -0.1,
+      "camera": {
+        "framing": "medium",
+        "subject": "bruno",
+        "fov": 32,
+        "azimuthDeg": -10,
+        "track": true
+      }
+    },
+    {
+      "id": "sh-05",
+      "with": "l14",
+      "offset": -0.2,
+      "camera": {
+        "framing": "over-shoulder",
+        "over": "bruno",
+        "subject": "lara",
+        "side": "left",
+        "fov": 32
+      }
+    },
+    {
+      "id": "sh-06",
+      "with": "bruno-pone",
+      "offset": -0.1,
+      "camera": {
+        "type": "static",
+        "position": [
+          1.15,
+          1.05,
+          0.55
+        ],
+        "target": [
+          0.2,
+          0.62,
+          -0.85
+        ],
+        "fov": 40,
+        "handheld": 0.3
+      },
+      "notes": "Fusible nuevo."
+    },
+    {
+      "id": "sh-07",
+      "with": "arranque",
+      "offset": 0.1,
+      "camera": {
+        "type": "static",
+        "position": [
+          1.3,
+          1.45,
+          1.1
+        ],
+        "target": [
+          0.1,
+          0.85,
+          -0.7
+        ],
+        "fov": 32
+      }
+    },
+    {
+      "id": "sh-08",
+      "with": "b16",
+      "offset": -0.1,
+      "camera": {
+        "framing": "close",
+        "subject": "bruno",
+        "fov": 30,
+        "azimuthDeg": -10,
+        "handheld": 0.4
+      }
+    },
+    {
+      "id": "sh-09",
+      "with": "l16",
+      "offset": -0.2,
+      "camera": {
+        "framing": "medium",
+        "subject": "lara",
+        "fov": 32,
+        "azimuthDeg": 30
+      }
+    },
+    {
+      "id": "sh-10",
+      "with": "l17",
+      "offset": -0.1,
+      "camera": {
+        "framing": "medium-close",
+        "subject": "lara",
+        "fov": 32,
+        "azimuthDeg": 15
+      }
+    },
+    {
+      "id": "sh-11",
+      "with": "b17",
+      "offset": -0.1,
+      "camera": {
+        "framing": "medium-close",
+        "subject": "bruno",
+        "fov": 32,
+        "azimuthDeg": 10
+      }
+    },
+    {
+      "id": "sh-12",
+      "with": "l18",
+      "offset": -0.1,
+      "camera": {
+        "framing": "medium-close",
+        "subject": "lara",
+        "fov": 32,
+        "azimuthDeg": 20
+      }
+    },
+    {
+      "id": "sh-13",
+      "with": "arranque-2",
+      "offset": -0.2,
+      "camera": {
+        "type": "static",
+        "position": [
+          2.6,
+          1.9,
+          3.6
+        ],
+        "target": [
+          0,
+          0.95,
+          -0.6
+        ],
+        "fov": 34
+      },
+      "notes": "El R-7 vuelve a la vida."
+    },
+    {
+      "id": "sh-14",
+      "with": "b19",
+      "offset": -0.1,
+      "camera": {
+        "framing": "medium-close",
+        "subject": "bruno",
+        "fov": 32,
+        "azimuthDeg": 10
+      }
+    },
+    {
+      "id": "sh-15",
+      "with": "l19",
+      "offset": -0.1,
+      "camera": {
+        "framing": "close",
+        "subject": "lara",
+        "fov": 30,
+        "azimuthDeg": 15
+      }
+    },
+    {
+      "id": "sh-16",
+      "with": "robot-pena",
+      "offset": -0.1,
+      "camera": {
+        "type": "static",
+        "position": [
+          2.6,
+          1.9,
+          3.6
+        ],
+        "target": [
+          0,
+          0.95,
+          -0.6
+        ],
+        "fov": 34,
+        "move": {
+          "type": "pull-out",
+          "amount": 0.35
+        }
+      },
+      "transitionIn": {
+        "type": "dissolve",
+        "durationSec": 0.4
+      }
+    }
+  ],
+  "sound": [
+    {
+      "id": "ambiente",
+      "kind": "ambience",
+      "sound": "workshop-ambience",
+      "at": 0,
+      "gainDb": -23,
+      "fadeIn": 0.3,
+      "fadeOut": 0.3
+    },
+    {
+      "id": "pitido-arranque",
+      "kind": "sfx",
+      "sound": "robot-beep",
+      "with": "arranque",
+      "gainDb": -8
+    },
+    {
+      "id": "pitido-fallo",
+      "kind": "sfx",
+      "sound": "robot-sad",
+      "with": "robot-recae",
+      "gainDb": -6
+    },
+    {
+      "id": "clic-tornillo",
+      "kind": "sfx",
+      "sound": "click",
+      "with": "bruno-aprieta",
+      "offset": 0.6,
+      "gainDb": -6
+    },
+    {
+      "id": "pitido-vida",
+      "kind": "sfx",
+      "sound": "robot-beep",
+      "with": "arranque-2",
+      "offset": 0.2,
+      "gainDb": -6
+    },
+    {
+      "id": "pitido-vida-2",
+      "kind": "sfx",
+      "sound": "robot-beep",
+      "with": "robot-brazo-l",
+      "gainDb": -7
+    },
+    {
+      "id": "pitido-lara",
+      "kind": "sfx",
+      "sound": "robot-beep",
+      "with": "robot-a-lara",
+      "gainDb": -8
+    },
+    {
+      "id": "pitido-pena",
+      "kind": "sfx",
+      "sound": "robot-sad",
+      "with": "robot-pena",
+      "gainDb": -5
+    },
+    {
+      "id": "musica-alegre",
+      "kind": "music",
+      "sound": "alegre",
+      "with": "arranque-2",
+      "offset": 0.4,
+      "gainDb": -18,
+      "fadeIn": 0.6,
+      "fadeOut": 2
+    }
+  ],
+  "transitionOut": {
+    "type": "fade",
+    "durationSec": 1.2
+  }
+}

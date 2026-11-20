@@ -20,16 +20,21 @@ Leyenda: ✅ hecho y probado (test automático y/o inspección de fotogramas/aud
 
 ## Piloto «El último turno»
 
-`npm run studio -- init pilot && npm run studio -- produce el-ultimo-turno ep-001` → `episodio.mp4` **1920×1080, 24 fps, 64,0 s (1536 fotogramas), H.264 + AAC 48 kHz estéreo + subtítulos mov_text**, `audio-master.wav`, `subtitulos.srt`, `metadata.json`, `storyboard/` (22 planos) y `validation-report.json` con **todas las comprobaciones superadas**:
+Guion en tres actos y cuatro escenas continuas (planteamiento con detonante, nudo con peor momento y giro, desenlace con clímax y *tag*), 41 líneas de diálogo, *setups/payoffs* («diez pasitos», «nada grave» → la deuda, «ajustando tornillos» → la solución, el café). Logline, sinopsis, estructura, escaleta y guion en `episodes/ep-001/sinopsis.md` y `guion.md`.
 
-- duración exacta, fotogramas = esperados, A/V ±1 ms; sin negros fuera de fundidos; todos los planos con detalle;
-- paridad editor/exportación: PSNR mínimo 30,2 dB (media ≈ 44 dB) entre el fotograma renderizado por la Stage y el decodificado del MP4;
-- diálogo −16,7 LUFS (anclado al diálogo), mezcla −15,1 LUFS, pico −0,9 dBTP; 17 líneas de diálogo colocadas con desfase **0 ms** (correlación de forma de onda);
-- lip-sync: desfase boca/voz **≤ 10 ms** en las 17 líneas (correlación mínima 0,47).
+`npm run studio -- init pilot && npm run studio -- produce el-ultimo-turno ep-001` → `episodio.mp4` **1920×1080, 24 fps, 133,3 s (3199 fotogramas), 46 planos, H.264 + AAC 48 kHz estéreo + subtítulos mov_text (43 rótulos)**, `audio-master.wav`, `subtitulos.srt`, `metadata.json`, `storyboard/` y `validation-report.json` con **todas las comprobaciones superadas**:
+
+- duración exacta, fotogramas = esperados, A/V ±3 ms; sin negros fuera de fundidos; todos los planos con detalle;
+- paridad editor/exportación: PSNR mínimo 31,4 dB entre el fotograma de la Stage y el decodificado del MP4;
+- diálogo −16,2 LUFS (anclado al diálogo), mezcla −15,0 LUFS, pico −1,0 dBTP; 41 líneas colocadas con desfase **0 ms** (correlación de forma de onda);
+- ritmo (`pacing.deadAir`): ningún hueco sin diálogo > 2,35 s (media 0,63 s), diálogo en el 79 % del metraje;
+- lip-sync: desfase global **−10 ms** (todas las líneas encadenadas); en cada arranque de voz la boca se abre entre **70 y 30 ms antes** del sonido (tolerancia: 87 ms tarde / 167 ms antes, ITU-R BT.1359 + 1 fotograma); cierres ≤ 240 ms; boca abierta en silencios largos 5,4 % del tiempo.
+
+Voz: los motores de Windows insertan ~1 s entre frases; el TTS acorta los silencios internos a ≤ 0,36 s (0,5 s con «...», respeta `[pausa N]`) y reajusta las marcas de tiempo. El alineador a veces estiraba una palabra dentro de la pausa siguiente (boca moviéndose en silencio): `snapToSpeech` devuelve esos visemas a su palabra. Medido en 6 frases con pausas: desacuerdo voz/boca del 44,6 % al 27,7 %. La correlación de actividad por frase (`lagMs`) se conserva en el informe solo como dato: en frases cortas su curva es casi plana (p. ej. 0,51 en 0 ms frente a 0,56 en −250 ms) y no distingue desfases.
 
 Contenido verificado viendo fotogramas reales del MP4: dos personajes procedurales distintos y reconocibles; taller reutilizable; robot articulado averiado (panel, cabeza, chispas, ojo parpadeante); dos voces españolas diferenciadas (Pablo −2,5 st con EQ grave; Laura); emociones (preocupación, miedo, nervios, enfado, ironía, sonrisa); entrar caminando por la puerta y detenerse; **giro corporal de 35°**; miradas automáticas entre personajes y a objetos; Bruno sujeta, esconde y deja caer el fusible (cae con rebotes y sonido metálico); Lara se acerca, lo recoge y lo muestra; planos generales, medios, primeros planos, contraplanos por encima del hombro, inserto; **encadenado** y fundidos; ambiente de taller, puerta, chispas, servo, pitidos, pasos, impactos; música procedural con ducking; subtítulos.
 
-Tiempo: render completo 1080p del piloto ≈ 2,5 min (≈ 8–11 fps de render en esta GPU); con caché, una re-exportación tras cambiar una escena solo renderiza los planos afectados. Reanudación verificada: un render 1080p interrumpido por un fallo reutilizó 14 de 22 fragmentos al relanzarlo.
+Tiempo: render completo 1080p del piloto (133 s) ≈ 7,6 min en esta GPU (GTX 660 Ti); con caché, una re-exportación tras cambiar una escena solo renderiza los planos afectados. Reanudación verificada: un render 1080p interrumpido por un fallo reutilizó 14 de 22 fragmentos al relanzarlo.
 
 ## Estado por área
 

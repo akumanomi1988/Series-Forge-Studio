@@ -1,0 +1,456 @@
+{
+  "schemaVersion": 2,
+  "id": "sc-003",
+  "name": "Doble y sin azúcar",
+  "environmentId": "taller",
+  "durationSec": "auto",
+  "tailSec": 0.5,
+  "autoLook": true,
+  "synopsis": "Giro. Bruno confiesa que el R-7 iba a ser un regalo de aniversario para Lara; ella se ablanda y propone sacrificar la consola.",
+  "actors": [
+    {
+      "id": "bruno",
+      "characterId": "bruno",
+      "position": [
+        -0.55,
+        0,
+        -0.5
+      ],
+      "yawDeg": 73.3,
+      "expression": "sad",
+      "idle": "idle"
+    },
+    {
+      "id": "lara",
+      "characterId": "lara",
+      "position": [
+        0.02,
+        0,
+        -0.257
+      ],
+      "yawDeg": -113.1,
+      "expression": "sad",
+      "idle": "idle"
+    }
+  ],
+  "props": [
+    {
+      "id": "robot",
+      "propId": "robot-r7",
+      "position": [
+        0.25,
+        0,
+        -0.85
+      ],
+      "yawDeg": -35
+    },
+    {
+      "id": "fusible",
+      "propId": "fusible-nucleo",
+      "heldBy": {
+        "actor": "lara",
+        "hand": "right"
+      }
+    },
+    {
+      "id": "fusible-consola",
+      "propId": "fusible-nucleo",
+      "on": {
+        "prop": "consola",
+        "anchor": "top"
+      }
+    }
+  ],
+  "actions": [
+    {
+      "id": "panel",
+      "type": "propJoint",
+      "prop": "robot",
+      "joint": "panel",
+      "at": 0,
+      "fromDeg": 95,
+      "toDeg": 95,
+      "durationSec": 0.05
+    },
+    {
+      "id": "cabeza-baja",
+      "type": "propJoint",
+      "prop": "robot",
+      "joint": "headTilt",
+      "at": 0,
+      "fromDeg": 22,
+      "toDeg": 22,
+      "durationSec": 0.05
+    },
+    {
+      "id": "lara-sujeta",
+      "type": "hold",
+      "actor": "lara",
+      "at": 0,
+      "hand": "right",
+      "pose": "show",
+      "durationSec": 0.05
+    },
+    {
+      "id": "lara-baja",
+      "type": "hold",
+      "actor": "lara",
+      "at": 0.6,
+      "hand": "right",
+      "pose": "side",
+      "durationSec": 0.6
+    },
+    {
+      "id": "bruno-se-sienta",
+      "type": "sit",
+      "actor": "bruno",
+      "at": 0.2,
+      "prop": "taburete",
+      "durationSec": 1
+    },
+    {
+      "id": "lara-gira",
+      "type": "turn",
+      "actor": "lara",
+      "with": "b10",
+      "offset": -0.4,
+      "towards": "bruno",
+      "durationSec": 0.6
+    },
+    {
+      "id": "lara-acerca",
+      "type": "walk",
+      "actor": "lara",
+      "with": "b10",
+      "offset": 0.6,
+      "to": {
+        "actor": "bruno",
+        "distance": 1.05
+      },
+      "faceTo": "bruno"
+    },
+    {
+      "id": "lara-sorpresa",
+      "type": "expression",
+      "actor": "lara",
+      "with": "l9",
+      "expression": "surprise",
+      "intensity": 0.7
+    },
+    {
+      "id": "lara-sonrie",
+      "type": "expression",
+      "actor": "lara",
+      "after": "b10",
+      "expression": "smile",
+      "intensity": 0.85
+    },
+    {
+      "id": "bruno-sonrie",
+      "type": "expression",
+      "actor": "bruno",
+      "with": "l10",
+      "offset": 0.8,
+      "expression": "smile",
+      "intensity": 0.7
+    },
+    {
+      "id": "lara-piensa",
+      "type": "play",
+      "actor": "lara",
+      "after": "b11",
+      "offset": 0.05,
+      "clip": "look-around",
+      "speed": 1.4
+    },
+    {
+      "id": "lara-decidida",
+      "type": "expression",
+      "actor": "lara",
+      "with": "l11",
+      "expression": "determined"
+    },
+    {
+      "id": "lara-senala",
+      "type": "play",
+      "actor": "lara",
+      "with": "l11",
+      "offset": 0.1,
+      "clip": "point",
+      "target": "consola",
+      "durationSec": 1.6
+    },
+    {
+      "id": "bruno-mira-consola",
+      "type": "lookAt",
+      "actor": "bruno",
+      "with": "l11",
+      "offset": 0.4,
+      "target": "consola",
+      "durationSec": 1.6
+    },
+    {
+      "id": "bruno-susto",
+      "type": "expression",
+      "actor": "bruno",
+      "with": "b12",
+      "expression": "fear",
+      "intensity": 0.8,
+      "durationSec": 1.8
+    },
+    {
+      "id": "bruno-se-levanta",
+      "type": "stand",
+      "actor": "bruno",
+      "with": "b12",
+      "offset": 0.05,
+      "durationSec": 0.8
+    },
+    {
+      "id": "lara-ironia",
+      "type": "expression",
+      "actor": "lara",
+      "with": "l12",
+      "expression": "smirk"
+    }
+  ],
+  "dialogue": [
+    {
+      "id": "b8b",
+      "actor": "bruno",
+      "text": "Voy a sentarme. Para morirme más cómodo.",
+      "emotion": "sad",
+      "intensity": 0.8,
+      "at": 0.45,
+      "pauseAfter": 0.4
+    },
+    {
+      "id": "l8",
+      "actor": "lara",
+      "text": "¿Por qué no me lo has dicho? Otra vez, Bruno.",
+      "to": "bruno",
+      "emotion": "sad",
+      "intensity": 0.7
+    },
+    {
+      "id": "b9",
+      "actor": "bruno",
+      "text": "Porque era una sorpresa. Le estaba poniendo un módulo para que te hiciera el café.",
+      "to": "lara",
+      "emotion": "sad",
+      "intensity": 0.6,
+      "reveals": [
+        "modulo-cafe"
+      ],
+      "gesture": "explain",
+      "after": "bruno-se-sienta",
+      "offset": -1.6
+    },
+    {
+      "id": "l9",
+      "actor": "lara",
+      "text": "¿Un robot... que me hace el café?",
+      "to": "bruno",
+      "emotion": "surprise",
+      "intensity": 0.7
+    },
+    {
+      "id": "b10",
+      "actor": "bruno",
+      "text": "Mañana hace seis años que abrimos el taller. Doble y sin azúcar, ¿no?",
+      "to": "lara",
+      "emotion": "smile",
+      "intensity": 0.6,
+      "knowledge": [
+        "taller-7"
+      ],
+      "pauseAfter": 0.6
+    },
+    {
+      "id": "l10",
+      "actor": "lara",
+      "text": "Eres un desastre, ¿lo sabes?",
+      "to": "bruno",
+      "emotion": "smile"
+    },
+    {
+      "id": "b11",
+      "actor": "bruno",
+      "text": "Un desastre con buena memoria.",
+      "to": "lara",
+      "emotion": "smile",
+      "gesture": "shrug",
+      "pauseAfter": 0.9
+    },
+    {
+      "id": "l11",
+      "actor": "lara",
+      "text": "La consola. Lleva un fusible igual, del mismo siglo que tu robot.",
+      "to": "bruno",
+      "emotion": "determined",
+      "intensity": 0.8
+    },
+    {
+      "id": "b12",
+      "actor": "bruno",
+      "text": "¡Ahí está toda la contabilidad!",
+      "to": "lara",
+      "emotion": "fear",
+      "intensity": 0.9
+    },
+    {
+      "id": "l12",
+      "actor": "lara",
+      "text": "¿La de los doce mil euros? Que descanse en paz.",
+      "to": "bruno",
+      "emotion": "smirk",
+      "knowledge": [
+        "deuda-pasada"
+      ],
+      "gesture": "dismiss"
+    }
+  ],
+  "shots": [
+    {
+      "id": "sh-01",
+      "at": 0,
+      "camera": {
+        "framing": "full",
+        "subject": "bruno",
+        "fov": 36,
+        "azimuthDeg": 25,
+        "track": true
+      },
+      "notes": "Bruno, derrotado, va al taburete."
+    },
+    {
+      "id": "sh-02",
+      "with": "b9",
+      "offset": -0.2,
+      "camera": {
+        "framing": "medium",
+        "subject": "bruno",
+        "fov": 32,
+        "azimuthDeg": 0
+      }
+    },
+    {
+      "id": "sh-03",
+      "with": "l9",
+      "offset": -0.1,
+      "camera": {
+        "framing": "medium-close",
+        "subject": "lara",
+        "fov": 32,
+        "azimuthDeg": 15
+      }
+    },
+    {
+      "id": "sh-04",
+      "with": "b10",
+      "offset": -0.1,
+      "camera": {
+        "framing": "close",
+        "subject": "bruno",
+        "fov": 30,
+        "azimuthDeg": 5,
+        "move": {
+          "type": "push-in",
+          "amount": 0.1
+        }
+      }
+    },
+    {
+      "id": "sh-05",
+      "with": "l10",
+      "offset": -0.2,
+      "camera": {
+        "framing": "two-shot",
+        "subjects": [
+          "lara",
+          "bruno"
+        ],
+        "fov": 34
+      }
+    },
+    {
+      "id": "sh-06",
+      "with": "b11",
+      "offset": -0.1,
+      "camera": {
+        "framing": "medium-close",
+        "subject": "bruno",
+        "fov": 32,
+        "azimuthDeg": 10
+      }
+    },
+    {
+      "id": "sh-07",
+      "with": "lara-piensa",
+      "offset": -0.1,
+      "camera": {
+        "framing": "medium-close",
+        "subject": "lara",
+        "fov": 32,
+        "azimuthDeg": -40
+      }
+    },
+    {
+      "id": "sh-08",
+      "with": "l11",
+      "offset": 1.2,
+      "camera": {
+        "type": "static",
+        "position": [
+          2,
+          1.35,
+          -0.45
+        ],
+        "target": [
+          3.7,
+          0.95,
+          -1.3
+        ],
+        "fov": 34
+      },
+      "notes": "La consola, condenada."
+    },
+    {
+      "id": "sh-09",
+      "with": "b12",
+      "offset": -0.1,
+      "camera": {
+        "framing": "medium",
+        "subject": "bruno",
+        "fov": 32,
+        "azimuthDeg": 10
+      }
+    },
+    {
+      "id": "sh-10",
+      "with": "l12",
+      "offset": -0.1,
+      "camera": {
+        "framing": "medium-close",
+        "subject": "lara",
+        "fov": 32,
+        "azimuthDeg": 20
+      }
+    }
+  ],
+  "sound": [
+    {
+      "id": "ambiente",
+      "kind": "ambience",
+      "sound": "workshop-ambience",
+      "at": 0,
+      "gainDb": -23,
+      "fadeIn": 0.3,
+      "fadeOut": 0.3
+    }
+  ],
+  "transitionOut": {
+    "type": "cut",
+    "durationSec": 0
+  }
+}

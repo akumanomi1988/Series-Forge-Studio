@@ -26,7 +26,8 @@ test('confirmar un episodio actualiza canon, conocimiento y relaciones; persiste
   assert.ok(canon.facts.some(f => f.id === 'fusible-oculto' && f.status === 'canon' && f.since === 'ep-001'));
   assert.ok(canon.characters.lara.knows.includes('nucleo-quemado'));
   const rel = canon.relationships.find(x => x.a === 'lara' && x.b === 'bruno')!;
-  assert.ok(Math.abs(rel.trust - 0.5) < 1e-9 && rel.history.length === 1);
+  assert.ok(Math.abs(rel.trust - 0.65) < 1e-9 && rel.history.length === 1, 'confianza 0,6 + 0,05 del episodio');
+  assert.ok(canon.characters.bruno.knows.includes('tornillo-suelto') && canon.facts.some(f => f.id === 'modulo-cafe'));
   await assert.rejects(confirmEpisode('el-ultimo-turno', 'ep-001'), /ya está confirmado/);
 });
 

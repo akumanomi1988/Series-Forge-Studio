@@ -4,12 +4,32 @@
   "facts": [
     {
       "id": "nucleo-quemado",
-      "text": "El núcleo del robot R-7 está quemado y medio circuito fundido.",
+      "text": "El núcleo del robot R-7 se quemó la víspera de la inspección.",
       "since": "ep-001"
     },
     {
       "id": "fusible-oculto",
       "text": "Bruno intentó ocultar a Lara el fusible quemado del R-7.",
+      "since": "ep-001"
+    },
+    {
+      "id": "sin-repuesto",
+      "text": "El fusible del núcleo del R-7 ya no se fabrica.",
+      "since": "ep-001"
+    },
+    {
+      "id": "modulo-cafe",
+      "text": "Bruno quería instalar en el R-7 un módulo para preparar el café de Lara, como regalo por el sexto aniversario del taller.",
+      "since": "ep-001"
+    },
+    {
+      "id": "consola-sin-fusible",
+      "text": "La consola del taller quedó apagada: su fusible se usó para el R-7.",
+      "since": "ep-001"
+    },
+    {
+      "id": "tornillo-suelto",
+      "text": "La avería del R-7 la causaba un tornillo suelto que tocaba el núcleo.",
       "since": "ep-001"
     }
   ],
@@ -18,30 +38,40 @@
     {
       "a": "lara",
       "b": "bruno",
-      "trustDelta": -0.1,
-      "note": "Lara descubre que Bruno le ocultaba la gravedad de la avería."
+      "trustDelta": 0.05,
+      "note": "Lara descubre que Bruno volvió a ocultarle algo, pero también que era un regalo para ella."
     },
     {
       "a": "bruno",
       "b": "lara",
-      "trustDelta": 0.05,
-      "note": "Bruno agradece que Lara se quede a ayudar."
+      "trustDelta": 0.1,
+      "note": "Lara le ayuda a salvar al R-7 en lugar de rendirse."
     }
   ],
   "emotionalStates": {
-    "bruno": "avergonzado pero aliviado",
-    "lara": "irritada, aunque decidida a ayudar"
+    "bruno": "aliviado e ilusionado",
+    "lara": "exasperada, pero conmovida"
   },
   "events": [
     {
       "id": "r7-averia",
-      "text": "El R-7 sufre una avería grave la víspera de la inspección.",
+      "text": "El núcleo del R-7 se quema mientras Bruno prepara una sorpresa.",
       "scene": "sc-001"
     },
     {
       "id": "fusible-descubierto",
       "text": "Lara descubre el fusible quemado que Bruno escondía.",
       "scene": "sc-002"
+    },
+    {
+      "id": "confesion",
+      "text": "Bruno confiesa que el R-7 iba a ser un regalo de aniversario para Lara.",
+      "scene": "sc-003"
+    },
+    {
+      "id": "r7-salvado",
+      "text": "Con el fusible de la consola y un tornillo apretado, el R-7 vuelve a funcionar.",
+      "scene": "sc-004"
     }
   ]
 }

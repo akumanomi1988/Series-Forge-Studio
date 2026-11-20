@@ -6,18 +6,20 @@
   "number": 1,
   "scenes": [
     "sc-001",
-    "sc-002"
+    "sc-002",
+    "sc-003",
+    "sc-004"
   ],
-  "targetDurationSec": 75,
+  "targetDurationSec": 150,
   "music": [
     {
       "id": "tema",
       "kind": "music",
       "sound": "ultimo-turno-tema",
       "at": 0,
-      "gainDb": -19,
-      "fadeIn": 3,
-      "fadeOut": 5
+      "gainDb": -21,
+      "fadeIn": 2,
+      "fadeOut": 4
     }
   ],
   "render": {
