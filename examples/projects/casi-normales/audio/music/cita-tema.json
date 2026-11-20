@@ -1,0 +1,34 @@
+{
+  "schemaVersion": 2,
+  "id": "cita-tema",
+  "kind": "music",
+  "generator": "procedural",
+  "tempo": 118,
+  "key": "C",
+  "mode": "major",
+  "progression": [
+    "I",
+    "V",
+    "vi",
+    "IV"
+  ],
+  "instruments": [
+    "keys",
+    "bass",
+    "drums",
+    "guitar",
+    "snaps"
+  ],
+  "style": "sitcom",
+  "swing": 0.15,
+  "sevenths": false,
+  "form": "loop",
+  "durationSec": 52,
+  "seed": 881,
+  "mood": "nervio romántico y comedia",
+  "license": {
+    "id": "procedural-original",
+    "source": "Series Forge procedural synthesis",
+    "commercialUse": "allowed"
+  }
+}

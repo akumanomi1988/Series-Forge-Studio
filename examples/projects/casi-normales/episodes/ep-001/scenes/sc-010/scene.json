@@ -1,0 +1,746 @@
+{
+  "schemaVersion": 2,
+  "id": "sc-010",
+  "name": "La persecución menos épica",
+  "synopsis": "Comedia física en cocina: bandejas, cubo, cuarto de limpieza y recuperación del bolso.",
+  "environmentId": "kitchen",
+  "durationSec": "auto",
+  "tailSec": 0.8,
+  "autoLook": false,
+  "autoActing": 1,
+  "coverage": "manual",
+  "actors": [
+    {
+      "id": "nico",
+      "characterId": "nico",
+      "position": [
+        -0.8,
+        0,
+        0.1
+      ],
+      "yawDeg": 65,
+      "expression": "nervous",
+      "idle": "idle"
+    },
+    {
+      "id": "vera",
+      "characterId": "vera",
+      "position": [
+        0.9,
+        0,
+        0.15
+      ],
+      "yawDeg": -55,
+      "expression": "smirk",
+      "idle": "idle"
+    },
+    {
+      "id": "ladron",
+      "characterId": "ladron",
+      "position": [
+        3.6,
+        0,
+        -1
+      ],
+      "yawDeg": 0,
+      "expression": "neutral",
+      "idle": "idle"
+    },
+    {
+      "id": "roman",
+      "characterId": "roman",
+      "position": [
+        -2.5,
+        0,
+        -1.5
+      ],
+      "yawDeg": 0,
+      "expression": "neutral",
+      "idle": "idle"
+    },
+    {
+      "id": "nico-voz",
+      "characterId": "nico-voz",
+      "position": [
+        55,
+        0,
+        55
+      ],
+      "yawDeg": 0,
+      "expression": "neutral",
+      "idle": "idle"
+    }
+  ],
+  "props": [
+    {
+      "id": "chaqueta",
+      "propId": "chaqueta",
+      "position": [
+        2.4,
+        0,
+        -1.3
+      ]
+    },
+    {
+      "id": "bolso",
+      "propId": "bolso",
+      "position": [
+        2.5,
+        0.1,
+        -0.3
+      ]
+    }
+  ],
+  "shots": [
+    {
+      "id": "p001",
+      "at": 0,
+      "durationSec": 9,
+      "camera": {
+        "type": "framing",
+        "framing": "two-shot",
+        "subjects": [
+          "nico",
+          "vera"
+        ],
+        "azimuthDeg": -15,
+        "compose": "thirds",
+        "fov": 34
+      },
+      "notes": "Cobertura del momento: Comedia física en cocina: bandejas, cubo, cuarto de limpieza y recuperación del bolso."
+    },
+    {
+      "id": "p002",
+      "at": 9,
+      "durationSec": 9,
+      "camera": {
+        "type": "framing",
+        "framing": "wide",
+        "subject": "vera",
+        "azimuthDeg": 18,
+        "compose": "thirds",
+        "fov": 36
+      },
+      "notes": "Corte dentro de escena. Interpretación natural, evitar primeros planos del narrador fuera de campo."
+    },
+    {
+      "id": "p003",
+      "at": 18,
+      "durationSec": 9,
+      "camera": {
+        "type": "framing",
+        "framing": "medium",
+        "subject": "ladron",
+        "azimuthDeg": 24,
+        "compose": "thirds",
+        "fov": 34
+      },
+      "notes": "Corte dentro de escena. Interpretación natural, evitar primeros planos del narrador fuera de campo."
+    },
+    {
+      "id": "p004",
+      "at": 27,
+      "durationSec": 9,
+      "camera": {
+        "type": "framing",
+        "framing": "close",
+        "subject": "roman",
+        "azimuthDeg": -26,
+        "compose": "thirds",
+        "fov": 34
+      },
+      "notes": "Corte dentro de escena. Interpretación natural, evitar primeros planos del narrador fuera de campo."
+    },
+    {
+      "id": "p005",
+      "at": 36,
+      "durationSec": 9,
+      "camera": {
+        "type": "framing",
+        "framing": "medium-close",
+        "subject": "nico",
+        "azimuthDeg": 24,
+        "compose": "thirds",
+        "fov": 34
+      },
+      "notes": "Corte dentro de escena. Interpretación natural, evitar primeros planos del narrador fuera de campo."
+    },
+    {
+      "id": "p006",
+      "at": 45,
+      "durationSec": 9,
+      "camera": {
+        "type": "framing",
+        "framing": "medium",
+        "subject": "vera",
+        "azimuthDeg": -26,
+        "compose": "thirds",
+        "fov": 34,
+        "move": {
+          "type": "push-in",
+          "amount": 0.08
+        }
+      },
+      "notes": "Corte dentro de escena. Interpretación natural, evitar primeros planos del narrador fuera de campo."
+    },
+    {
+      "id": "p007",
+      "at": 54,
+      "durationSec": 9,
+      "camera": {
+        "type": "framing",
+        "framing": "close",
+        "subject": "ladron",
+        "azimuthDeg": 24,
+        "compose": "thirds",
+        "fov": 34
+      },
+      "notes": "Corte dentro de escena. Interpretación natural, evitar primeros planos del narrador fuera de campo."
+    },
+    {
+      "id": "p008",
+      "at": 63,
+      "durationSec": 9,
+      "camera": {
+        "type": "framing",
+        "framing": "two-shot",
+        "subjects": [
+          "nico",
+          "vera"
+        ],
+        "azimuthDeg": 15,
+        "compose": "thirds",
+        "fov": 34
+      },
+      "notes": "Corte dentro de escena. Interpretación natural, evitar primeros planos del narrador fuera de campo."
+    },
+    {
+      "id": "p009",
+      "at": 72,
+      "durationSec": 9,
+      "camera": {
+        "type": "framing",
+        "framing": "wide",
+        "subject": "nico",
+        "azimuthDeg": 18,
+        "compose": "thirds",
+        "fov": 36
+      },
+      "notes": "Corte dentro de escena. Interpretación natural, evitar primeros planos del narrador fuera de campo."
+    },
+    {
+      "id": "p010",
+      "at": 81,
+      "durationSec": 9,
+      "camera": {
+        "type": "framing",
+        "framing": "close",
+        "subject": "vera",
+        "azimuthDeg": -26,
+        "compose": "thirds",
+        "fov": 34
+      },
+      "notes": "Corte dentro de escena. Interpretación natural, evitar primeros planos del narrador fuera de campo."
+    },
+    {
+      "id": "p011",
+      "at": 90,
+      "durationSec": 9,
+      "camera": {
+        "type": "framing",
+        "framing": "medium-close",
+        "subject": "ladron",
+        "azimuthDeg": 24,
+        "compose": "thirds",
+        "fov": 34,
+        "move": {
+          "type": "push-in",
+          "amount": 0.08
+        }
+      },
+      "notes": "Corte dentro de escena. Interpretación natural, evitar primeros planos del narrador fuera de campo."
+    },
+    {
+      "id": "p012",
+      "at": 99,
+      "durationSec": 9,
+      "camera": {
+        "type": "framing",
+        "framing": "medium",
+        "subject": "roman",
+        "azimuthDeg": -26,
+        "compose": "thirds",
+        "fov": 34
+      },
+      "notes": "Corte dentro de escena. Interpretación natural, evitar primeros planos del narrador fuera de campo."
+    },
+    {
+      "id": "p013",
+      "at": 108,
+      "durationSec": 9,
+      "camera": {
+        "type": "framing",
+        "framing": "close",
+        "subject": "nico",
+        "azimuthDeg": 24,
+        "compose": "thirds",
+        "fov": 34
+      },
+      "notes": "Corte dentro de escena. Interpretación natural, evitar primeros planos del narrador fuera de campo."
+    },
+    {
+      "id": "p014",
+      "at": 117,
+      "durationSec": 9,
+      "camera": {
+        "type": "framing",
+        "framing": "medium-close",
+        "subject": "vera",
+        "azimuthDeg": -26,
+        "compose": "thirds",
+        "fov": 34
+      },
+      "notes": "Corte dentro de escena. Interpretación natural, evitar primeros planos del narrador fuera de campo."
+    },
+    {
+      "id": "p015",
+      "at": 126,
+      "durationSec": 9,
+      "camera": {
+        "type": "framing",
+        "framing": "two-shot",
+        "subjects": [
+          "nico",
+          "vera"
+        ],
+        "azimuthDeg": -15,
+        "compose": "thirds",
+        "fov": 34
+      },
+      "notes": "Corte dentro de escena. Interpretación natural, evitar primeros planos del narrador fuera de campo."
+    },
+    {
+      "id": "p016",
+      "at": 135,
+      "durationSec": 9,
+      "camera": {
+        "type": "framing",
+        "framing": "wide",
+        "subject": "roman",
+        "azimuthDeg": 18,
+        "compose": "thirds",
+        "fov": 36
+      },
+      "notes": "Corte dentro de escena. Interpretación natural, evitar primeros planos del narrador fuera de campo."
+    },
+    {
+      "id": "p017",
+      "at": 144,
+      "durationSec": 9,
+      "camera": {
+        "type": "framing",
+        "framing": "medium-close",
+        "subject": "nico",
+        "azimuthDeg": 24,
+        "compose": "thirds",
+        "fov": 34
+      },
+      "notes": "Corte dentro de escena. Interpretación natural, evitar primeros planos del narrador fuera de campo."
+    },
+    {
+      "id": "p018",
+      "at": 153,
+      "durationSec": 9,
+      "camera": {
+        "type": "framing",
+        "framing": "medium",
+        "subject": "vera",
+        "azimuthDeg": -26,
+        "compose": "thirds",
+        "fov": 34
+      },
+      "notes": "Corte dentro de escena. Interpretación natural, evitar primeros planos del narrador fuera de campo."
+    },
+    {
+      "id": "p019",
+      "at": 162,
+      "durationSec": 9,
+      "camera": {
+        "type": "framing",
+        "framing": "close",
+        "subject": "ladron",
+        "azimuthDeg": 24,
+        "compose": "thirds",
+        "fov": 34
+      },
+      "notes": "Corte dentro de escena. Interpretación natural, evitar primeros planos del narrador fuera de campo."
+    },
+    {
+      "id": "p020",
+      "at": 171,
+      "durationSec": 4,
+      "camera": {
+        "type": "framing",
+        "framing": "medium-close",
+        "subject": "roman",
+        "azimuthDeg": -26,
+        "compose": "thirds",
+        "fov": 34
+      },
+      "notes": "Corte dentro de escena. Interpretación natural, evitar primeros planos del narrador fuera de campo."
+    }
+  ],
+  "actions": [
+    {
+      "id": "a001",
+      "type": "walk",
+      "actor": "ladron",
+      "at": 1,
+      "to": [
+        3.7,
+        0,
+        -1.5
+      ],
+      "gait": "run",
+      "speed": 3.1
+    },
+    {
+      "id": "a002",
+      "type": "walk",
+      "actor": "nico",
+      "at": 3,
+      "to": [
+        2.6,
+        0,
+        -1.3
+      ],
+      "gait": "run",
+      "speed": 2.6
+    },
+    {
+      "id": "a003",
+      "type": "walk",
+      "actor": "vera",
+      "at": 5,
+      "to": [
+        2.5,
+        0,
+        -0.5
+      ],
+      "gait": "run",
+      "speed": 2.7
+    },
+    {
+      "id": "a004",
+      "type": "effect",
+      "at": 11,
+      "effect": "smoke",
+      "position": [
+        0.8,
+        0.6,
+        -1
+      ],
+      "durationSec": 2,
+      "intensity": 0.3,
+      "sound": "clank"
+    },
+    {
+      "id": "a005",
+      "type": "walk",
+      "actor": "nico",
+      "at": 19,
+      "to": [
+        4,
+        0,
+        -1
+      ],
+      "gait": "run",
+      "speed": 2.8
+    },
+    {
+      "id": "a006",
+      "type": "play",
+      "actor": "nico",
+      "at": 31,
+      "clip": "facepalm",
+      "durationSec": 2
+    },
+    {
+      "id": "a007",
+      "type": "pickUp",
+      "actor": "vera",
+      "at": 38,
+      "prop": "bolso",
+      "durationSec": 1.2
+    },
+    {
+      "id": "a008",
+      "type": "drop",
+      "actor": "ladron",
+      "at": 40,
+      "prop": "chaqueta",
+      "sound": "impact-cloth"
+    },
+    {
+      "id": "a009",
+      "type": "play",
+      "actor": "vera",
+      "at": 45,
+      "clip": "laugh-body",
+      "durationSec": 2.4
+    }
+  ],
+  "dialogue": [
+    {
+      "id": "l001",
+      "actor": "nico-voz",
+      "text": "Yo no sé si habéis visto alguna vez una persecución de película. Gente que salta mesas, esquiva obstáculos y sale por una ventana sin despeinarse. Aquello fue exactamente lo contrario. Empezamos por atravesar una puerta que decía «solo personal». Y efectivamente, el personal no estaba preparado.",
+      "emotion": "smirk",
+      "direction": "voz en off; narración retrospectiva, confidencial, con ironía española",
+      "pauseAfter": 0.32
+    },
+    {
+      "id": "l002",
+      "actor": "roman",
+      "text": "¡Cuidado con la cocina!",
+      "emotion": "angry",
+      "direction": "gritando con intensidad",
+      "pauseAfter": 0.2
+    },
+    {
+      "id": "l003",
+      "actor": "nico",
+      "text": "¡Voy a por él!",
+      "emotion": "angry",
+      "direction": "gritando con intensidad",
+      "pauseAfter": 0.2
+    },
+    {
+      "id": "l004",
+      "actor": "vera",
+      "text": "¡Pues mira por dónde vas!",
+      "emotion": "angry",
+      "direction": "gritando con intensidad",
+      "pauseAfter": 0.2
+    },
+    {
+      "id": "l005",
+      "actor": "nico-voz",
+      "text": "Me golpeé con una bandeja. No sé cómo una bandeja tan pequeña puede hacer un ruido tan grande. Pareció que hubiese explotado una fábrica de cacerolas.",
+      "emotion": "smirk",
+      "direction": "voz en off; narración retrospectiva, confidencial, con ironía española",
+      "pauseAfter": 0.32
+    },
+    {
+      "id": "l006",
+      "actor": "ladron",
+      "text": "¡Dejadme en paz!",
+      "emotion": "fear",
+      "pauseAfter": 0.38
+    },
+    {
+      "id": "l007",
+      "actor": "vera",
+      "text": "¡Suelta el bolso!",
+      "emotion": "angry",
+      "direction": "gritando con intensidad",
+      "pauseAfter": 0.2
+    },
+    {
+      "id": "l008",
+      "actor": "nico-voz",
+      "text": "Vera esquivó una mesa, se agarró a una estantería y tuvo tiempo de insultar al ladrón y a mí en la misma frase. Eso es capacidad de gestión.",
+      "emotion": "smirk",
+      "direction": "voz en off; narración retrospectiva, confidencial, con ironía española",
+      "pauseAfter": 0.32
+    },
+    {
+      "id": "l009",
+      "actor": "nico",
+      "text": "¡Lo tengo! ¡Lo tengo!",
+      "emotion": "nervous",
+      "pauseAfter": 0.38
+    },
+    {
+      "id": "l010",
+      "actor": "nico-voz",
+      "text": "No lo tenía. Yo había visto una puerta abierta y había decidido anticiparme para cortarle el paso. La puerta llevaba a un cuarto de limpieza. Se cerró detrás de mí.",
+      "emotion": "smirk",
+      "direction": "voz en off; narración retrospectiva, confidencial, con ironía española",
+      "pauseAfter": 0.32
+    },
+    {
+      "id": "l011",
+      "actor": "nico",
+      "text": "¡Eh! ¡Un momento! ¡Abrid!",
+      "emotion": "angry",
+      "direction": "gritando con intensidad",
+      "pauseAfter": 0.2
+    },
+    {
+      "id": "l012",
+      "actor": "nico-voz",
+      "text": "Allí dentro había una fregona, un cubo y un olor a limón industrial que todavía me hace revivir la noche.",
+      "emotion": "smirk",
+      "direction": "voz en off; narración retrospectiva, confidencial, con ironía española",
+      "pauseAfter": 0.32
+    },
+    {
+      "id": "l013",
+      "actor": "vera",
+      "text": "¡Nico, sal de ahí!",
+      "emotion": "angry",
+      "direction": "gritando con intensidad",
+      "pauseAfter": 0.2
+    },
+    {
+      "id": "l014",
+      "actor": "nico",
+      "text": "¡Estoy intentándolo!",
+      "emotion": "angry",
+      "direction": "gritando con intensidad",
+      "pauseAfter": 0.2
+    },
+    {
+      "id": "l015",
+      "actor": "vera",
+      "text": "¿Estás encerrado?",
+      "emotion": "smirk",
+      "pauseAfter": 0.38
+    },
+    {
+      "id": "l016",
+      "actor": "nico",
+      "text": "No. Estoy... evaluando las salidas.",
+      "emotion": "nervous",
+      "pauseAfter": 0.38
+    },
+    {
+      "id": "l017",
+      "actor": "nico-voz",
+      "text": "Mientras yo evaluaba la salida única de un cuarto de dos metros cuadrados, Vera le arrebató el bolso al ladrón cuando este tropezó con la base de una mesa.",
+      "emotion": "smirk",
+      "direction": "voz en off; narración retrospectiva, confidencial, con ironía española",
+      "pauseAfter": 0.32
+    },
+    {
+      "id": "l018",
+      "actor": "ladron",
+      "text": "¡Eh!",
+      "emotion": "angry",
+      "direction": "gritando con intensidad",
+      "pauseAfter": 0.2
+    },
+    {
+      "id": "l019",
+      "actor": "vera",
+      "text": "¡Mi bolso!",
+      "emotion": "angry",
+      "direction": "gritando con intensidad",
+      "pauseAfter": 0.2
+    },
+    {
+      "id": "l020",
+      "actor": "nico-voz",
+      "text": "El tipo escapó con mi chaqueta. Desde dentro escuché la puerta de servicio golpearse contra la pared. Luego un silencio cortísimo. Después el ruido de algo muy caro rompiéndose en el comedor.",
+      "emotion": "smirk",
+      "direction": "voz en off; narración retrospectiva, confidencial, con ironía española",
+      "pauseAfter": 0.32
+    },
+    {
+      "id": "l021",
+      "actor": "roman",
+      "text": "¿Estáis bien?",
+      "emotion": "neutral",
+      "pauseAfter": 0.38
+    },
+    {
+      "id": "l022",
+      "actor": "vera",
+      "text": "Yo sí. El ingeniero está en el armario.",
+      "emotion": "smirk",
+      "pauseAfter": 0.38
+    },
+    {
+      "id": "l023",
+      "actor": "nico",
+      "text": "¡QUE NO ES UN ARMARIO!",
+      "emotion": "angry",
+      "direction": "gritando con intensidad",
+      "pauseAfter": 0.2
+    },
+    {
+      "id": "l024",
+      "actor": "nico-voz",
+      "text": "Al final logré salir. Llevaba un cubo enganchado al pie. No preguntéis cómo. Hay hechos de los que la humanidad no necesita tener constancia documental.",
+      "emotion": "smirk",
+      "direction": "voz en off; narración retrospectiva, confidencial, con ironía española",
+      "pauseAfter": 0.32
+    },
+    {
+      "id": "l025",
+      "actor": "vera",
+      "text": "¿Lo has atrapado?",
+      "emotion": "smirk",
+      "pauseAfter": 0.38
+    },
+    {
+      "id": "l026",
+      "actor": "nico",
+      "text": "Casi.",
+      "emotion": "nervous",
+      "pauseAfter": 0.38
+    },
+    {
+      "id": "l027",
+      "actor": "vera",
+      "text": "¿Cómo de casi?",
+      "emotion": "smirk",
+      "pauseAfter": 0.38
+    },
+    {
+      "id": "l028",
+      "actor": "nico",
+      "text": "He encontrado los productos de limpieza.",
+      "emotion": "nervous",
+      "pauseAfter": 0.38
+    },
+    {
+      "id": "l029",
+      "actor": "nico-voz",
+      "text": "Y Vera, con la cara llena de sudor, el bolso recuperado y un cucharón gigantesco en la mano, empezó a reírse de una forma que no había escuchado en toda la noche.",
+      "emotion": "smirk",
+      "direction": "voz en off; narración retrospectiva, confidencial, con ironía española",
+      "pauseAfter": 0.32
+    }
+  ],
+  "sound": [
+    {
+      "id": "ambiente",
+      "kind": "ambience",
+      "sound": "workshop-ambience",
+      "at": 0,
+      "gainDb": -31,
+      "fadeIn": 0.5,
+      "fadeOut": 0.5
+    },
+    {
+      "id": "sfx-clank-12",
+      "kind": "sfx",
+      "sound": "clank",
+      "at": 12,
+      "gainDb": -12
+    },
+    {
+      "id": "sfx-impact-wood-42",
+      "kind": "sfx",
+      "sound": "impact-wood",
+      "at": 42,
+      "gainDb": -12
+    }
+  ],
+  "transitionOut": {
+    "type": "cut",
+    "durationSec": 0
+  }
+}

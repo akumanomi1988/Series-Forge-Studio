@@ -1,0 +1,722 @@
+{
+  "schemaVersion": 2,
+  "id": "sc-011",
+  "name": "Una declaración imposible",
+  "synopsis": "Comisaría improvisada en el restaurante tras el robo; Dani se enreda accidentalmente en mantel.",
+  "environmentId": "restaurant",
+  "durationSec": "auto",
+  "tailSec": 0.8,
+  "autoLook": false,
+  "autoActing": 1,
+  "coverage": "manual",
+  "actors": [
+    {
+      "id": "nico",
+      "characterId": "nico",
+      "position": [
+        -0.8,
+        0,
+        0.1
+      ],
+      "yawDeg": 65,
+      "expression": "nervous",
+      "idle": "idle"
+    },
+    {
+      "id": "vera",
+      "characterId": "vera",
+      "position": [
+        0.9,
+        0,
+        0.15
+      ],
+      "yawDeg": -55,
+      "expression": "smirk",
+      "idle": "idle"
+    },
+    {
+      "id": "dani",
+      "characterId": "dani",
+      "position": [
+        1.75,
+        0,
+        -1
+      ],
+      "yawDeg": 0,
+      "expression": "neutral",
+      "idle": "idle"
+    },
+    {
+      "id": "ines",
+      "characterId": "ines",
+      "position": [
+        2.6,
+        0,
+        0.2
+      ],
+      "yawDeg": -60,
+      "expression": "neutral",
+      "idle": "idle"
+    },
+    {
+      "id": "roman",
+      "characterId": "roman",
+      "position": [
+        -2.5,
+        0,
+        -1.5
+      ],
+      "yawDeg": 0,
+      "expression": "neutral",
+      "idle": "idle"
+    },
+    {
+      "id": "nico-voz",
+      "characterId": "nico-voz",
+      "position": [
+        55,
+        0,
+        55
+      ],
+      "yawDeg": 0,
+      "expression": "neutral",
+      "idle": "idle"
+    }
+  ],
+  "props": [
+    {
+      "id": "mantel",
+      "propId": "mantel",
+      "position": [
+        2,
+        0.6,
+        -0.8
+      ]
+    }
+  ],
+  "shots": [
+    {
+      "id": "p001",
+      "at": 0,
+      "durationSec": 9,
+      "camera": {
+        "type": "framing",
+        "framing": "two-shot",
+        "subjects": [
+          "nico",
+          "vera"
+        ],
+        "azimuthDeg": -15,
+        "compose": "thirds",
+        "fov": 34
+      },
+      "notes": "Cobertura del momento: Comisaría improvisada en el restaurante tras el robo; Dani se enreda accidentalmente en mantel."
+    },
+    {
+      "id": "p002",
+      "at": 9,
+      "durationSec": 9,
+      "camera": {
+        "type": "framing",
+        "framing": "wide",
+        "subject": "vera",
+        "azimuthDeg": 18,
+        "compose": "thirds",
+        "fov": 36
+      },
+      "notes": "Corte dentro de escena. Interpretación natural, evitar primeros planos del narrador fuera de campo."
+    },
+    {
+      "id": "p003",
+      "at": 18,
+      "durationSec": 9,
+      "camera": {
+        "type": "framing",
+        "framing": "medium",
+        "subject": "dani",
+        "azimuthDeg": 24,
+        "compose": "thirds",
+        "fov": 34
+      },
+      "notes": "Corte dentro de escena. Interpretación natural, evitar primeros planos del narrador fuera de campo."
+    },
+    {
+      "id": "p004",
+      "at": 27,
+      "durationSec": 9,
+      "camera": {
+        "type": "framing",
+        "framing": "close",
+        "subject": "ines",
+        "azimuthDeg": -26,
+        "compose": "thirds",
+        "fov": 34
+      },
+      "notes": "Corte dentro de escena. Interpretación natural, evitar primeros planos del narrador fuera de campo."
+    },
+    {
+      "id": "p005",
+      "at": 36,
+      "durationSec": 9,
+      "camera": {
+        "type": "framing",
+        "framing": "medium-close",
+        "subject": "roman",
+        "azimuthDeg": 24,
+        "compose": "thirds",
+        "fov": 34
+      },
+      "notes": "Corte dentro de escena. Interpretación natural, evitar primeros planos del narrador fuera de campo."
+    },
+    {
+      "id": "p006",
+      "at": 45,
+      "durationSec": 9,
+      "camera": {
+        "type": "framing",
+        "framing": "medium",
+        "subject": "nico",
+        "azimuthDeg": -26,
+        "compose": "thirds",
+        "fov": 34,
+        "move": {
+          "type": "push-in",
+          "amount": 0.08
+        }
+      },
+      "notes": "Corte dentro de escena. Interpretación natural, evitar primeros planos del narrador fuera de campo."
+    },
+    {
+      "id": "p007",
+      "at": 54,
+      "durationSec": 9,
+      "camera": {
+        "type": "framing",
+        "framing": "close",
+        "subject": "vera",
+        "azimuthDeg": 24,
+        "compose": "thirds",
+        "fov": 34
+      },
+      "notes": "Corte dentro de escena. Interpretación natural, evitar primeros planos del narrador fuera de campo."
+    },
+    {
+      "id": "p008",
+      "at": 63,
+      "durationSec": 9,
+      "camera": {
+        "type": "framing",
+        "framing": "two-shot",
+        "subjects": [
+          "nico",
+          "vera"
+        ],
+        "azimuthDeg": 15,
+        "compose": "thirds",
+        "fov": 34
+      },
+      "notes": "Corte dentro de escena. Interpretación natural, evitar primeros planos del narrador fuera de campo."
+    },
+    {
+      "id": "p009",
+      "at": 72,
+      "durationSec": 9,
+      "camera": {
+        "type": "framing",
+        "framing": "wide",
+        "subject": "ines",
+        "azimuthDeg": 18,
+        "compose": "thirds",
+        "fov": 36
+      },
+      "notes": "Corte dentro de escena. Interpretación natural, evitar primeros planos del narrador fuera de campo."
+    },
+    {
+      "id": "p010",
+      "at": 81,
+      "durationSec": 9,
+      "camera": {
+        "type": "framing",
+        "framing": "close",
+        "subject": "roman",
+        "azimuthDeg": -26,
+        "compose": "thirds",
+        "fov": 34
+      },
+      "notes": "Corte dentro de escena. Interpretación natural, evitar primeros planos del narrador fuera de campo."
+    },
+    {
+      "id": "p011",
+      "at": 90,
+      "durationSec": 9,
+      "camera": {
+        "type": "framing",
+        "framing": "medium-close",
+        "subject": "nico",
+        "azimuthDeg": 24,
+        "compose": "thirds",
+        "fov": 34,
+        "move": {
+          "type": "push-in",
+          "amount": 0.08
+        }
+      },
+      "notes": "Corte dentro de escena. Interpretación natural, evitar primeros planos del narrador fuera de campo."
+    },
+    {
+      "id": "p012",
+      "at": 99,
+      "durationSec": 9,
+      "camera": {
+        "type": "framing",
+        "framing": "medium",
+        "subject": "vera",
+        "azimuthDeg": -26,
+        "compose": "thirds",
+        "fov": 34
+      },
+      "notes": "Corte dentro de escena. Interpretación natural, evitar primeros planos del narrador fuera de campo."
+    },
+    {
+      "id": "p013",
+      "at": 108,
+      "durationSec": 9,
+      "camera": {
+        "type": "framing",
+        "framing": "close",
+        "subject": "dani",
+        "azimuthDeg": 24,
+        "compose": "thirds",
+        "fov": 34
+      },
+      "notes": "Corte dentro de escena. Interpretación natural, evitar primeros planos del narrador fuera de campo."
+    },
+    {
+      "id": "p014",
+      "at": 117,
+      "durationSec": 9,
+      "camera": {
+        "type": "framing",
+        "framing": "medium-close",
+        "subject": "ines",
+        "azimuthDeg": -26,
+        "compose": "thirds",
+        "fov": 34
+      },
+      "notes": "Corte dentro de escena. Interpretación natural, evitar primeros planos del narrador fuera de campo."
+    },
+    {
+      "id": "p015",
+      "at": 126,
+      "durationSec": 9,
+      "camera": {
+        "type": "framing",
+        "framing": "two-shot",
+        "subjects": [
+          "nico",
+          "vera"
+        ],
+        "azimuthDeg": -15,
+        "compose": "thirds",
+        "fov": 34
+      },
+      "notes": "Corte dentro de escena. Interpretación natural, evitar primeros planos del narrador fuera de campo."
+    },
+    {
+      "id": "p016",
+      "at": 135,
+      "durationSec": 9,
+      "camera": {
+        "type": "framing",
+        "framing": "wide",
+        "subject": "nico",
+        "azimuthDeg": 18,
+        "compose": "thirds",
+        "fov": 36
+      },
+      "notes": "Corte dentro de escena. Interpretación natural, evitar primeros planos del narrador fuera de campo."
+    },
+    {
+      "id": "p017",
+      "at": 144,
+      "durationSec": 9,
+      "camera": {
+        "type": "framing",
+        "framing": "medium-close",
+        "subject": "vera",
+        "azimuthDeg": 24,
+        "compose": "thirds",
+        "fov": 34
+      },
+      "notes": "Corte dentro de escena. Interpretación natural, evitar primeros planos del narrador fuera de campo."
+    },
+    {
+      "id": "p018",
+      "at": 153,
+      "durationSec": 9,
+      "camera": {
+        "type": "framing",
+        "framing": "medium",
+        "subject": "dani",
+        "azimuthDeg": -26,
+        "compose": "thirds",
+        "fov": 34
+      },
+      "notes": "Corte dentro de escena. Interpretación natural, evitar primeros planos del narrador fuera de campo."
+    },
+    {
+      "id": "p019",
+      "at": 162,
+      "durationSec": 9,
+      "camera": {
+        "type": "framing",
+        "framing": "close",
+        "subject": "ines",
+        "azimuthDeg": 24,
+        "compose": "thirds",
+        "fov": 34
+      },
+      "notes": "Corte dentro de escena. Interpretación natural, evitar primeros planos del narrador fuera de campo."
+    },
+    {
+      "id": "p020",
+      "at": 171,
+      "durationSec": 9,
+      "camera": {
+        "type": "framing",
+        "framing": "medium-close",
+        "subject": "roman",
+        "azimuthDeg": -26,
+        "compose": "thirds",
+        "fov": 34
+      },
+      "notes": "Corte dentro de escena. Interpretación natural, evitar primeros planos del narrador fuera de campo."
+    },
+    {
+      "id": "p021",
+      "at": 180,
+      "durationSec": 9,
+      "camera": {
+        "type": "framing",
+        "framing": "medium",
+        "subject": "nico",
+        "azimuthDeg": 24,
+        "compose": "thirds",
+        "fov": 34,
+        "move": {
+          "type": "push-in",
+          "amount": 0.08
+        }
+      },
+      "notes": "Corte dentro de escena. Interpretación natural, evitar primeros planos del narrador fuera de campo."
+    },
+    {
+      "id": "p022",
+      "at": 189,
+      "durationSec": 7,
+      "camera": {
+        "type": "framing",
+        "framing": "two-shot",
+        "subjects": [
+          "nico",
+          "vera"
+        ],
+        "azimuthDeg": 15,
+        "compose": "thirds",
+        "fov": 34
+      },
+      "notes": "Corte dentro de escena. Interpretación natural, evitar primeros planos del narrador fuera de campo."
+    }
+  ],
+  "actions": [
+    {
+      "id": "a001",
+      "type": "play",
+      "actor": "ines",
+      "at": 3,
+      "clip": "hands-on-hips",
+      "durationSec": 3
+    },
+    {
+      "id": "a002",
+      "type": "play",
+      "actor": "roman",
+      "at": 14,
+      "clip": "explain",
+      "durationSec": 3
+    },
+    {
+      "id": "a003",
+      "type": "play",
+      "actor": "dani",
+      "at": 27,
+      "clip": "angry-gesture",
+      "durationSec": 3
+    },
+    {
+      "id": "a004",
+      "type": "play",
+      "actor": "nico",
+      "at": 43,
+      "clip": "angry-gesture",
+      "durationSec": 4
+    },
+    {
+      "id": "a005",
+      "type": "play",
+      "actor": "vera",
+      "at": 55,
+      "clip": "laugh-body",
+      "durationSec": 1.8
+    },
+    {
+      "id": "a006",
+      "type": "play",
+      "actor": "dani",
+      "at": 66,
+      "clip": "nervous",
+      "durationSec": 3
+    },
+    {
+      "id": "a007",
+      "type": "effect",
+      "at": 70,
+      "effect": "flicker",
+      "position": [
+        0,
+        0.8,
+        0
+      ],
+      "durationSec": 1,
+      "sound": "impact-glass"
+    }
+  ],
+  "dialogue": [
+    {
+      "id": "l001",
+      "actor": "nico-voz",
+      "text": "Cuando regresamos al comedor, el desastre ya estaba hecho. Dani había intentado detener al ladrón con uno de esos discursos que deben de funcionar muy bien en las reuniones de propietarios. El ladrón le apartó, Dani cayó sobre la mesa y la mesa decidió jubilarse en el acto.",
+      "emotion": "smirk",
+      "direction": "voz en off; narración retrospectiva, confidencial, con ironía española",
+      "pauseAfter": 0.32
+    },
+    {
+      "id": "l002",
+      "actor": "ines",
+      "text": "A ver. ¿Quién ha llamado?",
+      "emotion": "neutral",
+      "pauseAfter": 0.38
+    },
+    {
+      "id": "l003",
+      "actor": "roman",
+      "text": "Yo. Soy el camarero. El de verdad, por si acaso.",
+      "emotion": "neutral",
+      "pauseAfter": 0.38
+    },
+    {
+      "id": "l004",
+      "actor": "ines",
+      "text": "Gracias por la aclaración. Empezamos bien.",
+      "emotion": "neutral",
+      "pauseAfter": 0.38
+    },
+    {
+      "id": "l005",
+      "actor": "dani",
+      "text": "¡Soy el dueño del local! Exijo que detengan a ese individuo.",
+      "emotion": "smirk",
+      "pauseAfter": 0.38
+    },
+    {
+      "id": "l006",
+      "actor": "ines",
+      "text": "¿A cuál?",
+      "emotion": "neutral",
+      "pauseAfter": 0.38
+    },
+    {
+      "id": "l007",
+      "actor": "dani",
+      "text": "¡Al ladrón, por supuesto!",
+      "emotion": "smirk",
+      "pauseAfter": 0.38
+    },
+    {
+      "id": "l008",
+      "actor": "nico",
+      "text": "En eso estamos de acuerdo, por una vez.",
+      "emotion": "nervous",
+      "pauseAfter": 0.38
+    },
+    {
+      "id": "l009",
+      "actor": "nico-voz",
+      "text": "La agente se llamaba Inés y tenía la mirada de alguien que llevaba demasiados años escuchando historias de gente convencida de ser el protagonista de su propia película.",
+      "emotion": "smirk",
+      "direction": "voz en off; narración retrospectiva, confidencial, con ironía española",
+      "pauseAfter": 0.32
+    },
+    {
+      "id": "l010",
+      "actor": "ines",
+      "text": "Usted, el de la camisa azul, ¿qué ha pasado?",
+      "emotion": "neutral",
+      "pauseAfter": 0.38
+    },
+    {
+      "id": "l011",
+      "actor": "nico",
+      "text": "Nos han robado. Hemos salido detrás del ladrón. Ha habido un pequeño problema con una puerta.",
+      "emotion": "nervous",
+      "pauseAfter": 0.38
+    },
+    {
+      "id": "l012",
+      "actor": "vera",
+      "text": "Se ha encerrado en el cuarto de limpieza.",
+      "emotion": "smirk",
+      "pauseAfter": 0.38
+    },
+    {
+      "id": "l013",
+      "actor": "nico",
+      "text": "Eso es una interpretación.",
+      "emotion": "nervous",
+      "pauseAfter": 0.38
+    },
+    {
+      "id": "l014",
+      "actor": "vera",
+      "text": "Es literalmente lo que ha pasado.",
+      "emotion": "smirk",
+      "pauseAfter": 0.38
+    },
+    {
+      "id": "l015",
+      "actor": "dani",
+      "text": "¡Todo esto es culpa de tu acompañante, Vera! ¡Menudo numerito!",
+      "emotion": "smirk",
+      "pauseAfter": 0.38
+    },
+    {
+      "id": "l016",
+      "actor": "nico-voz",
+      "text": "Entonces Dani cometió su error definitivo. Yo llevaba toda la noche intentando ser el tío más correcto, más educado y más cómodo del universo. Pero aquello me tocó los cojones.",
+      "emotion": "smirk",
+      "direction": "voz en off; narración retrospectiva, confidencial, con ironía española",
+      "pauseAfter": 0.32
+    },
+    {
+      "id": "l017",
+      "actor": "nico",
+      "text": "Mira, Dani. No sé qué problema tienes conmigo. Ni te conozco. Pero llevas toda la noche intentando hacerme sentir como un idiota.",
+      "emotion": "nervous",
+      "pauseAfter": 0.38
+    },
+    {
+      "id": "l018",
+      "actor": "dani",
+      "text": "No te pongas agresivo, campeón.",
+      "emotion": "smirk",
+      "pauseAfter": 0.38
+    },
+    {
+      "id": "l019",
+      "actor": "nico",
+      "text": "No me pongo agresivo. Me pongo sincero. Y te aseguro que para hacer el ridículo no necesito ayuda de nadie.",
+      "emotion": "nervous",
+      "pauseAfter": 0.38
+    },
+    {
+      "id": "l020",
+      "actor": "vera",
+      "text": "Ahí te doy la razón.",
+      "emotion": "smirk",
+      "pauseAfter": 0.38
+    },
+    {
+      "id": "l021",
+      "actor": "nico-voz",
+      "text": "Vera lo dijo sonriendo. Dani se levantó para responder y se enganchó con el mantel que había quedado en el suelo. Yo intenté sujetarlo. Él pensó que le estaba atacando. Un segundo después estábamos los dos tirando de un mismo trozo de tela como dos gatos peleándose por una cortina.",
+      "emotion": "smirk",
+      "direction": "voz en off; narración retrospectiva, confidencial, con ironía española",
+      "pauseAfter": 0.32
+    },
+    {
+      "id": "l022",
+      "actor": "ines",
+      "text": "¡QUIETOS LOS DOS!",
+      "emotion": "angry",
+      "direction": "gritando con intensidad",
+      "pauseAfter": 0.2
+    },
+    {
+      "id": "l023",
+      "actor": "roman",
+      "text": "Cuidado con la copa.",
+      "emotion": "neutral",
+      "pauseAfter": 0.38
+    },
+    {
+      "id": "l024",
+      "actor": "nico-voz",
+      "text": "La copa no sobrevivió. Dani terminó sentado en una silla, con el mantel enredado alrededor de los brazos y una expresión digna de alguien que acababa de descubrir que el universo tenía sentido del humor.",
+      "emotion": "smirk",
+      "direction": "voz en off; narración retrospectiva, confidencial, con ironía española",
+      "pauseAfter": 0.32
+    },
+    {
+      "id": "l025",
+      "actor": "ines",
+      "text": "¿Y vosotros dos sois pareja?",
+      "emotion": "neutral",
+      "pauseAfter": 0.38
+    },
+    {
+      "id": "l026",
+      "actor": "nico",
+      "text": "No.",
+      "emotion": "nervous",
+      "pauseAfter": 0.38
+    },
+    {
+      "id": "l027",
+      "actor": "vera",
+      "text": "¡Ni de coña!",
+      "emotion": "angry",
+      "direction": "gritando con intensidad",
+      "pauseAfter": 0.2
+    },
+    {
+      "id": "l028",
+      "actor": "nico-voz",
+      "text": "Fue entonces cuando empecé a comprender que hay amistades que se forman a base de afinidades, y otras que se fraguan sobreviviendo al mismo desastre.",
+      "emotion": "smirk",
+      "direction": "voz en off; narración retrospectiva, confidencial, con ironía española",
+      "pauseAfter": 0.32
+    }
+  ],
+  "sound": [
+    {
+      "id": "ambiente",
+      "kind": "ambience",
+      "sound": "room-tone",
+      "at": 0,
+      "gainDb": -31,
+      "fadeIn": 0.5,
+      "fadeOut": 0.5
+    },
+    {
+      "id": "sfx-impact-glass-73",
+      "kind": "sfx",
+      "sound": "impact-glass",
+      "at": 73,
+      "gainDb": -12
+    }
+  ],
+  "transitionOut": {
+    "type": "cut",
+    "durationSec": 0
+  }
+}

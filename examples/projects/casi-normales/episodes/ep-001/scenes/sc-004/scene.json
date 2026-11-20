@@ -1,0 +1,604 @@
+{
+  "schemaVersion": 2,
+  "id": "sc-004",
+  "name": "El restaurante de los ricos",
+  "synopsis": "Nico llega; agua con hielo, recibimiento, golpe en la mesa y primeras miradas.",
+  "environmentId": "restaurant",
+  "durationSec": "auto",
+  "tailSec": 0.8,
+  "autoLook": false,
+  "autoActing": 1,
+  "coverage": "manual",
+  "actors": [
+    {
+      "id": "nico",
+      "characterId": "nico",
+      "position": [
+        -0.8,
+        0,
+        0.1
+      ],
+      "yawDeg": 65,
+      "expression": "nervous",
+      "idle": "idle"
+    },
+    {
+      "id": "vera",
+      "characterId": "vera",
+      "position": [
+        0.9,
+        0,
+        0.15
+      ],
+      "yawDeg": -55,
+      "expression": "smirk",
+      "idle": "idle"
+    },
+    {
+      "id": "roman",
+      "characterId": "roman",
+      "position": [
+        -2.5,
+        0,
+        -1.5
+      ],
+      "yawDeg": 0,
+      "expression": "neutral",
+      "idle": "idle"
+    },
+    {
+      "id": "nico-voz",
+      "characterId": "nico-voz",
+      "position": [
+        55,
+        0,
+        55
+      ],
+      "yawDeg": 0,
+      "expression": "neutral",
+      "idle": "idle"
+    }
+  ],
+  "props": [],
+  "shots": [
+    {
+      "id": "p001",
+      "at": 0,
+      "durationSec": 9,
+      "camera": {
+        "type": "framing",
+        "framing": "two-shot",
+        "subjects": [
+          "nico",
+          "vera"
+        ],
+        "azimuthDeg": -15,
+        "compose": "thirds",
+        "fov": 34
+      },
+      "notes": "Cobertura del momento: Nico llega; agua con hielo, recibimiento, golpe en la mesa y primeras miradas."
+    },
+    {
+      "id": "p002",
+      "at": 9,
+      "durationSec": 9,
+      "camera": {
+        "type": "framing",
+        "framing": "wide",
+        "subject": "vera",
+        "azimuthDeg": 18,
+        "compose": "thirds",
+        "fov": 36
+      },
+      "notes": "Corte dentro de escena. Interpretación natural, evitar primeros planos del narrador fuera de campo."
+    },
+    {
+      "id": "p003",
+      "at": 18,
+      "durationSec": 9,
+      "camera": {
+        "type": "framing",
+        "framing": "medium",
+        "subject": "roman",
+        "azimuthDeg": 24,
+        "compose": "thirds",
+        "fov": 34
+      },
+      "notes": "Corte dentro de escena. Interpretación natural, evitar primeros planos del narrador fuera de campo."
+    },
+    {
+      "id": "p004",
+      "at": 27,
+      "durationSec": 9,
+      "camera": {
+        "type": "framing",
+        "framing": "close",
+        "subject": "nico",
+        "azimuthDeg": -26,
+        "compose": "thirds",
+        "fov": 34
+      },
+      "notes": "Corte dentro de escena. Interpretación natural, evitar primeros planos del narrador fuera de campo."
+    },
+    {
+      "id": "p005",
+      "at": 36,
+      "durationSec": 9,
+      "camera": {
+        "type": "framing",
+        "framing": "medium-close",
+        "subject": "vera",
+        "azimuthDeg": 24,
+        "compose": "thirds",
+        "fov": 34
+      },
+      "notes": "Corte dentro de escena. Interpretación natural, evitar primeros planos del narrador fuera de campo."
+    },
+    {
+      "id": "p006",
+      "at": 45,
+      "durationSec": 9,
+      "camera": {
+        "type": "framing",
+        "framing": "medium",
+        "subject": "roman",
+        "azimuthDeg": -26,
+        "compose": "thirds",
+        "fov": 34,
+        "move": {
+          "type": "push-in",
+          "amount": 0.08
+        }
+      },
+      "notes": "Corte dentro de escena. Interpretación natural, evitar primeros planos del narrador fuera de campo."
+    },
+    {
+      "id": "p007",
+      "at": 54,
+      "durationSec": 9,
+      "camera": {
+        "type": "framing",
+        "framing": "close",
+        "subject": "nico",
+        "azimuthDeg": 24,
+        "compose": "thirds",
+        "fov": 34
+      },
+      "notes": "Corte dentro de escena. Interpretación natural, evitar primeros planos del narrador fuera de campo."
+    },
+    {
+      "id": "p008",
+      "at": 63,
+      "durationSec": 9,
+      "camera": {
+        "type": "framing",
+        "framing": "two-shot",
+        "subjects": [
+          "nico",
+          "vera"
+        ],
+        "azimuthDeg": 15,
+        "compose": "thirds",
+        "fov": 34
+      },
+      "notes": "Corte dentro de escena. Interpretación natural, evitar primeros planos del narrador fuera de campo."
+    },
+    {
+      "id": "p009",
+      "at": 72,
+      "durationSec": 9,
+      "camera": {
+        "type": "framing",
+        "framing": "wide",
+        "subject": "roman",
+        "azimuthDeg": 18,
+        "compose": "thirds",
+        "fov": 36
+      },
+      "notes": "Corte dentro de escena. Interpretación natural, evitar primeros planos del narrador fuera de campo."
+    },
+    {
+      "id": "p010",
+      "at": 81,
+      "durationSec": 9,
+      "camera": {
+        "type": "framing",
+        "framing": "close",
+        "subject": "nico",
+        "azimuthDeg": -26,
+        "compose": "thirds",
+        "fov": 34
+      },
+      "notes": "Corte dentro de escena. Interpretación natural, evitar primeros planos del narrador fuera de campo."
+    },
+    {
+      "id": "p011",
+      "at": 90,
+      "durationSec": 9,
+      "camera": {
+        "type": "framing",
+        "framing": "medium-close",
+        "subject": "vera",
+        "azimuthDeg": 24,
+        "compose": "thirds",
+        "fov": 34,
+        "move": {
+          "type": "push-in",
+          "amount": 0.08
+        }
+      },
+      "notes": "Corte dentro de escena. Interpretación natural, evitar primeros planos del narrador fuera de campo."
+    },
+    {
+      "id": "p012",
+      "at": 99,
+      "durationSec": 9,
+      "camera": {
+        "type": "framing",
+        "framing": "medium",
+        "subject": "roman",
+        "azimuthDeg": -26,
+        "compose": "thirds",
+        "fov": 34
+      },
+      "notes": "Corte dentro de escena. Interpretación natural, evitar primeros planos del narrador fuera de campo."
+    },
+    {
+      "id": "p013",
+      "at": 108,
+      "durationSec": 9,
+      "camera": {
+        "type": "framing",
+        "framing": "close",
+        "subject": "nico",
+        "azimuthDeg": 24,
+        "compose": "thirds",
+        "fov": 34
+      },
+      "notes": "Corte dentro de escena. Interpretación natural, evitar primeros planos del narrador fuera de campo."
+    },
+    {
+      "id": "p014",
+      "at": 117,
+      "durationSec": 9,
+      "camera": {
+        "type": "framing",
+        "framing": "medium-close",
+        "subject": "vera",
+        "azimuthDeg": -26,
+        "compose": "thirds",
+        "fov": 34
+      },
+      "notes": "Corte dentro de escena. Interpretación natural, evitar primeros planos del narrador fuera de campo."
+    },
+    {
+      "id": "p015",
+      "at": 126,
+      "durationSec": 9,
+      "camera": {
+        "type": "framing",
+        "framing": "two-shot",
+        "subjects": [
+          "nico",
+          "vera"
+        ],
+        "azimuthDeg": -15,
+        "compose": "thirds",
+        "fov": 34
+      },
+      "notes": "Corte dentro de escena. Interpretación natural, evitar primeros planos del narrador fuera de campo."
+    },
+    {
+      "id": "p016",
+      "at": 135,
+      "durationSec": 9,
+      "camera": {
+        "type": "framing",
+        "framing": "wide",
+        "subject": "nico",
+        "azimuthDeg": 18,
+        "compose": "thirds",
+        "fov": 36
+      },
+      "notes": "Corte dentro de escena. Interpretación natural, evitar primeros planos del narrador fuera de campo."
+    },
+    {
+      "id": "p017",
+      "at": 144,
+      "durationSec": 9,
+      "camera": {
+        "type": "framing",
+        "framing": "medium-close",
+        "subject": "vera",
+        "azimuthDeg": 24,
+        "compose": "thirds",
+        "fov": 34
+      },
+      "notes": "Corte dentro de escena. Interpretación natural, evitar primeros planos del narrador fuera de campo."
+    },
+    {
+      "id": "p018",
+      "at": 153,
+      "durationSec": 3,
+      "camera": {
+        "type": "framing",
+        "framing": "medium",
+        "subject": "roman",
+        "azimuthDeg": -26,
+        "compose": "thirds",
+        "fov": 34
+      },
+      "notes": "Corte dentro de escena. Interpretación natural, evitar primeros planos del narrador fuera de campo."
+    }
+  ],
+  "actions": [
+    {
+      "id": "a001",
+      "type": "play",
+      "actor": "nico",
+      "at": 3,
+      "clip": "nervous",
+      "durationSec": 3
+    },
+    {
+      "id": "a002",
+      "type": "play",
+      "actor": "roman",
+      "at": 10,
+      "clip": "present",
+      "durationSec": 2
+    },
+    {
+      "id": "a003",
+      "type": "walk",
+      "actor": "vera",
+      "at": 22,
+      "to": [
+        1,
+        0,
+        0.8
+      ],
+      "speed": 1.05,
+      "faceTo": "nico"
+    },
+    {
+      "id": "a004",
+      "type": "play",
+      "actor": "nico",
+      "at": 29,
+      "clip": "shrug",
+      "durationSec": 1.8
+    },
+    {
+      "id": "a005",
+      "type": "sit",
+      "actor": "nico",
+      "at": 43,
+      "prop": "silla-nico",
+      "durationSec": 1
+    },
+    {
+      "id": "a006",
+      "type": "sit",
+      "actor": "vera",
+      "at": 46,
+      "prop": "silla-vera",
+      "durationSec": 1
+    },
+    {
+      "id": "a007",
+      "type": "play",
+      "actor": "vera",
+      "at": 50,
+      "clip": "headshake",
+      "durationSec": 1.5
+    }
+  ],
+  "dialogue": [
+    {
+      "id": "l001",
+      "actor": "nico-voz",
+      "text": "Llegué antes de la hora. Muy antes. Treinta y cinco minutos antes. A estas alturas, el camarero me habría cobrado alquiler por ocupar la mesa sin pedir nada.",
+      "emotion": "smirk",
+      "direction": "voz en off; narración retrospectiva, confidencial, con ironía española",
+      "pauseAfter": 0.32
+    },
+    {
+      "id": "l002",
+      "actor": "roman",
+      "text": "¿Agua con gas o sin gas, señor?",
+      "emotion": "neutral",
+      "pauseAfter": 0.38
+    },
+    {
+      "id": "l003",
+      "actor": "nico",
+      "text": "Con hielo, gracias.",
+      "emotion": "nervous",
+      "pauseAfter": 0.38
+    },
+    {
+      "id": "l004",
+      "actor": "roman",
+      "text": "Eso no responde a mi pregunta.",
+      "emotion": "neutral",
+      "pauseAfter": 0.38
+    },
+    {
+      "id": "l005",
+      "actor": "nico",
+      "text": "Sin gas. Lo del hielo sigue en pie, si puede ser.",
+      "emotion": "nervous",
+      "pauseAfter": 0.38
+    },
+    {
+      "id": "l006",
+      "actor": "nico-voz",
+      "text": "El camarero tenía la expresión de alguien que había tenido un mal día y acababa de ver cómo entraba un día todavía peor por la puerta.",
+      "emotion": "smirk",
+      "direction": "voz en off; narración retrospectiva, confidencial, con ironía española",
+      "pauseAfter": 0.32
+    },
+    {
+      "id": "l007",
+      "actor": "nico-voz",
+      "text": "Yo estaba convencido de que el restaurante era perfecto. Sonaba música suave, había velas y nadie gritaba. Era todo tan elegante que me daba miedo respirar demasiado fuerte.",
+      "emotion": "smirk",
+      "direction": "voz en off; narración retrospectiva, confidencial, con ironía española",
+      "pauseAfter": 0.32
+    },
+    {
+      "id": "l008",
+      "actor": "roman",
+      "text": "¿Desea esperar a su acompañante antes de pedir?",
+      "emotion": "neutral",
+      "pauseAfter": 0.38
+    },
+    {
+      "id": "l009",
+      "actor": "nico",
+      "text": "Sí. De hecho, creo que voy a esperar para todo. Hasta para parpadear.",
+      "emotion": "nervous",
+      "pauseAfter": 0.38
+    },
+    {
+      "id": "l010",
+      "actor": "nico-voz",
+      "text": "Cuando Vera llegó, me levanté tan rápido que golpeé la mesa con las rodillas. La vela saltó, la copa tembló y una cuchara hizo un ruido que pareció escucharse en toda la provincia.",
+      "emotion": "smirk",
+      "direction": "voz en off; narración retrospectiva, confidencial, con ironía española",
+      "pauseAfter": 0.32
+    },
+    {
+      "id": "l011",
+      "actor": "vera",
+      "text": "¿Estás bien?",
+      "emotion": "smirk",
+      "pauseAfter": 0.38
+    },
+    {
+      "id": "l012",
+      "actor": "nico",
+      "text": "Sí, sí. Perfectamente. Soy muy ágil.",
+      "emotion": "nervous",
+      "pauseAfter": 0.38
+    },
+    {
+      "id": "l013",
+      "actor": "nico-voz",
+      "text": "Me senté. Volví a darme en la misma rodilla. Y esa fue mi entrada triunfal.",
+      "emotion": "smirk",
+      "direction": "voz en off; narración retrospectiva, confidencial, con ironía española",
+      "pauseAfter": 0.32
+    },
+    {
+      "id": "l014",
+      "actor": "vera",
+      "text": "Así que tú eres Nico.",
+      "emotion": "smirk",
+      "pauseAfter": 0.38
+    },
+    {
+      "id": "l015",
+      "actor": "nico",
+      "text": "Y tú eres Vera.",
+      "emotion": "nervous",
+      "pauseAfter": 0.38
+    },
+    {
+      "id": "l016",
+      "actor": "vera",
+      "text": "Impresionante. Nos hemos aprendido los nombres.",
+      "emotion": "smirk",
+      "pauseAfter": 0.38
+    },
+    {
+      "id": "l017",
+      "actor": "nico",
+      "text": "Llevo ensayándolo desde el martes.",
+      "emotion": "nervous",
+      "pauseAfter": 0.38
+    },
+    {
+      "id": "l018",
+      "actor": "nico-voz",
+      "text": "Lo dije en voz alta. A mí nadie me había avisado de que algunas cosas estaban mejor quedándose dentro de la cabeza.",
+      "emotion": "smirk",
+      "direction": "voz en off; narración retrospectiva, confidencial, con ironía española",
+      "pauseAfter": 0.32
+    },
+    {
+      "id": "l019",
+      "actor": "vera",
+      "text": "Bueno, al menos eres sincero.",
+      "emotion": "smirk",
+      "pauseAfter": 0.38
+    },
+    {
+      "id": "l020",
+      "actor": "nico",
+      "text": "Eso dicen. No siempre es una ventaja.",
+      "emotion": "nervous",
+      "pauseAfter": 0.38
+    },
+    {
+      "id": "l021",
+      "actor": "nico-voz",
+      "text": "Vera tenía esa sonrisa de la gente que detecta inmediatamente que estás haciendo el ridículo, pero todavía no ha decidido si le molesta o le hace gracia. Yo esperaba que eligiera la segunda opción.",
+      "emotion": "smirk",
+      "direction": "voz en off; narración retrospectiva, confidencial, con ironía española",
+      "pauseAfter": 0.32
+    },
+    {
+      "id": "l022",
+      "actor": "roman",
+      "text": "Aquí tienen las cartas.",
+      "emotion": "neutral",
+      "pauseAfter": 0.38
+    },
+    {
+      "id": "l023",
+      "actor": "nico",
+      "text": "Muchas gracias.",
+      "emotion": "nervous",
+      "pauseAfter": 0.38
+    },
+    {
+      "id": "l024",
+      "actor": "vera",
+      "text": "Nico, la carta está al revés.",
+      "emotion": "smirk",
+      "pauseAfter": 0.38
+    },
+    {
+      "id": "l025",
+      "actor": "nico-voz",
+      "text": "Y yo pensé: todavía quedan un montón de horas para que esto empeore. Qué ingenuo era.",
+      "emotion": "smirk",
+      "direction": "voz en off; narración retrospectiva, confidencial, con ironía española",
+      "pauseAfter": 0.32
+    }
+  ],
+  "sound": [
+    {
+      "id": "ambiente",
+      "kind": "ambience",
+      "sound": "room-tone",
+      "at": 0,
+      "gainDb": -31,
+      "fadeIn": 0.5,
+      "fadeOut": 0.5
+    },
+    {
+      "id": "sfx-chair-creak-35",
+      "kind": "sfx",
+      "sound": "chair-creak",
+      "at": 35,
+      "gainDb": -12
+    }
+  ],
+  "transitionOut": {
+    "type": "cut",
+    "durationSec": 0
+  }
+}

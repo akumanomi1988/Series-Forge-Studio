@@ -21,7 +21,6 @@
   },
   "alternatives": {
     "voicebox": {
-      "voice": "",
       "engine": "qwen",
       "instruct": "Spanish female, sardonic friend, quick-witted",
       "license": {

@@ -1,0 +1,33 @@
+{
+  "schemaVersion": 2,
+  "id": "cita-cama",
+  "kind": "music",
+  "generator": "procedural",
+  "tempo": 96,
+  "key": "F",
+  "mode": "major",
+  "progression": [
+    "I",
+    "vi",
+    "ii",
+    "V"
+  ],
+  "instruments": [
+    "keys",
+    "bass",
+    "brushes",
+    "guitar"
+  ],
+  "style": "lounge",
+  "swing": 0.22,
+  "sevenths": true,
+  "form": "loop",
+  "durationSec": 120,
+  "seed": 144,
+  "mood": "comedia romántica discreta",
+  "license": {
+    "id": "procedural-original",
+    "source": "Series Forge procedural synthesis",
+    "commercialUse": "allowed"
+  }
+}

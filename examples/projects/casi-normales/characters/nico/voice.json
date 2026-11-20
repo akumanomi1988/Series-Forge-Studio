@@ -28,7 +28,6 @@
   },
   "alternatives": {
     "voicebox": {
-      "voice": "",
       "engine": "qwen",
       "instruct": "Spanish male, intimate self-deprecating conversational tone",
       "license": {

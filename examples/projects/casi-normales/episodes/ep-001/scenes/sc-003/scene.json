@@ -1,0 +1,498 @@
+{
+  "schemaVersion": 2,
+  "id": "sc-003",
+  "name": "La norma de Vera",
+  "synopsis": "Vera se prepara y habla por teléfono con Sofía. Se justifica cómo lo sabe el narrador.",
+  "environmentId": "apartment",
+  "durationSec": "auto",
+  "tailSec": 0.8,
+  "autoLook": false,
+  "autoActing": 1,
+  "coverage": "manual",
+  "actors": [
+    {
+      "id": "vera",
+      "characterId": "vera",
+      "position": [
+        0.9,
+        0,
+        0.15
+      ],
+      "yawDeg": -55,
+      "expression": "smirk",
+      "idle": "idle"
+    },
+    {
+      "id": "sofia",
+      "characterId": "sofia",
+      "position": [
+        50,
+        0,
+        50
+      ],
+      "yawDeg": 0,
+      "expression": "neutral",
+      "idle": "idle"
+    },
+    {
+      "id": "nico-voz",
+      "characterId": "nico-voz",
+      "position": [
+        55,
+        0,
+        55
+      ],
+      "yawDeg": 0,
+      "expression": "neutral",
+      "idle": "idle"
+    }
+  ],
+  "props": [],
+  "shots": [
+    {
+      "id": "p001",
+      "at": 0,
+      "durationSec": 9,
+      "camera": {
+        "type": "framing",
+        "framing": "close",
+        "subject": "vera",
+        "azimuthDeg": 24,
+        "compose": "thirds",
+        "fov": 34,
+        "move": {
+          "type": "push-in",
+          "amount": 0.08
+        }
+      },
+      "notes": "Cobertura del momento: Vera se prepara y habla por teléfono con Sofía. Se justifica cómo lo sabe el narrador."
+    },
+    {
+      "id": "p002",
+      "at": 9,
+      "durationSec": 9,
+      "camera": {
+        "type": "framing",
+        "framing": "wide",
+        "subject": "vera",
+        "azimuthDeg": 18,
+        "compose": "thirds",
+        "fov": 36
+      },
+      "notes": "Corte dentro de escena. Interpretación natural, evitar primeros planos del narrador fuera de campo."
+    },
+    {
+      "id": "p003",
+      "at": 18,
+      "durationSec": 9,
+      "camera": {
+        "type": "framing",
+        "framing": "medium",
+        "subject": "vera",
+        "azimuthDeg": 24,
+        "compose": "thirds",
+        "fov": 34
+      },
+      "notes": "Corte dentro de escena. Interpretación natural, evitar primeros planos del narrador fuera de campo."
+    },
+    {
+      "id": "p004",
+      "at": 27,
+      "durationSec": 9,
+      "camera": {
+        "type": "framing",
+        "framing": "close",
+        "subject": "vera",
+        "azimuthDeg": -26,
+        "compose": "thirds",
+        "fov": 34
+      },
+      "notes": "Corte dentro de escena. Interpretación natural, evitar primeros planos del narrador fuera de campo."
+    },
+    {
+      "id": "p005",
+      "at": 36,
+      "durationSec": 9,
+      "camera": {
+        "type": "framing",
+        "framing": "medium-close",
+        "subject": "vera",
+        "azimuthDeg": 24,
+        "compose": "thirds",
+        "fov": 34
+      },
+      "notes": "Corte dentro de escena. Interpretación natural, evitar primeros planos del narrador fuera de campo."
+    },
+    {
+      "id": "p006",
+      "at": 45,
+      "durationSec": 9,
+      "camera": {
+        "type": "framing",
+        "framing": "medium",
+        "subject": "vera",
+        "azimuthDeg": -26,
+        "compose": "thirds",
+        "fov": 34,
+        "move": {
+          "type": "push-in",
+          "amount": 0.08
+        }
+      },
+      "notes": "Corte dentro de escena. Interpretación natural, evitar primeros planos del narrador fuera de campo."
+    },
+    {
+      "id": "p007",
+      "at": 54,
+      "durationSec": 9,
+      "camera": {
+        "type": "framing",
+        "framing": "close",
+        "subject": "vera",
+        "azimuthDeg": 24,
+        "compose": "thirds",
+        "fov": 34
+      },
+      "notes": "Corte dentro de escena. Interpretación natural, evitar primeros planos del narrador fuera de campo."
+    },
+    {
+      "id": "p008",
+      "at": 63,
+      "durationSec": 9,
+      "camera": {
+        "type": "framing",
+        "framing": "medium-close",
+        "subject": "vera",
+        "azimuthDeg": -26,
+        "compose": "thirds",
+        "fov": 34
+      },
+      "notes": "Corte dentro de escena. Interpretación natural, evitar primeros planos del narrador fuera de campo."
+    },
+    {
+      "id": "p009",
+      "at": 72,
+      "durationSec": 9,
+      "camera": {
+        "type": "framing",
+        "framing": "wide",
+        "subject": "vera",
+        "azimuthDeg": 18,
+        "compose": "thirds",
+        "fov": 36
+      },
+      "notes": "Corte dentro de escena. Interpretación natural, evitar primeros planos del narrador fuera de campo."
+    },
+    {
+      "id": "p010",
+      "at": 81,
+      "durationSec": 9,
+      "camera": {
+        "type": "framing",
+        "framing": "close",
+        "subject": "vera",
+        "azimuthDeg": -26,
+        "compose": "thirds",
+        "fov": 34
+      },
+      "notes": "Corte dentro de escena. Interpretación natural, evitar primeros planos del narrador fuera de campo."
+    },
+    {
+      "id": "p011",
+      "at": 90,
+      "durationSec": 9,
+      "camera": {
+        "type": "framing",
+        "framing": "medium-close",
+        "subject": "vera",
+        "azimuthDeg": 24,
+        "compose": "thirds",
+        "fov": 34,
+        "move": {
+          "type": "push-in",
+          "amount": 0.08
+        }
+      },
+      "notes": "Corte dentro de escena. Interpretación natural, evitar primeros planos del narrador fuera de campo."
+    },
+    {
+      "id": "p012",
+      "at": 99,
+      "durationSec": 9,
+      "camera": {
+        "type": "framing",
+        "framing": "medium",
+        "subject": "vera",
+        "azimuthDeg": -26,
+        "compose": "thirds",
+        "fov": 34
+      },
+      "notes": "Corte dentro de escena. Interpretación natural, evitar primeros planos del narrador fuera de campo."
+    },
+    {
+      "id": "p013",
+      "at": 108,
+      "durationSec": 9,
+      "camera": {
+        "type": "framing",
+        "framing": "close",
+        "subject": "vera",
+        "azimuthDeg": 24,
+        "compose": "thirds",
+        "fov": 34
+      },
+      "notes": "Corte dentro de escena. Interpretación natural, evitar primeros planos del narrador fuera de campo."
+    },
+    {
+      "id": "p014",
+      "at": 117,
+      "durationSec": 9,
+      "camera": {
+        "type": "framing",
+        "framing": "medium-close",
+        "subject": "vera",
+        "azimuthDeg": -26,
+        "compose": "thirds",
+        "fov": 34
+      },
+      "notes": "Corte dentro de escena. Interpretación natural, evitar primeros planos del narrador fuera de campo."
+    },
+    {
+      "id": "p015",
+      "at": 126,
+      "durationSec": 9,
+      "camera": {
+        "type": "framing",
+        "framing": "medium",
+        "subject": "vera",
+        "azimuthDeg": 24,
+        "compose": "thirds",
+        "fov": 34
+      },
+      "notes": "Corte dentro de escena. Interpretación natural, evitar primeros planos del narrador fuera de campo."
+    },
+    {
+      "id": "p016",
+      "at": 135,
+      "durationSec": 9,
+      "camera": {
+        "type": "framing",
+        "framing": "wide",
+        "subject": "vera",
+        "azimuthDeg": 18,
+        "compose": "thirds",
+        "fov": 36
+      },
+      "notes": "Corte dentro de escena. Interpretación natural, evitar primeros planos del narrador fuera de campo."
+    },
+    {
+      "id": "p017",
+      "at": 144,
+      "durationSec": 4,
+      "camera": {
+        "type": "framing",
+        "framing": "medium-close",
+        "subject": "vera",
+        "azimuthDeg": 24,
+        "compose": "thirds",
+        "fov": 34
+      },
+      "notes": "Corte dentro de escena. Interpretación natural, evitar primeros planos del narrador fuera de campo."
+    }
+  ],
+  "actions": [
+    {
+      "id": "a001",
+      "type": "play",
+      "actor": "vera",
+      "at": 4,
+      "clip": "think",
+      "durationSec": 3
+    },
+    {
+      "id": "a002",
+      "type": "play",
+      "actor": "vera",
+      "at": 20,
+      "clip": "shrug",
+      "durationSec": 2
+    },
+    {
+      "id": "a003",
+      "type": "expression",
+      "actor": "vera",
+      "at": 45,
+      "expression": "smirk",
+      "durationSec": 5
+    },
+    {
+      "id": "a004",
+      "type": "hold",
+      "actor": "vera",
+      "at": 55,
+      "pose": "front",
+      "durationSec": 2
+    }
+  ],
+  "dialogue": [
+    {
+      "id": "l001",
+      "actor": "nico-voz",
+      "text": "De lo que pasó en casa de Vera me enteré bastante más tarde. Ella sostiene que estaba relajadísima. Sofía, su mejor amiga, sostiene que llevaba media hora discutiendo con una horquilla. Yo me inclino por la versión de Sofía.",
+      "emotion": "smirk",
+      "direction": "voz en off; narración retrospectiva, confidencial, con ironía española",
+      "pauseAfter": 0.32
+    },
+    {
+      "id": "l002",
+      "actor": "sofia",
+      "text": "¿Seguro que vas a ir?",
+      "emotion": "neutral",
+      "pauseAfter": 0.38
+    },
+    {
+      "id": "l003",
+      "actor": "vera",
+      "text": "He dicho que sí, ¿no?",
+      "emotion": "smirk",
+      "pauseAfter": 0.38
+    },
+    {
+      "id": "l004",
+      "actor": "sofia",
+      "text": "Has dicho que sí cuatro veces y en las cuatro has añadido «pero».",
+      "emotion": "neutral",
+      "pauseAfter": 0.38
+    },
+    {
+      "id": "l005",
+      "actor": "vera",
+      "text": "Es que no sé si me apetece volver a escuchar a un tío hablar durante dos horas de su gimnasio.",
+      "emotion": "smirk",
+      "pauseAfter": 0.38
+    },
+    {
+      "id": "l006",
+      "actor": "sofia",
+      "text": "A lo mejor este no tiene gimnasio.",
+      "emotion": "neutral",
+      "pauseAfter": 0.38
+    },
+    {
+      "id": "l007",
+      "actor": "vera",
+      "text": "En la foto sale con una planta. Igual habla de la planta durante dos horas.",
+      "emotion": "smirk",
+      "pauseAfter": 0.38
+    },
+    {
+      "id": "l008",
+      "actor": "nico-voz",
+      "text": "Vera había terminado meses antes una relación agotadora. Su ex era de esos hombres que decían «nosotros decidimos» cuando querían decir «yo he decidido por los dos». No tenía ganas de repetir la experiencia.",
+      "emotion": "smirk",
+      "direction": "voz en off; narración retrospectiva, confidencial, con ironía española",
+      "pauseAfter": 0.32
+    },
+    {
+      "id": "l009",
+      "actor": "sofia",
+      "text": "¿Y qué sabes de él?",
+      "emotion": "neutral",
+      "pauseAfter": 0.38
+    },
+    {
+      "id": "l010",
+      "actor": "vera",
+      "text": "Se llama Nico. Parece bastante majo. Tiene gafas y cara de pedir perdón cuando alguien lo pisa.",
+      "emotion": "smirk",
+      "pauseAfter": 0.38
+    },
+    {
+      "id": "l011",
+      "actor": "sofia",
+      "text": "O sea, tu tipo.",
+      "emotion": "neutral",
+      "pauseAfter": 0.38
+    },
+    {
+      "id": "l012",
+      "actor": "vera",
+      "text": "Mi tipo es alguien que no me dé trabajo. Nada más.",
+      "emotion": "smirk",
+      "pauseAfter": 0.38
+    },
+    {
+      "id": "l013",
+      "actor": "nico-voz",
+      "text": "También dijo que lo único que quería era conocer a alguien normal. En una aplicación de citas. Esa era la primera señal de que los dos vivíamos en un universo sin contacto con la realidad.",
+      "emotion": "smirk",
+      "direction": "voz en off; narración retrospectiva, confidencial, con ironía española",
+      "pauseAfter": 0.32
+    },
+    {
+      "id": "l014",
+      "actor": "sofia",
+      "text": "Hazme un favor. Si resulta ser un pesado, me escribes y te llamo con una emergencia inventada.",
+      "emotion": "neutral",
+      "pauseAfter": 0.38
+    },
+    {
+      "id": "l015",
+      "actor": "vera",
+      "text": "¿Qué emergencia?",
+      "emotion": "smirk",
+      "pauseAfter": 0.38
+    },
+    {
+      "id": "l016",
+      "actor": "sofia",
+      "text": "Que se me ha quedado un gato encerrado en el ascensor.",
+      "emotion": "neutral",
+      "pauseAfter": 0.38
+    },
+    {
+      "id": "l017",
+      "actor": "vera",
+      "text": "No tienes gato.",
+      "emotion": "smirk",
+      "pauseAfter": 0.38
+    },
+    {
+      "id": "l018",
+      "actor": "sofia",
+      "text": "Por eso es tan urgente.",
+      "emotion": "neutral",
+      "pauseAfter": 0.38
+    },
+    {
+      "id": "l019",
+      "actor": "nico-voz",
+      "text": "Vera se rió, cogió el bolso y salió. Años después, me contó que en ese momento pensaba que lo peor que podía pasar era una cena aburrida. Y me preguntó si recordaba que a mí me había pasado exactamente lo mismo.",
+      "emotion": "smirk",
+      "direction": "voz en off; narración retrospectiva, confidencial, con ironía española",
+      "pauseAfter": 0.32
+    }
+  ],
+  "sound": [
+    {
+      "id": "ambiente",
+      "kind": "ambience",
+      "sound": "room-tone",
+      "at": 0,
+      "gainDb": -31,
+      "fadeIn": 0.5,
+      "fadeOut": 0.5
+    },
+    {
+      "id": "sfx-click-30",
+      "kind": "sfx",
+      "sound": "click",
+      "at": 30,
+      "gainDb": -12
+    }
+  ],
+  "transitionOut": {
+    "type": "cut",
+    "durationSec": 0
+  }
+}

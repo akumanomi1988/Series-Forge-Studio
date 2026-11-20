@@ -1,0 +1,77 @@
+{
+  "schemaVersion": 1,
+  "status": "draft",
+  "facts": [
+    {
+      "id": "primera-cita",
+      "text": "Nico y Vera tuvieron su primera cita en el restaurante La Perla.",
+      "since": "ep-001",
+      "status": "proposed"
+    },
+    {
+      "id": "no-pareja",
+      "text": "Nico y Vera decidieron no ser pareja y seguir viéndose como amigos.",
+      "since": "ep-001",
+      "status": "proposed"
+    },
+    {
+      "id": "robo-cita",
+      "text": "Durante la cita un falso camarero robó la chaqueta y llaves de Nico y trató de robar el bolso de Vera.",
+      "since": "ep-001",
+      "status": "proposed"
+    }
+  ],
+  "knowledge": [],
+  "relationships": [
+    {
+      "a": "nico",
+      "b": "vera",
+      "trustDelta": 0.5,
+      "note": "Comparten una noche desastrosa; nace una amistad sin romance."
+    },
+    {
+      "a": "vera",
+      "b": "nico",
+      "trustDelta": 0.55,
+      "note": "Vera aprecia la sinceridad de Nico."
+    },
+    {
+      "a": "vera",
+      "b": "dani",
+      "trustDelta": -0.35,
+      "note": "Vera vuelve a poner límites a su ex."
+    }
+  ],
+  "emotionalStates": {
+    "nico": "aliviado y sorprendentemente feliz",
+    "vera": "amistad sincera y ganas de seguir quedando",
+    "dani": "herido en su orgullo"
+  },
+  "events": [
+    {
+      "id": "cita",
+      "text": "Nico conoce a Vera en La Perla",
+      "scene": "sc-004"
+    },
+    {
+      "id": "ex",
+      "text": "Dani interrumpe la cena",
+      "scene": "sc-007"
+    },
+    {
+      "id": "robo",
+      "text": "Un falso camarero roba objetos personales",
+      "scene": "sc-009"
+    },
+    {
+      "id": "policia",
+      "text": "Inés interroga a los protagonistas",
+      "scene": "sc-011"
+    },
+    {
+      "id": "amistad",
+      "text": "Nico y Vera acuerdan ser amigos",
+      "scene": "sc-012"
+    }
+  ]
+}

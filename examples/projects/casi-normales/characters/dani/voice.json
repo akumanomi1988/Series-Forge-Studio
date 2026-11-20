@@ -25,7 +25,6 @@
   },
   "alternatives": {
     "voicebox": {
-      "voice": "",
       "engine": "qwen",
       "instruct": "Spanish male, performatively friendly, smug with brittle confidence",
       "license": {

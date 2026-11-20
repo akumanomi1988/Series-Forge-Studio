@@ -24,7 +24,6 @@
   },
   "alternatives": {
     "voicebox": {
-      "voice": "",
       "engine": "qwen",
       "instruct": "Spanish female, low authoritative calm, precise, dry irony",
       "license": {

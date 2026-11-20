@@ -1,0 +1,65 @@
+{
+  "schemaVersion": 2,
+  "id": "ep-001",
+  "type": "episode",
+  "name": "La peor cita del mundo",
+  "number": 1,
+  "scenes": [
+    "sc-001",
+    "sc-002",
+    "sc-003",
+    "sc-004",
+    "sc-005",
+    "sc-006",
+    "sc-007",
+    "sc-008",
+    "sc-009",
+    "sc-010",
+    "sc-011",
+    "sc-012",
+    "sc-013"
+  ],
+  "targetDurationSec": 1200,
+  "voiceProvider": "kokoro",
+  "render": {
+    "width": 1920,
+    "height": 1080,
+    "fps": 24,
+    "sampleRate": 48000,
+    "loudnessLufs": -16
+  },
+  "score": {
+    "theme": {
+      "music": "cita-tema",
+      "gainDb": -13,
+      "durationSec": 9,
+      "fadeOut": 2
+    },
+    "underscore": {
+      "music": "cita-cama",
+      "gainDb": -24,
+      "fadeIn": 2,
+      "fadeOut": 2
+    },
+    "bumpers": {
+      "music": "cita-golpe",
+      "gainDb": -16,
+      "durationSec": 2,
+      "leadSec": 0.3,
+      "scenes": [
+        "sc-002",
+        "sc-007",
+        "sc-009",
+        "sc-011",
+        "sc-013"
+      ]
+    },
+    "ending": {
+      "music": "cita-cierre",
+      "gainDb": -15,
+      "durationSec": 8,
+      "fadeOut": 2
+    }
+  },
+  "status": "draft"
+}

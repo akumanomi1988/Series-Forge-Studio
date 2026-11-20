@@ -27,7 +27,6 @@
   },
   "alternatives": {
     "voicebox": {
-      "voice": "",
       "engine": "qwen",
       "instruct": "Spanish male retrospective voiceover, ironic, intimate; same timbre as Nico",
       "license": {

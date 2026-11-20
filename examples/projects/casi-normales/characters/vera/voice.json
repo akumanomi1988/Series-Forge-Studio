@@ -28,7 +28,6 @@
   },
   "alternatives": {
     "voicebox": {
-      "voice": "",
       "engine": "qwen",
       "instruct": "Spanish female, warm, dry humour, confident but guarded",
       "license": {

@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 2,
+  "id": "cita-cierre",
+  "kind": "music",
+  "generator": "procedural",
+  "tempo": 95,
+  "key": "F",
+  "mode": "major",
+  "progression": [
+    "ii",
+    "V",
+    "I"
+  ],
+  "instruments": [
+    "guitar",
+    "keys",
+    "bass",
+    "brushes"
+  ],
+  "style": "bossa",
+  "swing": 0.18,
+  "sevenths": true,
+  "form": "loop",
+  "durationSec": 35,
+  "seed": 765,
+  "mood": "despedida cálida y divertida",
+  "license": {
+    "id": "procedural-original",
+    "source": "Series Forge procedural synthesis",
+    "commercialUse": "allowed"
+  }
+}

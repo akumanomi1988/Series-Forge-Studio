@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 2,
+  "id": "cita-golpe",
+  "kind": "music",
+  "generator": "procedural",
+  "tempo": 124,
+  "key": "C",
+  "mode": "major",
+  "progression": [
+    "V",
+    "I"
+  ],
+  "instruments": [
+    "keys",
+    "bass",
+    "drums"
+  ],
+  "style": "sitcom",
+  "swing": 0.08,
+  "sevenths": false,
+  "form": "button",
+  "durationSec": 3,
+  "seed": 287,
+  "mood": "remate absurdo",
+  "license": {
+    "id": "procedural-original",
+    "source": "Series Forge procedural synthesis",
+    "commercialUse": "allowed"
+  }
+}

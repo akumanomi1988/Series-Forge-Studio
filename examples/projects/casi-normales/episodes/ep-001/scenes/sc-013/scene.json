@@ -1,0 +1,256 @@
+{
+  "schemaVersion": 2,
+  "id": "sc-013",
+  "name": "Poscréditos: La última palabra",
+  "synopsis": "El ex sigue atrapado en el mantel. Remate final.",
+  "environmentId": "restaurant",
+  "durationSec": "auto",
+  "tailSec": 0.8,
+  "autoLook": false,
+  "autoActing": 1,
+  "coverage": "manual",
+  "actors": [
+    {
+      "id": "dani",
+      "characterId": "dani",
+      "position": [
+        1.75,
+        0,
+        -1
+      ],
+      "yawDeg": 0,
+      "expression": "neutral",
+      "idle": "idle"
+    },
+    {
+      "id": "ines",
+      "characterId": "ines",
+      "position": [
+        2.6,
+        0,
+        0.2
+      ],
+      "yawDeg": -60,
+      "expression": "neutral",
+      "idle": "idle"
+    },
+    {
+      "id": "roman",
+      "characterId": "roman",
+      "position": [
+        -2.5,
+        0,
+        -1.5
+      ],
+      "yawDeg": 0,
+      "expression": "neutral",
+      "idle": "idle"
+    },
+    {
+      "id": "nico-voz",
+      "characterId": "nico-voz",
+      "position": [
+        55,
+        0,
+        55
+      ],
+      "yawDeg": 0,
+      "expression": "neutral",
+      "idle": "idle"
+    }
+  ],
+  "props": [
+    {
+      "id": "mantel",
+      "propId": "mantel",
+      "position": [
+        2,
+        0.6,
+        -0.8
+      ]
+    }
+  ],
+  "shots": [
+    {
+      "id": "p001",
+      "at": 0,
+      "durationSec": 9,
+      "camera": {
+        "type": "framing",
+        "framing": "two-shot",
+        "subjects": [
+          "dani",
+          "ines"
+        ],
+        "azimuthDeg": -15,
+        "compose": "thirds",
+        "fov": 34
+      },
+      "notes": "Cobertura del momento: El ex sigue atrapado en el mantel. Remate final."
+    },
+    {
+      "id": "p002",
+      "at": 9,
+      "durationSec": 9,
+      "camera": {
+        "type": "framing",
+        "framing": "wide",
+        "subject": "ines",
+        "azimuthDeg": 18,
+        "compose": "thirds",
+        "fov": 36
+      },
+      "notes": "Corte dentro de escena. Interpretación natural, evitar primeros planos del narrador fuera de campo."
+    },
+    {
+      "id": "p003",
+      "at": 18,
+      "durationSec": 9,
+      "camera": {
+        "type": "framing",
+        "framing": "medium",
+        "subject": "roman",
+        "azimuthDeg": 24,
+        "compose": "thirds",
+        "fov": 34
+      },
+      "notes": "Corte dentro de escena. Interpretación natural, evitar primeros planos del narrador fuera de campo."
+    },
+    {
+      "id": "p004",
+      "at": 27,
+      "durationSec": 7,
+      "camera": {
+        "type": "framing",
+        "framing": "close",
+        "subject": "dani",
+        "azimuthDeg": -26,
+        "compose": "thirds",
+        "fov": 34
+      },
+      "notes": "Corte dentro de escena. Interpretación natural, evitar primeros planos del narrador fuera de campo."
+    }
+  ],
+  "actions": [
+    {
+      "id": "a001",
+      "type": "play",
+      "actor": "dani",
+      "at": 1,
+      "clip": "angry-gesture",
+      "durationSec": 2
+    },
+    {
+      "id": "a002",
+      "type": "play",
+      "actor": "ines",
+      "at": 5,
+      "clip": "dismiss",
+      "durationSec": 2
+    },
+    {
+      "id": "a003",
+      "type": "play",
+      "actor": "roman",
+      "at": 10,
+      "clip": "shrug",
+      "durationSec": 2
+    }
+  ],
+  "dialogue": [
+    {
+      "id": "l001",
+      "actor": "dani",
+      "text": "Perdone... ¿Quién me desata?",
+      "emotion": "smirk",
+      "pauseAfter": 0.38
+    },
+    {
+      "id": "l002",
+      "actor": "ines",
+      "text": "¿Usted no es el dueño?",
+      "emotion": "neutral",
+      "pauseAfter": 0.38
+    },
+    {
+      "id": "l003",
+      "actor": "dani",
+      "text": "¡Sí!",
+      "emotion": "smirk",
+      "pauseAfter": 0.38
+    },
+    {
+      "id": "l004",
+      "actor": "ines",
+      "text": "Pues gestione usted la incidencia.",
+      "emotion": "neutral",
+      "pauseAfter": 0.38
+    },
+    {
+      "id": "l005",
+      "actor": "roman",
+      "text": "Yo ficho a las doce.",
+      "emotion": "neutral",
+      "pauseAfter": 0.38
+    },
+    {
+      "id": "l006",
+      "actor": "dani",
+      "text": "¡PERO QUE ALGUIEN ME QUITE ESTO!",
+      "emotion": "angry",
+      "direction": "gritando con intensidad",
+      "pauseAfter": 0.2
+    },
+    {
+      "id": "l007",
+      "actor": "roman",
+      "text": "La cena de la señora iba por cuenta de la casa, ¿no?",
+      "emotion": "neutral",
+      "pauseAfter": 0.38
+    },
+    {
+      "id": "l008",
+      "actor": "dani",
+      "text": "¿Y qué?",
+      "emotion": "smirk",
+      "pauseAfter": 0.38
+    },
+    {
+      "id": "l009",
+      "actor": "roman",
+      "text": "Entonces el mantel también.",
+      "emotion": "neutral",
+      "pauseAfter": 0.38
+    },
+    {
+      "id": "l010",
+      "actor": "nico-voz",
+      "text": "Hay finales que no necesitan una moraleja. Solo necesitan que alguien cierre la puerta.",
+      "emotion": "smirk",
+      "direction": "voz en off; narración retrospectiva, confidencial, con ironía española",
+      "pauseAfter": 0.32
+    }
+  ],
+  "sound": [
+    {
+      "id": "ambiente",
+      "kind": "ambience",
+      "sound": "room-tone",
+      "at": 0,
+      "gainDb": -31,
+      "fadeIn": 0.5,
+      "fadeOut": 0.5
+    },
+    {
+      "id": "sfx-door-creak-15",
+      "kind": "sfx",
+      "sound": "door-creak",
+      "at": 15,
+      "gainDb": -12
+    }
+  ],
+  "transitionOut": {
+    "type": "cut",
+    "durationSec": 0
+  }
+}
