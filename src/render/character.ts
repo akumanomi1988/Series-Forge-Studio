@@ -25,6 +25,7 @@ interface Ring {
   /** angular width of the bust lobes (narrow = breasts, wide = pectorals) */ bw?: number;
   /** radial cloth folds: amplitude (m) and count around the ring */ fold?: number; folds?: number;
   /** skirt cloth: share of each vertex skinned to the thigh on its side (0 = follows the hips) */ legBlend?: number;
+  /** torso shoulder: share of the side vertices skinned to the upper arm, so the shoulder is one surface with the arm */ armBlend?: number;
 }
 /** Specular strength of each fabric. Characters are matte now (toon shadows only); kept for the schema. */
 export const FABRIC_GLOSS: Record<string, number> = { matte: 0, satin: 0.55, silk: 0.75, leather: 0.45, sequin: 0.95 };
@@ -50,6 +51,7 @@ function smoothRings(input: Ring[], passes = 1): Ring[] {
       if (r.fold || n.fold) { m.fold = Math.max(0, cr('fold')); m.folds = r.folds ?? n.folds; }
       if (r.bw || n.bw) m.bw = r.bw ?? n.bw;
       if (r.legBlend !== undefined || n.legBlend !== undefined) m.legBlend = ((r.legBlend ?? 0) + (n.legBlend ?? 0)) / 2;
+      if (r.armBlend || n.armBlend) m.armBlend = ((r.armBlend ?? 0) + (n.armBlend ?? 0)) / 2;
       out.push(m);
     }
     rs = out;
@@ -63,8 +65,10 @@ function ringPoint(r: Ring, a: number): [number, number] {
   const sa = Math.sin(a), ca = Math.cos(a);
   let px = sa * r.rx, pz = ca * (ca >= 0 ? r.rz : (r.rzb ?? r.rz));
   const bw = r.bw ?? 0.36;
-  const bump = (r.bust ?? 0) * (lobe(a, 0.6, bw) + lobe(a, -0.6, bw)) + (r.glute ?? 0) * (lobe(a, Math.PI - 0.5, 0.45) + lobe(a, Math.PI + 0.5, 0.45)) + (r.fold ?? 0) * Math.sin((r.folds ?? 9) * a);
-  px += sa * bump; pz += ca * bump;
+  const bust = (r.bust ?? 0) * (lobe(a, 0.55, bw) + lobe(a, -0.55, bw));
+  const bump = (r.glute ?? 0) * (lobe(a, Math.PI - 0.5, 0.45) + lobe(a, Math.PI + 0.5, 0.45)) + (r.fold ?? 0) * Math.sin((r.folds ?? 9) * a);
+  // the bust projects forward (a radial push would also widen the chest sideways and read as sagging)
+  px += sa * (bump + bust * 0.35); pz += ca * bump + bust * Math.max(0, ca) * 1.15;
   return [r.x + px, r.z + pz];
 }
 interface TubeOpts { seg?: number; capTop?: boolean; capBottom?: boolean; arc?: [number, number]; passes?: number }
@@ -91,6 +95,11 @@ function tubeGeometry(raw: Ring[], boneIndex: Map<string, number>, seg = 18, cap
   };
   /** cloth that follows the thighs: blend the ring weights with the thigh on the vertex's side (more at the front) */
   const vw = (r: Ring, a: number): W => {
+    if (r.armBlend) {
+      const sa = Math.sin(a), k = r.armBlend * smoothstep(clamp((Math.abs(sa) - 0.5) / 0.45, 0, 1));
+      if (k <= 0) return r.w;
+      return [...r.w.map(([b, v]) => [b, v * (1 - k)] as [string, number]), [sa > 0 ? 'leftUpperArm' : 'rightUpperArm', k]];
+    }
     if (!r.legBlend) return r.w;
     const k = r.legBlend * (0.55 + 0.45 * Math.cos(a)), sa = Math.sin(a);
     return [...r.w.map(([b, v]) => [b, v * (1 - k)] as [string, number]), ['leftThigh', k * (0.5 + 0.5 * sa)], ['rightThigh', k * (0.5 - 0.5 * sa)]];
@@ -222,8 +231,9 @@ export class CharacterVisual {
       [neckY + 0.01 * s, d.armR * 1.2, d.armR * 1.1, d.armR * 1.1],
       [neckY - 0.008 * s, d.chestRx * 0.5, d.chestRz * 0.62, d.chestRz * 0.62],
       [neckY - 0.03 * s, d.shoulderX * 0.66, d.chestRz * 0.74, d.chestRz * 0.74],
-      [shoulderY + 0.012 * s, d.shoulderX * 0.84, d.chestRz * 0.84, d.chestRz * 0.84],
-      [shoulderY - 0.025 * s, d.shoulderX * 0.9, d.chestRz * (0.95 + 0.1 * b.chest), d.chestRz * 0.95],
+      [shoulderY + 0.022 * s, d.shoulderX * 0.82, d.chestRz * 0.8, d.chestRz * 0.82],
+      [shoulderY - 0.004 * s, d.shoulderX * 0.97 + d.armR * 0.35, d.chestRz * 0.9, d.chestRz * 0.9],
+      [shoulderY - 0.035 * s, d.shoulderX * 0.97 + d.armR * 0.3, d.chestRz * (0.95 + 0.1 * b.chest), d.chestRz * 0.95],
       [shoulderY - 0.07 * s, d.chestRx * 1.04, d.chestRz * (1.05 + 0.15 * b.chest), d.chestRz * 0.98],
       [chestY, d.chestRx * (1 - 0.05 * wc), d.chestRz * (1.02 + 0.1 * b.chest), d.chestRz * 0.95],
       [(chestY + spineY) / 2, ((d.chestRx + d.waistRx) / 2) * (1 - 0.1 * wc) + belly * 0.5, d.chestRz * 0.95 + belly * 0.7, d.chestRz * 0.9 * (1 - 0.06 * wc)],
@@ -233,15 +243,15 @@ export class CharacterVisual {
       [hipsY + 0.035 * s, lerp(Math.max(d.waistRx, d.hipRx * 0.66), d.hipRx, 0.62) + belly * 0.4, d.chestRz * 0.93 + belly * 0.6, d.chestRz * 0.9],
       [hipsY - 0.035 * s, d.hipRx * (1 + 0.03 * wc), d.chestRz * 0.92 + belly * 0.3, d.chestRz * 0.95],
       [hipsY - 0.08 * s, d.hipRx * 0.92, d.chestRz * 0.84, d.chestRz * 0.88],
-      [hipsY - 0.11 * s, d.hipRx * 0.7, d.chestRz * 0.6, d.chestRz * 0.66]
+      [hipsY - 0.12 * s, d.hipRx * 0.86, d.chestRz * 0.7, d.chestRz * 0.74]
     ];
     const mono = keys.filter((k, i) => i === 0 || k[0] < keys[i - 1][0] - 0.004);
     const asc = [...mono].reverse();
     const fRx = pchip(asc.map(k => k[0]), asc.map(k => k[1])), fRz = pchip(asc.map(k => k[0]), asc.map(k => k[2])), fRzb = pchip(asc.map(k => k[0]), asc.map(k => k[3]));
     // bust (or pectorals) and glutes: teardrop profiles, softer above the peak than below it
-    const bustB = b.bust * 0.085 * s + b.pecs * 0.026 * s, bustY = shoulderY - (0.12 + 0.025 * b.bust) * s, bustW = b.bust >= b.pecs ? 0.36 : 0.55;
+    const bustB = b.bust * 0.085 * s + b.pecs * 0.026 * s, bustY = shoulderY - (0.095 + 0.012 * b.bust) * s, bustW = b.bust >= b.pecs ? 0.46 : 0.6;
     const gl = b.glutes * 0.075 * s, gluteY = hipsY - 0.055 * s;
-    const bustAt = (y: number) => bustB * Math.exp(-(((y - bustY) / ((y > bustY ? 0.075 : 0.042) * s)) ** 2));
+    const bustAt = (y: number) => bustB * Math.exp(-(((y - bustY) / ((y > bustY ? 0.062 : 0.036) * s)) ** 2));
     const gluteAt = (y: number) => gl * Math.exp(-(((y - gluteY) / ((y > gluteY ? 0.075 : 0.05) * s)) ** 2));
     const ys = new Set<number>(mono.map(k => k[0]));
     const yTop = mono[0][0], yBot = mono[mono.length - 1][0];
@@ -268,15 +278,18 @@ export class CharacterVisual {
         rings.push({ y: by - 0.001, rx: fRx(by) * k, rz: fRz(by) * k, rzb: fRzb(by) * k, glute: gluteAt(by), x: 0, z: 0, color, w: tw(by) });
       }
       const neckColor = depth > 0 && y > neckY - 0.005 * s ? skin : color;
-      rings.push({ y, rx: fRx(y) * k, rz: fRz(y) * k, rzb: fRzb(y) * k, bust: bustAt(y) * k, bw: bustW, glute: gluteAt(y), x: 0, z: 0.0, color: neckColor, w: tw(y), gloss: glossOf(neckColor), neck: depth > 0 ? neckBase - y : undefined });
+      rings.push({ y, rx: fRx(y) * k, rz: fRz(y) * k, rzb: fRzb(y) * k, bust: bustAt(y) * k, bw: bustW, glute: gluteAt(y), x: 0, z: 0.0, color: neckColor, w: tw(y), gloss: glossOf(neckColor), neck: depth > 0 ? neckBase - y : undefined, armBlend: 0 * Math.exp(-(((y - (shoulderY - 0.02 * s)) / (0.045 * s)) ** 2)) });
     }
     this.addSkinned(tubeGeometry(rings, boneIndex, depth > 0 ? 64 : 56, true, true, { passes: 1 }), skeleton, 'torso', neckSpec);
     // neck
     const headY = this.boneWorldY('head').y;
+    // neck thickness from the build (shoulders, pectorals), never from the head size
+    const nR = 0.05 * s * Math.sqrt(b.shoulderWidth / 0.4) * (1 + 0.15 * b.pecs);
     this.addSkinned(tubeGeometry(([
-      { y: headY + d.headRy * 0.4, rx: d.headRx * 0.38, rz: d.headRz * 0.38, x: 0, z: -0.01 * s, color: skin, w: [['head', 1]] },
-      { y: headY, rx: d.headRx * 0.36, rz: d.headRz * 0.38, x: 0, z: -0.01 * s, color: skin, w: [['head', 0.5], ['neck', 0.5]] },
-      { y: neckY - 0.02 * s, rx: d.headRx * 0.42, rz: d.headRz * 0.42, x: 0, z: -0.01 * s, color: skin, w: [['neck', 0.5], ['chest', 0.5]] }
+      { y: headY + d.headRy * 0.4, rx: nR * 0.96, rz: nR * 1.02, x: 0, z: -0.008 * s, color: skin, w: [['head', 1]] },
+      { y: headY, rx: nR * 0.92, rz: nR, x: 0, z: -0.01 * s, color: skin, w: [['head', 0.5], ['neck', 0.5]] },
+      { y: (headY + neckY) / 2 - 0.01 * s, rx: nR * 0.98, rz: nR * 1.0, x: 0, z: -0.012 * s, color: skin, w: [['neck', 1]] },
+      { y: neckY - 0.02 * s, rx: nR * 1.25, rz: nR * 1.1, x: 0, z: -0.012 * s, color: skin, w: [['neck', 0.5], ['chest', 0.5]] }
     ] as Ring[]), boneIndex, 24, false, false), skeleton, 'neck');
     // arms
     const sleeve = top.type === 'tanktop' || top.type === 'dress' ? 0 : top.type === 'tshirt' || top.type === 'vest' || top.type === 'overalls' ? 0.45 : 1.0;
@@ -285,10 +298,12 @@ export class CharacterVisual {
       const sx = side === 'left' ? 1 : -1;
       const up = this.boneWorldY(`${side}UpperArm`), el = this.boneWorldY(`${side}LowerArm`), wr = this.boneWorldY(`${side}Hand`);
       const len = up.y - wr.y;
-      const prof: [number, number][] = [[-0.02, 0.9], [0, 1.22], [0.06, 1.28], [0.14, 1.2], [0.3, 1.08], [0.47, 0.88], [0.53, 0.86], [0.68, 0.96], [0.85, 0.8], [0.95, 0.68], [1, 0.64]];
+      const prof: [number, number][] = [[0.0, 0.78], [0.02, 1.0], [0.05, 1.16], [0.13, 1.12], [0.24, 1.06], [0.36, 0.98], [0.46, 0.84], [0.51, 0.82], [0.57, 0.9], [0.66, 0.94], [0.8, 0.78], [0.93, 0.62], [1, 0.6]];
       const sleeveEnd = sleeve * len;
       const arm: Ring[] = [];
-      const wOf = (y: number): W => y > up.y - 0.04 * s ? [[`${side}UpperArm`, 0.6], ['chest', 0.4]] : blendW(`${side}UpperArm`, `${side}LowerArm`, y, el.y, 0.045 * s);
+      // the top of the arm (deltoid) blends smoothly into the chest, so raising the arm stretches the shoulder
+      // instead of swinging a ball of geometry above it
+      const wOf = (y: number): W => { if (y < el.y + 0.06 * s) return blendW(`${side}UpperArm`, `${side}LowerArm`, y, el.y, 0.045 * s); const k = smoothstep(clamp((up.y + 0.01 * s - y) / (0.1 * s), 0, 1)); return [[`${side}UpperArm`, 0.3 + 0.7 * k], ['chest', 0.7 * (1 - k)]]; };
       const pushArm = (u: number, rf: number, color: string, k = 1) => { const y = up.y - u * len; arm.push({ y, rx: d.armR * rf * k, rz: d.armR * rf * k, x: up.x + sx * 0.004, z: up.z, color, w: wOf(y) }); };
       for (let i = 0; i < prof.length; i++) {
         const [u, rf] = prof[i];
@@ -300,12 +315,12 @@ export class CharacterVisual {
       // off-shoulder: the sleeve starts below the shoulder, the shoulder itself is bare
       if (top.neckline === 'off-shoulder') for (const r of arm) if (r.y > up.y - 0.05 * s) r.color = skin;
       for (const r of arm) r.gloss = r.color === skin ? skinG : topG;
-      this.addSkinned(tubeGeometry(arm, boneIndex, 28, true, true), skeleton, `${side}Arm`);
+      this.addSkinned(tubeGeometry(arm, boneIndex, 40, true, true), skeleton, `${side}Arm`);
       // legs
       const th = this.boneWorldY(`${side}Thigh`), kn = this.boneWorldY(`${side}Shin`), an = this.boneWorldY(`${side}Foot`);
       const legLen = th.y - an.y;
       const shorts = bottom.type === 'shorts' ? 0.42 : bottom.type === 'skirt' ? 0.3 : 1.02;
-      const lprof: [number, number][] = [[-0.1, 1.15], [0, 1.25], [0.2, 1.15], [0.45, 0.95], [0.5, 0.9], [0.55, 0.92], [0.7, 0.98], [0.9, 0.72], [1.0, 0.62]];
+      const lprof: [number, number][] = [[-0.1, 1.02], [0, 1.1], [0.12, 1.08], [0.28, 1.02], [0.42, 0.86], [0.49, 0.8], [0.54, 0.82], [0.62, 0.9], [0.7, 0.9], [0.8, 0.74], [0.9, 0.6], [1.0, 0.56]];
       const leg: Ring[] = [];
       const lw = (y: number): W => y > th.y - 0.03 * s ? [[`${side}Thigh`, 0.55], ['hips', 0.45]] : blendW(`${side}Thigh`, `${side}Shin`, y, kn.y, 0.05 * s);
       const bootTop = g.outfit.shoes.type === 'boots' ? 0.8 : 2;
@@ -319,10 +334,11 @@ export class CharacterVisual {
         const rzl = d.legR * rf * (inPants ? 1.04 : 0.92) * fullness;
         // the seat continues into the back of the upper thigh
         const seat = bottom.type === 'skirt' || top.type === 'dress' ? 1 : 1 + 0.6 * b.glutes * Math.exp(-(((u - 0.02) / 0.07) ** 2));
-        leg.push({ y, rx: d.legR * rf * (inPants ? 1.04 : 0.92) * (u < 0 ? 1.2 : 1) * fullness, rz: rzl, rzb: rzl * seat, x: th.x * (u < 0 ? 0.7 : 1), z: 0, color, w: lw(y) });
+        const calf = 1 + 0.22 * Math.exp(-(((u - 0.66) / 0.1) ** 2)) * (inPants ? 0.4 : 1), quad = 1 + 0.08 * Math.exp(-(((u - 0.2) / 0.15) ** 2));
+        leg.push({ y, rx: d.legR * rf * (inPants ? 1.04 : 0.92) * fullness, rz: rzl * quad, rzb: rzl * seat * calf, x: th.x * (u < 0 ? 0.7 : 1), z: 0, color, w: lw(y) });
       }
       for (const r of leg) r.gloss = r.color === skin ? skinG : r.color === pants ? botG : 0;
-      this.addSkinned(tubeGeometry(leg, boneIndex, 28, false, true), skeleton, `${side}Leg`);
+      this.addSkinned(tubeGeometry(leg, boneIndex, 40, false, true), skeleton, `${side}Leg`);
     }
     // clothing details (rigid on bones)
     const chest = this.rig.bone('chest'), hips = this.rig.bone('hips');
@@ -359,14 +375,14 @@ export class CharacterVisual {
       const y0 = waistY - 0.012 * s;
       const fit = bottom.fit;
       // a skater skirt starts at the natural waist (above the hips) and flares as a cone
-      const ys = fit === 'skater' ? spineY + 0.012 * s : y0;
-      this.clothShell(top.type === 'labcoat' ? 'coat-tails' : 'skirt', ys, y0 - len, color, top.type === 'labcoat' ? { flare: 0.05, arc: [0.3, Math.PI * 2 - 0.3], legBlend: 0.35, foldAmp: 0.004 } : fit === 'skater' ? { cone: 0.42, legBlend: 0.45, foldAmp: 0.01, folds: 13 } : { flare: fit === 'fitted' ? 0.03 : top.type === 'dress' ? 0.14 : 0.1, legBlend: 0.7 });
+      const ys = fit === 'skater' || fit === 'fitted' ? spineY + 0.04 * s : y0;
+      this.clothShell(top.type === 'labcoat' ? 'coat-tails' : 'skirt', ys, y0 - len, color, top.type === 'labcoat' ? { flare: 0.05, arc: [0.3, Math.PI * 2 - 0.3], legBlend: 0.35, foldAmp: 0.004 } : fit === 'skater' ? { cone: 0.42, legBlend: 0.45, foldAmp: 0.01, folds: 13, offset: 0.003, band: bottom.waistband ?? shade(topColor, 0.72) } : fit === 'fitted' ? { cone: 0.1, legBlend: 0.6, foldAmp: 0.003, folds: 9, offset: 0.003 } : { flare: top.type === 'dress' ? 0.14 : 0.1, legBlend: 0.7 });
     }
   }
   /** A cloth surface that wraps the body from `y0` down to `y1` (skirt, dress, coat tails, apron): it starts on the
    * torso's own contour, hangs from the widest point of the hips/glutes, flares, gets folds towards the hem and is
    * skinned to the hips and, progressively, to the thighs, so it moves with the legs instead of floating. */
-  private clothShell(name: string, y0: number, y1: number, color: string, o: { flare?: number; arc?: [number, number]; offset?: number; legBlend?: number; folds?: number; foldAmp?: number; /** flare as a cone from the top ring (m per m), never inside the body */ cone?: number }) {
+  private clothShell(name: string, y0: number, y1: number, color: string, o: { band?: string; flare?: number; arc?: [number, number]; offset?: number; legBlend?: number; folds?: number; foldAmp?: number; /** flare as a cone from the top ring (m per m), never inside the body */ cone?: number }) {
     const d = this.d, s = d.scale, b = this.geo.body;
     const hipsY = this.boneWorldY('hips').y, torsoBottom = hipsY - 0.11 * s;
     const th = this.boneWorldY('leftThigh'), kn = this.boneWorldY('leftShin');
@@ -381,7 +397,7 @@ export class CharacterVisual {
       else {
         // below the crotch the body is two thighs: the envelope spans both
         const legU = clamp((th.y - y) / Math.max(0.05, th.y - kn.y), 0, 1);
-        const lr = d.legR * lerp(1.22, 0.95, legU) * (1 + 0.15 * b.thighs);
+        const lr = d.legR * lerp(1.08, 0.86, legU) * (1 + 0.15 * b.thighs);
         rx = Math.abs(th.x) + lr; rz = lr * 1.05; rzb = lr * 1.05; glute = this.torsoAt(torsoBottom).glute * Math.exp(-(((torsoBottom - y) / (0.06 * s)) ** 2));
       }
       // cloth hangs from the widest point above (it does not cling under the glutes) and flares towards the hem
@@ -390,7 +406,8 @@ export class CharacterVisual {
       const fl = (o.flare ?? 0.12) * Math.max(0, hipsY - y);
       const fold = (o.foldAmp ?? 0.007) * s * Math.max(0, (u - 0.25) / 0.75);
       // the cloth covers the glutes with their own shape (never less than the body under it) and partly bridges the cleft
-      rings.push({ y, rx: rxW + off + fl, rz: rzW + off + fl * 0.8, rzb: rzbW + glW * 0.4 + off + fl * 0.5, glute: glW * 1.04, bust, bw: this.torsoAt(y).bw, x: 0, z: 0, color, w: y > hipsY - 0.02 * s ? this.torsoW(y) : [['hips', 1]], legBlend: (o.legBlend ?? 0.55) * smoothstep(clamp((hipsY - 0.1 * s - y) / Math.max(0.05, len * 0.7), 0, 1)), fold, folds: o.folds ?? 11 });
+      const rc = o.band && y > y0 - 0.026 * s ? o.band : color;
+      rings.push({ y, rx: rxW + off + fl, rz: rzW + off + fl * 0.8, rzb: rzbW + glW * 0.4 + off + fl * 0.5, glute: glW * 1.04, bust, bw: this.torsoAt(y).bw, x: 0, z: 0, color: rc, w: y > hipsY - 0.02 * s ? this.torsoW(y) : [['hips', 1]], legBlend: (o.legBlend ?? 0.55) * smoothstep(clamp((hipsY - 0.1 * s - y) / Math.max(0.05, len * 0.7), 0, 1)), fold, folds: o.folds ?? 11 });
       if (o.cone && i > 0) {
         const r0 = rings[0], last = rings[rings.length - 1], dy = y0 - y;
         last.rx = Math.max(rx + off, r0.rx + o.cone * dy); last.rz = Math.max(rz + off, r0.rz + o.cone * 0.8 * dy);
@@ -426,6 +443,11 @@ export class CharacterVisual {
     for (let i = 0; i < p.count; i++) {
       let x = p.getX(i), y = p.getY(i), z = p.getZ(i);
       if (y < 0) { const k = 1 - (1 - g.body.jaw) * 0.35 * Math.pow(-y, 1.5); x *= k; z = z > 0 ? z * (1 + 0.06 * -y) : z * (1 - 0.25 * -y); }
+      // anatomy on the sphere: cheekbones, a defined chin, fuller back of the skull, flatter brow
+      if (z > 0) x *= 1 + 0.045 * Math.exp(-(((y + 0.08) / 0.2) ** 2)) * Math.min(1, z * 2);
+      if (y < -0.62 && z > 0.2) { const c = (-y - 0.62) / 0.38; z *= 1 + 0.1 * c * (1 - Math.abs(x) * 1.5); x *= 1 - 0.12 * c * (1 - g.body.jaw); }
+      if (y > -0.3 && z < 0) z *= 1 + 0.06 * Math.min(1, (y + 0.3) / 0.4);
+      if (y > 0.25 && z > 0.3) z *= 1 - 0.035 * Math.min(1, (y - 0.25) / 0.4);
       if (y > 0.2 && z < 0) z *= 1.05;
       p.setXYZ(i, x * rx, y * ry, z * rz);
     }
@@ -635,12 +657,12 @@ export class CharacterVisual {
       const sx = side === 'left' ? 1 : -1;
       const hand = this.rig.bone(`${side}Hand`);
       const L = d.handLen;
-      const palm = new THREE.Mesh(new THREE.SphereGeometry(1, 28, 20), toon(handColor)); palm.scale.set(L * 0.17, L * 0.3, L * 0.27); palm.position.set(0, -L * 0.28, 0.0);
+      const palm = new THREE.Mesh(new THREE.SphereGeometry(1, 28, 20), toon(handColor)); palm.scale.set(L * 0.16, L * 0.33, L * 0.3); palm.position.set(0, -L * 0.3, 0.0);
       hand.add(withOutline(palm, 0.005 * s));
       const list: THREE.Object3D[] = [];
       for (let i = 0; i < 4; i++) {
         const piv = new THREE.Group(); piv.position.set(-sx * L * 0.02, -L * 0.5, L * (0.17 - i * 0.11)); hand.add(piv);
-        const len = L * (0.36 - Math.abs(i - 1.2) * 0.04);
+        const len = L * (0.42 - Math.abs(i - 1.2) * 0.05);
         const fm = new THREE.Mesh(new THREE.CapsuleGeometry(L * 0.065, len, 8, 16), toon(handColor)); fm.position.y = -len / 2; piv.add(withOutline(fm, 0.004 * s));
         piv.userData.side = sx; list.push(piv);
       }
@@ -652,15 +674,15 @@ export class CharacterVisual {
       const foot = this.rig.bone(`${side}Foot`), toe = this.rig.bone(`${side}Toe`);
       const sh = g.outfit.shoes, sole = sh.soleColor ?? (sh.type === 'sneakers' ? '#efefea' : shade(sh.color, 0.5));
       const fl = d.footLen, ah = d.ankleH;
-      const heel = new THREE.Mesh(new THREE.SphereGeometry(1, 30, 20), toon(sh.color)); heel.scale.set(d.legR * 0.95, ah * 0.85, fl * 0.42); heel.position.set(0, -ah * 0.35, fl * 0.12);
+      const heel = new THREE.Mesh(new THREE.SphereGeometry(1, 30, 20), toon(sh.color)); heel.scale.set(d.legR * 0.82, ah * 0.8, fl * 0.42); heel.position.set(0, -ah * 0.35, fl * 0.12);
       foot.add(withOutline(heel, 0.006 * s));
-      const soleM = new THREE.Mesh(roundedBox(d.legR * 1.75, ah * 0.28, fl * 0.66), toon(sole)); soleM.position.set(0, -ah * 0.86, fl * 0.12); foot.add(withOutline(soleM, 0.005 * s));
-      const cap = new THREE.Mesh(new THREE.SphereGeometry(1, 28, 20), toon(sh.color)); cap.scale.set(d.legR * 0.92, ah * 0.6, fl * 0.24); cap.position.set(0, -ah * 0.42 + (foot.position.y - toe.position.y) * 0 - 0.0, 0.0);
+      const soleM = new THREE.Mesh(roundedBox(d.legR * 1.45, ah * 0.26, fl * 0.66), toon(sole)); soleM.position.set(0, -ah * 0.86, fl * 0.12); foot.add(withOutline(soleM, 0.005 * s));
+      const cap = new THREE.Mesh(new THREE.SphereGeometry(1, 28, 20), toon(sh.color)); cap.scale.set(d.legR * 0.8, ah * 0.55, fl * 0.24); cap.position.set(0, -ah * 0.42 + (foot.position.y - toe.position.y) * 0 - 0.0, 0.0);
       // toe cap sits on the toe bone so the shoe bends at toe-off
       const tl = toe.position;
       cap.position.set(0, -tl.y - ah * 0.42, 0.02 * s);
       toe.add(withOutline(cap, 0.006 * s));
-      const toeSole = new THREE.Mesh(roundedBox(d.legR * 1.6, ah * 0.28, fl * 0.3), toon(sole)); toeSole.position.set(0, -tl.y - ah * 0.86, 0.03 * s); toe.add(toeSole);
+      const toeSole = new THREE.Mesh(roundedBox(d.legR * 1.35, ah * 0.28, fl * 0.3), toon(sole)); toeSole.position.set(0, -tl.y - ah * 0.86, 0.03 * s); toe.add(toeSole);
       if (sh.type === 'heels') {
         // slim pump: lower, narrower shell, a thin stiletto under the heel and an ankle strap
         heel.scale.set(d.legR * 0.62, ah * 0.4, fl * 0.4); heel.position.set(0, -ah * 0.5, fl * 0.06);
@@ -706,7 +728,7 @@ export class CharacterVisual {
         case 'toolbelt': case 'apron': { const hips = this.rig.bone('hips'); const y = (this.boneWorldY('hips').y + this.boneWorldY('spine').y) / 2 - 0.02 * s; if (a.type === 'toolbelt') { const t = new THREE.Mesh(new THREE.TorusGeometry(1, 0.1, 6, 28), toon(a.color)); t.rotation.x = Math.PI / 2; t.scale.set(d.waistRx * 1.12 + g.body.belly * 0.03, d.chestRz * 1.02 + g.body.belly * 0.07, d.waistRx * 0.3); t.position.copy(hips.worldToLocal(new THREE.Vector3(0, y, 0))); hips.add(withOutline(t, 0.004 * s)); for (const [px, pz] of [[0.9, 0.3], [-0.9, 0.3], [0.6, 0.8]]) { const p = new THREE.Mesh(new THREE.BoxGeometry(0.06 * s, 0.08 * s, 0.035 * s), toon(c2)); p.position.copy(hips.worldToLocal(new THREE.Vector3(px * d.waistRx * 1.1, y - 0.045 * s, pz * d.chestRz * 1.05))); p.lookAt(hips.localToWorld(new THREE.Vector3(0, p.position.y, 0))); p.rotateY(Math.PI); hips.add(withOutline(p, 0.003 * s)); } const wrench = new THREE.Mesh(new THREE.BoxGeometry(0.012 * s, 0.12 * s, 0.02 * s), toon('#a7b0ba')); wrench.position.copy(hips.worldToLocal(new THREE.Vector3(-0.9 * d.waistRx * 1.1, y - 0.06 * s, 0.32 * d.chestRz + 0.03 * s))); hips.add(wrench); } else {
             // a bib apron that wraps the front of the body from the chest to above the knees, tied at the waist
             const yTop = this.boneWorldY('chest').y + 0.08 * s, yHem = y - 0.42 * s;
-            this.clothShell('apron', yTop, yHem, a.color, { arc: [-1.2, 1.2], offset: 0.012, flare: 0.06, legBlend: 0.6, foldAmp: 0.004, folds: 9 });
+            this.clothShell('apron', yTop, yHem, a.color, { arc: [-1.45, 1.45], offset: 0.012, flare: 0.06, legBlend: 0.6, foldAmp: 0.004, folds: 9 });
             const tie = new THREE.Mesh(new THREE.TorusGeometry(1, 0.06, 6, 32), toon(a.color)); tie.rotation.x = Math.PI / 2; const wt = this.torsoAt(y + 0.01 * s); tie.scale.set(wt.rx * 1.06 + 0.012 * s, Math.max(wt.rz, wt.rzb) * 1.06 + 0.012 * s, 0.25 * wt.rx); tie.position.copy(hips.worldToLocal(new THREE.Vector3(0, y + 0.01 * s, 0))); hips.add(tie);
             const strap = new THREE.Mesh(new THREE.TorusGeometry(1, 0.08, 6, 24), toon(a.color)); strap.rotation.x = Math.PI / 2 - 0.35; strap.scale.set(d.headRx * 0.58, d.headRz * 0.62, d.headRx * 0.5); const chest = this.rig.bone('chest'); strap.position.copy(chest.worldToLocal(this.boneWorldY('neck').clone().add(new THREE.Vector3(0, -0.03 * s, 0.01 * s)))); chest.add(strap);
           } break; }
