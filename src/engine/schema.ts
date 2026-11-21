@@ -66,8 +66,8 @@ export const BeardSchema = z.object({
 }).strict();
 export const OutfitSchema = z.object({
   top: z.object({ type: z.enum(['tshirt', 'longsleeve', 'jacket', 'hoodie', 'vest', 'overalls', 'labcoat', 'tanktop', 'dress']).default('tshirt'), color: color.default('#d9534f'), secondaryColor: color.optional(), neckline: z.enum(['crew', 'v', 'scoop', 'plunge', 'off-shoulder']).default('crew'), fabric: z.enum(['matte', 'satin', 'silk', 'leather', 'sequin']).default('matte') }).strict().default({ type: 'tshirt', color: '#d9534f', neckline: 'crew', fabric: 'matte' }),
-  bottom: z.object({ type: z.enum(['pants', 'shorts', 'skirt']).default('pants'), color: color.default('#34495e'), fabric: z.enum(['matte', 'satin', 'silk', 'leather', 'sequin']).default('matte') }).strict().default({ type: 'pants', color: '#34495e', fabric: 'matte' }),
-  shoes: z.object({ type: z.enum(['sneakers', 'boots', 'shoes', 'sandals']).default('sneakers'), color: color.default('#2c2c2c'), soleColor: color.optional() }).strict().default({ type: 'sneakers', color: '#2c2c2c' }),
+  bottom: z.object({ type: z.enum(['pants', 'shorts', 'skirt']).default('pants'), color: color.default('#34495e'), fabric: z.enum(['matte', 'satin', 'silk', 'leather', 'sequin']).default('matte'), /** skirt cut: fitted (follows hips and seat), aline (hangs from the hips), skater (flares from the waist) */ fit: z.enum(['fitted', 'aline', 'skater']).default('aline'), /** contrasting waistband on a dress */ waistband: color.optional() }).strict().default({ type: 'pants', color: '#34495e', fabric: 'matte', fit: 'aline' }),
+  shoes: z.object({ type: z.enum(['sneakers', 'boots', 'shoes', 'sandals', 'heels']).default('sneakers'), color: color.default('#2c2c2c'), soleColor: color.optional() }).strict().default({ type: 'sneakers', color: '#2c2c2c' }),
   gloves: z.object({ color: color }).strict().optional()
 }).strict();
 export const AccessorySchema = z.object({
@@ -99,7 +99,10 @@ export const CharacterGeometrySchema = z.object({
   outfit: OutfitSchema.default(OutfitSchema.parse({})),
   accessories: z.array(AccessorySchema).max(24).default([]),
   parts: z.array(PartSchema).max(200).default([]),
-  outlineWidth: num(0, 0.05).default(0.012)
+  outlineWidth: num(0, 0.05).default(0.012),
+  /** Acting personality used by automatic direction: postures while listening (held), gestures while talking,
+   * and how much the character moves (0.5 = contained, 1.5 = expansive). */
+  acting: z.object({ listen: z.array(z.string().max(60)).max(8).default([]), talk: z.array(z.string().max(60)).max(8).default([]), energy: num(0, 2).default(1) }).strict().default({ listen: [], talk: [], energy: 1 })
 }).strict();
 export type CharacterGeometry = z.infer<typeof CharacterGeometrySchema>;
 export type BodyParams = z.infer<typeof BodySchema>;
@@ -293,12 +296,15 @@ export const ActionSchema = z.discriminatedUnion('type', [
   z.object({ type: z.literal('sit'), id: z.string().max(60).optional(), actor: z.string(), ...timeRef, prop: z.string(), anchor: z.string().default('seat'), durationSec: num(0.3, 10).default(1.0) }).strict(),
   z.object({ type: z.literal('stand'), id: z.string().max(60).optional(), actor: z.string(), ...timeRef, durationSec: num(0.3, 10).default(1.0) }).strict(),
   z.object({ type: z.literal('propJoint'), id: z.string().max(60).optional(), prop: z.string(), joint: z.string(), ...timeRef, toDeg: num(-360, 360), fromDeg: num(-360, 360).optional(), durationSec: num(0.05, 60).default(0.8), ease: z.string().max(20).optional(), sound: z.string().max(60).optional() }).strict(),
-  z.object({ type: z.literal('effect'), id: z.string().max(60).optional(), effect: z.enum(['sparks', 'smoke', 'flicker', 'glow', 'off']), ...timeRef, prop: z.string().optional(), part: z.string().optional(), position: vec3.optional(), durationSec: num(0.05, 600).default(1), /** ends when this line/action starts (overrides durationSec) */ until: z.string().max(60).optional(), intensity: num(0, 5).default(1), sound: z.string().max(60).optional() }).strict()
+  z.object({ type: z.literal('effect'), id: z.string().max(60).optional(), effect: z.enum(['sparks', 'smoke', 'flicker', 'glow', 'off', 'freeze']), ...timeRef, prop: z.string().optional(), part: z.string().optional(), position: vec3.optional(), durationSec: num(0.05, 600).default(1), /** ends when this line/action starts (overrides durationSec) */ until: z.string().max(60).optional(), intensity: num(0, 5).default(1), sound: z.string().max(60).optional() }).strict()
 ]);
 export type Action = z.infer<typeof ActionSchema>;
 export const DialogueLineSchema = z.object({
   id: z.string().regex(/^[a-zA-Z0-9_-]{1,60}$/),
+  /** actor id of the scene; for a voice-over line, a character id (the narrator need not be on the set) */
   actor: z.string(),
+  /** narration off screen (no lip-sync, no gaze, no coverage; italic subtitles) */
+  voiceOver: z.boolean().default(false),
   text: z.string().min(1).max(600),
   to: z.string().max(60).optional(),
   emotion: z.string().max(40).optional(),
@@ -395,10 +401,10 @@ export const EpisodeSchema = z.object({
   /** Automatic score: opening theme, underscore bed (ducked under dialogue), a bumper sting on every scene change
    * and an ending theme. Each cue names a music asset; durations default to the asset's own. */
   score: z.object({
-    theme: z.object({ music: slug, gainDb: num(-60, 12).default(-12), durationSec: num(1, 120).default(9), fadeOut: num(0, 10).default(2.5) }).strict().optional(),
-    underscore: z.object({ music: slug, gainDb: num(-60, 12).default(-22), fadeIn: num(0, 10).default(2), fadeOut: num(0, 10).default(1.5) }).strict().optional(),
-    bumpers: z.object({ music: slug, gainDb: num(-60, 12).default(-11), durationSec: num(0.5, 20).optional(), leadSec: num(0, 5).default(0.3), scenes: z.array(z.string().regex(/^sc-\d{3,4}$/)).optional() }).strict().optional(),
-    ending: z.object({ music: slug, gainDb: num(-60, 12).default(-12), durationSec: num(1, 120).default(7), fadeOut: num(0, 10).default(1.5) }).strict().optional(),
+    theme: z.object({ music: slug, gainDb: num(-60, 12).default(-4), durationSec: num(1, 120).default(9), fadeOut: num(0, 10).default(2.5) }).strict().optional(),
+    underscore: z.object({ music: slug, gainDb: num(-60, 12).default(-14), fadeIn: num(0, 10).default(2), fadeOut: num(0, 10).default(1.5) }).strict().optional(),
+    bumpers: z.object({ music: slug, gainDb: num(-60, 12).default(-4), durationSec: num(0.5, 20).optional(), leadSec: num(0, 5).default(0.3), scenes: z.array(z.string().regex(/^sc-\d{3,4}$/)).optional() }).strict().optional(),
+    ending: z.object({ music: slug, gainDb: num(-60, 12).default(-4), durationSec: num(1, 120).default(7), fadeOut: num(0, 10).default(1.5) }).strict().optional(),
     /** Fade to black between scenes (out at the end of a scene, in at the start of the next; continuous scenes cut).
      * The scene keeps `holdSec` of silence after its last event before fading, so a line never fades with it. */
     sceneFade: z.object({ durationSec: num(0.2, 5).default(1.2), holdSec: num(0, 5).default(0.8) }).strict().optional()

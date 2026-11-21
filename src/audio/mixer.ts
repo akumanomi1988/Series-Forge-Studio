@@ -101,10 +101,10 @@ export async function mixSegment(cues: AudioCue[], segStart: number, duration: n
       report.push({ id: c.id, kind: c.kind, start: c.start, duration: c.duration, peak: g });
     }
   }
-  // ducking: beds dip under dialogue (attack 40 ms, release 450 ms, -9 dB)
+  // ducking: beds dip under dialogue (attack 40 ms, release 450 ms, -6 dB: the music stays audible under the voices)
   const att = Math.exp(-1 / (0.04 * SR)), rel = Math.exp(-1 / (0.45 * SR));
   let envv = 0;
-  const duck = dbToGain(-9);
+  const duck = dbToGain(-6);
   const L = new Float32Array(N), R = new Float32Array(N);
   // look-ahead so the dip starts slightly before speech
   const ahead = Math.round(0.08 * SR);

@@ -40,7 +40,7 @@ export type PropSegment =
   | { kind: 'fall'; start: number; end: number; actor: string; hand: 'left' | 'right'; floorY: number; seed: number; impacts: number[]; rest: Vec3; restRotationDeg: Vec3; restYaw: number };
 export interface PropJointAnim { joint: string; start: number; end: number; fromDeg: number; toDeg: number; ease?: string }
 export interface PropTimeline { id: string; propId: string; scale: number; segments: PropSegment[]; joints: PropJointAnim[] }
-export interface EffectInstance { effect: 'sparks' | 'smoke' | 'flicker' | 'glow' | 'off'; start: number; end: number; prop?: string; part?: string; position?: Vec3; intensity: number; seed: number }
+export interface EffectInstance { effect: 'sparks' | 'smoke' | 'flicker' | 'glow' | 'off' | 'freeze'; start: number; end: number; prop?: string; part?: string; position?: Vec3; intensity: number; seed: number }
 export interface ResolvedShot { id: string; start: number; end: number; camera: CameraSpec; transitionIn?: { type: 'cut' | 'dissolve' | 'fade' | 'iris' | 'wipe'; durationSec: number } }
 export interface AudioCue { id: string; kind: 'dialogue' | 'sfx' | 'ambience' | 'music'; sound: string; start: number; duration: number; gainDb: number; fadeIn: number; fadeOut: number; pan: number; duck: boolean; file?: string; actor?: string; text?: string; auto?: boolean; /** a foreground musical moment (theme, bumper, sting): not dead air */ feature?: boolean }
 
@@ -48,11 +48,13 @@ export interface AssetLibrary {
   characters: Record<string, { geometry: CharacterGeometry; rigOffsets: Record<string, Vec3>; legacy?: unknown; clips: Record<string, ClipV2>; locomotion: Record<string, Locomotion>; expressions: Record<string, ExpressionV2> }>;
   props: Record<string, PropGeometry>;
   environments: Record<string, EnvironmentV2>;
+  /** project-wide look: 'toon' (cel + ink) or 'soft' (stylised 3D with soft shadows and ambient occlusion) */
+  style?: 'toon' | 'soft';
 }
 export interface ResolvedScene {
   schemaVersion: 2; id: string; name: string; durationSec: number; environmentId: string | null;
   actors: ActorTimeline[]; props: PropTimeline[]; effects: EffectInstance[]; shots: ResolvedShot[]; audio: AudioCue[];
-  subtitles: { start: number; end: number; actor: string; text: string; lineId: string }[];
+  subtitles: { start: number; end: number; actor: string; text: string; lineId: string; voiceOver?: boolean }[];
   transitionOut?: { type: 'cut' | 'fade'; durationSec: number };
   warnings: string[];
 }

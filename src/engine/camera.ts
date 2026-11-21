@@ -158,12 +158,23 @@ export function shotCamera(ev: SceneEvaluator, shot: ResolvedShot, t: number, as
     }
   }
   if (c.type !== 'static') position = insideRoom(ev, target, position);
+  // headroom: in a group or wide shot nobody's head may be cut by the top of the frame (a wall can push the camera
+  // closer than planned): tilt up first, then open the lens a little
+  let fovOut = fov;
+  if (c.type !== 'static' && c.framing && (['two-shot', 'wide', 'full', 'establishing'].includes(c.framing) || (c.subjects?.length ?? 0) > 1)) {
+    const ids = c.subjects ?? (c.framing === 'two-shot' && !c.subject ? ev.scene.actors.map(a => a.id) : c.subject ? [c.subject] : ev.scene.actors.map(a => a.id));
+    const heads = ids.filter(id => ev.scene.actors.some(a => a.id === id)).map(id => ev.headWorld(id, t).clone().add(new THREE.Vector3(0, 0.17, 0)));
+    const cam = new THREE.PerspectiveCamera(fovOut, aspect, 0.05, 200);
+    const topNdc = () => { cam.fov = fovOut; cam.position.copy(position); cam.lookAt(target); cam.updateProjectionMatrix(); cam.updateMatrixWorld(); return Math.max(-1, ...heads.map(h => h.clone().project(cam).y)); };
+    for (let k = 0; k < 12 && heads.length && topNdc() > 0.9; k++) target.y += 0.05;
+    for (let k = 0; k < 8 && heads.length && topNdc() > 0.9; k++) fovOut = Math.min(fov * 1.4, fovOut * 1.05);
+  }
   if (c.handheld > 0) {
     const seed = Math.floor(hash01(shot.id) * 1000);
     position.add(new THREE.Vector3(noise1(seed, t * 0.9), noise1(seed + 1, t * 0.8), noise1(seed + 2, t * 0.7)).multiplyScalar(0.025 * c.handheld));
     target.add(new THREE.Vector3(noise1(seed + 3, t * 1.1), noise1(seed + 4, t * 1.3), 0).multiplyScalar(0.018 * c.handheld));
   }
-  return { position, target, fov };
+  return { position, target, fov: fovOut };
 }
 
 export function evaluateShots(ev: SceneEvaluator, scene: ResolvedScene, t: number, aspect: number): ShotEval {

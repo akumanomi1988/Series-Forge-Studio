@@ -219,6 +219,7 @@ export function checkReferences(p: LoadedProject): void {
       if (act.type === 'play') { const a = sc.actors.find(x => x.id === act.actor); if (a && p.characters[a.characterId] && !p.characters[a.characterId].clips[act.clip]) err(path, `Animación desconocida ${act.clip}`); }
     }
     for (const l of sc.dialogue) {
+      if (l.voiceOver) { const ch = p.characters[sc.actors.find(x => x.id === l.actor)?.characterId ?? l.actor]; if (!ch) err(path, `Narración ${l.id}: personaje desconocido ${l.actor}`); else if (!ch.voice) err(path, `Narración ${l.id}: ${l.actor} no tiene voice.json v2`); continue; }
       if (!actorIds.has(l.actor)) err(path, `Diálogo ${l.id}: actor desconocido ${l.actor}`);
       const a = sc.actors.find(x => x.id === l.actor);
       if (a && p.characters[a.characterId] && !p.characters[a.characterId].voice) err(path, `Diálogo ${l.id}: ${a.characterId} no tiene voice.json v2`);
@@ -231,6 +232,6 @@ export function checkReferences(p: LoadedProject): void {
 export function assetLibrary(p: LoadedProject): AssetLibrary {
   const characters: AssetLibrary['characters'] = {};
   for (const [id, c] of Object.entries(p.characters)) characters[id] = { geometry: c.geometry, rigOffsets: c.rigOffsets, clips: c.clips, locomotion: c.locomotion, expressions: c.expressions };
-  return { characters, props: Object.fromEntries(Object.entries(p.props).map(([k, v]) => [k, v.geometry])), environments: Object.fromEntries(Object.entries(p.environments).map(([k, v]) => [k, v.env])) };
+  return { characters, props: Object.fromEntries(Object.entries(p.props).map(([k, v]) => [k, v.geometry])), environments: Object.fromEntries(Object.entries(p.environments).map(([k, v]) => [k, v.env])), style: (p.meta as { renderStyle?: string }).renderStyle === 'soft' ? 'soft' : 'toon' };
 }
 export const hashText = sha;

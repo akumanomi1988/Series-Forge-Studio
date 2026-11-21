@@ -35,7 +35,7 @@ export interface PlanShot { id: string; scene: string; sceneIndex: number; start
 export interface EpisodePlan {
   schemaVersion: 2; project: string; episode: string; name: string; settings: RenderSettings; durationSec: number; frames: number;
   scenes: { id: string; name: string; start: number; duration: number; frame0: number; frames: number; resolvedFile: string; hash: string; warnings: string[] }[];
-  shots: PlanShot[]; audio: AudioCue[]; subtitles: { start: number; end: number; actor: string; text: string; lineId: string }[];
+  shots: PlanShot[]; audio: AudioCue[]; subtitles: { start: number; end: number; actor: string; text: string; lineId: string; voiceOver?: boolean }[];
   speech: Record<string, { file: string; duration: number; cached: boolean; provider: string; method: string; key: string }>;
   rendererHash: string; generatedAt: string;
 }
@@ -97,8 +97,8 @@ export async function compileEpisode(project: string, episode: string, settings:
     // speech
     const speech: Record<string, SpeechInfo> = {};
     for (const line of scene.dialogue) {
-      const actor = scene.actors.find(a => a.id === line.actor)!;
-      const ch = p.characters[actor.characterId];
+      const actor = scene.actors.find(a => a.id === line.actor);
+      const ch = p.characters[actor?.characterId ?? line.actor]; // a narrator off the set is named by character id
       if (settings.speech === 'estimate' || !ch.voice) { const e = estimateSpeech(line.text, ch.voice?.rate ?? 1); speech[line.id] = { ...e, estimated: true }; continue; }
       const emo = resolveEmotion(line.emotion);
       progress({ stage: 'tts', scene: sid, line: line.id });
@@ -183,7 +183,8 @@ function srt(subs: EpisodePlan['subtitles']): string {
   const ts = (s: number) => { const ms = Math.max(0, Math.round(s * 1000)); const h = Math.floor(ms / 3600000), m = Math.floor(ms / 60000) % 60, sec = Math.floor(ms / 1000) % 60; return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(sec).padStart(2, '0')},${String(ms % 1000).padStart(3, '0')}`; };
   const sorted = [...subs].sort((a, b) => a.start - b.start);
   for (let i = 0; i + 1 < sorted.length; i++) if (sorted[i].end > sorted[i + 1].start) sorted[i].end = Math.max(sorted[i].start + 0.3, sorted[i + 1].start - 0.02);
-  return sorted.map((s, i) => `${i + 1}\n${ts(s.start)} --> ${ts(s.end)}\n${s.text}\n`).join('\n');
+  // narration (voice-over) is set in italics
+  return sorted.map((s, i) => `${i + 1}\n${ts(s.start)} --> ${ts(s.end)}\n${s.voiceOver ? `<i>${s.text.replace(/\n/g, '</i>\n<i>')}</i>` : s.text}\n`).join('\n');
 }
 function ffmpegSink(out: string, w: number, h: number, fps: number, crf: number, preset: string) {
   const args = ['-nostdin', '-hide_banner', '-loglevel', 'error', '-y', '-f', 'rawvideo', '-pix_fmt', 'rgba', '-s', `${w}x${h}`, '-r', String(fps), '-i', '-', '-vf', 'vflip,format=yuv420p', '-c:v', 'libx264', '-preset', preset, '-crf', String(crf), '-g', String(fps * 2), '-bf', '2', '-pix_fmt', 'yuv420p', '-colorspace', 'bt709', '-color_primaries', 'bt709', '-color_trc', 'bt709', '-movflags', '+faststart', '-r', String(fps), out];

@@ -54,7 +54,7 @@ test('cobertura automática: plano desde t=0, sin destellos, sin saltos de eje n
   // cuts lead the voice slightly (J-cut) and never come after it
   const l3 = r.actors.find(a => a.id === 'susana')!.speech.find(x => x.lineId === 'l3')!;
   const cut = r.shots.find(s => s.id === 'auto-l3');
-  if (cut) assert.ok(cut.start <= l3.start && l3.start - cut.start < 0.3);
+  if (cut) assert.ok(cut.start <= l3.start && l3.start - cut.start < 1.2) // J-cut, or a reaction shot of the one who answers that runs into the answer;
 });
 
 test('cobertura automática: los planos escritos son insertos y la cobertura se reanuda después', async () => {

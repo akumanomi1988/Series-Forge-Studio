@@ -222,6 +222,7 @@ export function compileScene(scene: SceneV2, lib: AssetLibrary, opts: DirectorOp
   // ---------------- items & timing resolution
   const items: Item[] = [];
   const lineEnd = new Map<string, number>();
+  const voSubs: { lineId: string; start: number; end: number; actor: string; text: string }[] = [];
   scene.actions.forEach((a, i) => items.push({ id: a.id ?? `action-${i + 1}`, kind: 'action', at: a.at, after: a.after, with: a.with, offset: a.offset ?? 0, data: a, actor: 'actor' in a ? a.actor : undefined, order: i }));
   scene.dialogue.forEach((l, i) => {
     const untimed = l.at === undefined && !l.after && !l.with;
@@ -248,8 +249,8 @@ export function compileScene(scene: SceneV2, lib: AssetLibrary, opts: DirectorOp
   // turn-taking: a breath when the same character goes on, a real beat when another one answers, and a longer
   // one before a reaction (surprise, fear, sadness, thinking): the silence is part of the joke or of the tension
   const LINE_GAP = 0.12;
-  let lastLineEnd = -Infinity, lastLineActor = '';
-  const gapBefore = (l: DialogueLine) => { if (!lastLineActor) return LINE_GAP; const emo = resolveEmotion(l.emotion) ?? ''; return (l.actor === lastLineActor ? 0.16 : 0.34) + (['surprise', 'fear', 'sad', 'thinking', 'worried'].includes(emo) ? 0.25 : 0); };
+  let lastLineEnd = -Infinity, lastLineActor = '', lastLineStrong = false;
+  const gapBefore = (l: DialogueLine) => { if (!lastLineActor) return LINE_GAP; const emo = resolveEmotion(l.emotion) ?? ''; return (l.actor === lastLineActor ? 0.16 : 0.34) + (['surprise', 'fear', 'sad', 'thinking', 'worried'].includes(emo) ? 0.25 : 0) + (lastLineStrong && l.actor !== lastLineActor ? 0.35 : 0); };
   const startOf = (it: Item): number | null => {
     let s: number;
     if (it.at !== undefined) s = it.at + it.offset;
@@ -269,13 +270,24 @@ export function compileScene(scene: SceneV2, lib: AssetLibrary, opts: DirectorOp
     pending.delete(best);
     best.start = bestT;
     best.end = execute(best, bestT);
-    if (best.kind === 'line') { lastLineEnd = Math.max(lastLineEnd, best.end); lastLineActor = (best.data as DialogueLine).actor; }
+    if (best.kind === 'line') { const bl = best.data as DialogueLine; lastLineEnd = Math.max(lastLineEnd, best.end); lastLineActor = bl.actor; lastLineStrong = ['surprise', 'angry', 'laugh', 'fear', 'disgust'].includes(resolveEmotion(bl.emotion) ?? '') || (/!/.test(bl.text) && bl.intensity >= 1); }
   }
   for (const u of untilFx) { const ref = byId.get(u.ref); if (!ref) throw new Error(`Efecto ${u.src}: until desconocido ${u.ref}`); effects[u.idx].end = Math.max(effects[u.idx].start + 0.05, ref.start!); }
 
   function execute(it: Item, s: number): number {
     if (it.kind === 'shot') return s;
     if (it.kind === 'sound') { const e = it.data as SoundEvent; audio.push({ id: it.id, kind: e.kind, sound: e.sound, start: s, duration: e.durationSec ?? -1, gainDb: e.gainDb, fadeIn: e.fadeIn, fadeOut: e.fadeOut, pan: e.pan, duck: e.duck ?? e.kind !== 'sfx', feature: e.kind === 'music' && e.gainDb >= -18 }); return s + (e.durationSec ?? 0); }
+    if (it.kind === 'line' && (it.data as DialogueLine).voiceOver) {
+      // narration: audio and italic subtitles only, nobody on the set moves their lips
+      const l = it.data as DialogueLine;
+      const info = opts.speech?.[l.id] ?? opts.estimateSpeech?.(l.text) ?? { duration: Math.max(0.6, l.text.split(/\s+/).length * 0.36 + 0.25), visemes: [], estimated: true };
+      if (info.estimated) warnings.push(`Duración estimada (sin audio sintetizado) para ${l.id}`);
+      const e = s + info.duration;
+      audio.push({ id: l.id, kind: 'dialogue', sound: l.id, start: s, duration: info.duration, gainDb: 0, fadeIn: 0, fadeOut: 0, pan: 0, duck: false, file: info.file, actor: l.actor, text: l.text });
+      voSubs.push({ lineId: l.id, start: s, end: e, actor: l.actor, text: l.text });
+      lineEnd.set(l.id, e);
+      return e;
+    }
     if (it.kind === 'line') {
       const l = it.data as DialogueLine;
       actor(l.actor);
@@ -493,6 +505,7 @@ export function compileScene(scene: SceneV2, lib: AssetLibrary, opts: DirectorOp
     // only between characters on the set: someone behind a door does not stare through the wall
     const inRoom = (tl: ActorTimeline, t: number) => { if (env?.kind !== 'room') return true; const p = rootStateAt(tl, t); return Math.abs(p[0]) < env.size[0] / 2 && p[2] > -env.size[2] / 2 && p[2] < env.size[2] / 2 + 1.5; };
     for (const l of scene.dialogue) {
+      if (l.voiceOver) continue;
       const sp = actor(l.actor).speech.find(x => x.lineId === l.id)!;
       if (!inRoom(actor(l.actor), sp.start)) continue;
       for (const other of actors) {
@@ -529,6 +542,7 @@ export function compileScene(scene: SceneV2, lib: AssetLibrary, opts: DirectorOp
       lastAuto.set(tl.id, clip);
     };
     for (const l of scene.dialogue) {
+      if (l.voiceOver) continue;
       const tl = actor(l.actor), sp = tl.speech.find(x => x.lineId === l.id); if (!sp) continue;
       const s = sp.start, e = sp.end, d = e - s, txt = l.text.trim().toLowerCase(), emo = resolveEmotion(l.emotion) ?? 'neutral';
       const h = hash01(l.id, 'act');
@@ -545,7 +559,12 @@ export function compileScene(scene: SceneV2, lib: AssetLibrary, opts: DirectorOp
         else if (txt.includes('?') && d > 1.0) pick = { clip: emo === 'surprise' || emo === 'worried' || h < 0.4 ? 'shrug' : 'present', w: 0.75, at: Math.max(0.2, d - 1.4) };
         else if (/\b(mira|fíjate|toma|aquí|esto|este|esta)\b/.test(txt) && d > 1.0) pick = { clip: 'present', w: 0.8, at: 0.15 };
         else if (/\b(da igual|bah|olvídalo|déjalo|tranquil[oa])\b/.test(txt) && d > 0.9) pick = { clip: 'dismiss', w: 0.8, at: 0.2 };
-        else if (d >= 1.8) pick = { clip: 'explain', loop: true, w: 0.45 + 0.3 * h };
+        else if (d >= 1.8) {
+          // the character's own repertoire first (energy scales the gesture), the generic explaining hands otherwise
+          const talk = charOf(l.actor).geometry.acting.talk.filter(c => charOf(l.actor).clips[c]);
+          const en = charOf(l.actor).geometry.acting.energy;
+          pick = talk.length && h < 0.75 ? { clip: talk[Math.floor(hash01(l.id, 'talk') * talk.length)], loop: charOf(l.actor).clips[talk[0]]?.loop, w: (0.55 + 0.3 * h) * en, at: 0.2 } : { clip: 'explain', loop: true, w: (0.45 + 0.3 * h) * en };
+        }
         if (pick && pick.clip === lastAuto.get(l.actor) && pick.clip !== 'explain' && !pick.loop) pick = d >= 1.8 && hands ? { clip: 'explain', loop: true, w: 0.5 } : null;
         if (pick) {
           const st = s + (pick.at ?? 0.12);
@@ -559,6 +578,26 @@ export function compileScene(scene: SceneV2, lib: AssetLibrary, opts: DirectorOp
         if (other.id === l.actor || (l.to && other.id !== l.to)) continue;
         if (hash01(l.id, other.id) > 0.55 || busy(other, e - 1.2, e) || other.speech.some(x => x.start < e && x.end > e - 1.2)) continue;
         add(other, 'nod', e - 1.0 - 0.3 * hash01(other.id, l.id), e + 0.2, 0.55);
+      }
+    }
+    // attitude while listening: in every silence of 3 s or more each character holds one of its own postures
+    // (arms crossed, hands on hips, rubbing hands…) instead of standing like a mannequin
+    for (const tl of actors) {
+      const rep = charOf(tl.id).geometry.acting.listen.filter(c => charOf(tl.id).clips[c]);
+      if (!rep.length) continue;
+      const talks = [...tl.speech].sort((a, b) => a.start - b.start);
+      const gaps: [number, number][] = []; let t0 = 0.3;
+      for (const sp of talks) { if (sp.start - t0 >= 3) gaps.push([t0, sp.start]); t0 = Math.max(t0, sp.end + 0.4); }
+      if (duration - t0 >= 3) gaps.push([t0, duration - 0.2]);
+      for (const [g0, g1] of gaps) {
+        // split long silences so the posture changes now and then
+        for (let a0 = g0; a0 < g1 - 2.5; a0 += 9) {
+          const a1 = Math.min(g1, a0 + 9), hh = hash01(tl.id, a0.toFixed(1), 'pose');
+          if (hh > 0.7 || busy(tl, a0 + 0.3, a1 - 0.3)) continue;
+          const clip = rep[Math.floor(hh / 0.7 * rep.length) % rep.length], c = charOf(tl.id).clips[clip];
+          if (!['arms', 'additive', 'head'].includes(c.layer) && tl.sits.some(x => x.start < a1 && x.end > a0)) continue;
+          tl.clips.push({ clip, start: a0 + 0.4, end: a1 - 0.3, speed: 1, fadeIn: 0.55, fadeOut: 0.55, loop: c.loop, weight: 0.9, source: 'auto:pose:' + clip });
+        }
       }
     }
   }
@@ -590,7 +629,7 @@ export function compileScene(scene: SceneV2, lib: AssetLibrary, opts: DirectorOp
       const az = singleAz(subj, other, t) * Math.PI / 180, zr = Math.cos(yaw + az), zl = Math.cos(yaw - az);
       return zr >= zl ? 'right' : 'left';
     };
-    const lines = scene.dialogue.map(l => ({ l, sp: actor(l.actor).speech.find(x => x.lineId === l.id)! })).filter(x => x.sp).sort((p, q) => p.sp.start - q.sp.start);
+    const lines = scene.dialogue.filter(l => !l.voiceOver).map(l => ({ l, sp: actor(l.actor).speech.find(x => x.lineId === l.id)! })).filter(x => x.sp).sort((p, q) => p.sp.start - q.sp.start);
     const out: ResolvedShot[] = [];
     const push = (id: string, start: number, camera: Shot['camera'], transitionIn?: ResolvedShot['transitionIn']) => {
       const prev = out[out.length - 1];
@@ -607,7 +646,7 @@ export function compileScene(scene: SceneV2, lib: AssetLibrary, opts: DirectorOp
     const opening = inserts.find(s => s.start < 0.01);
     const present0 = ids.filter(id => onSet(id, 0.5));
     if (!opening) push('auto-establishing', 0, CameraSchema.parse({ framing: present0.length > 1 ? 'wide' : 'full', subjects: present0.length > 1 ? present0 : undefined, subject: present0.length <= 1 ? present0[0] ?? ids[0] : undefined, move: { type: 'push-in', amount: 0.08 } }));
-    let n = 0, lastSpeaker = '';
+    let n = 0, lastSpeaker = '', lastReact = -99;
     for (const { l, sp } of lines) {
       const s = sp.start - 0.12; // J-cut: picture changes just before the voice
       if (s < Math.min(firstLine, 2.2) && out.length && !opening) { lastSpeaker = l.actor; continue; } // let the opening breathe
@@ -630,6 +669,12 @@ export function compileScene(scene: SceneV2, lib: AssetLibrary, opts: DirectorOp
       if (prev && prev.subject === cam.subject && prev.framing === cam.framing && !prev.over) cam = { ...cam, framing: cam.framing === 'medium-close' ? 'medium' : 'medium-close', move: undefined };
       push(`auto-${l.id}`, s, CameraSchema.parse(cam));
       lastSpeaker = l.actor; n++;
+      // reaction shot: after a strong line, cut to the face of who receives it (not more than one every 12 s)
+      const strong = ['surprise', 'angry', 'laugh', 'fear', 'disgust'].includes(emo) || (/!/.test(l.text) && l.intensity >= 1);
+      if (strong && other && !walking && sp.end - s >= 1.6 && sp.end - lastReact >= 12) {
+        push(`react-${l.id}`, sp.end - 0.08, CameraSchema.parse({ framing: 'medium-close', subject: other, side: singleSide(other, l.actor, sp.end), azimuthDeg: singleAz(other, l.actor, sp.end) }));
+        lastReact = sp.end; lastSpeaker = '';
+      }
     }
     // hand-written shots are inserts: they interrupt coverage for their duration, then the current coverage resumes
     for (const ins of inserts) {
@@ -655,6 +700,11 @@ export function compileScene(scene: SceneV2, lib: AssetLibrary, opts: DirectorOp
     const total = chunks.reduce((n, c) => n + c.length, 0);
     let t = sp.start;
     for (const c of chunks) { const d = (sp.end - sp.start) * c.length / total; resolved.subtitles.push({ start: t, end: Math.min(duration, t + d + 0.15), actor: a.id, text: c, lineId: sp.lineId }); t += d; }
+  }
+  for (const v of voSubs) {
+    const chunks = splitSubtitle(v.text.replace(/\s*\[pausa\s+[0-9.]+\]\s*/gi, ' ').replace(/\s{2,}/g, ' ').trim());
+    const total = chunks.reduce((n, c) => n + c.length, 0); let t = v.start;
+    for (const c of chunks) { const d = (v.end - v.start) * c.length / total; resolved.subtitles.push({ start: t, end: Math.min(duration, t + d + 0.15), actor: v.actor, text: c, lineId: v.lineId, voiceOver: true }); t += d; }
   }
   resolved.subtitles.sort((a, b) => a.start - b.start);
   audio.sort((a, b) => a.start - b.start || a.id.localeCompare(b.id));
