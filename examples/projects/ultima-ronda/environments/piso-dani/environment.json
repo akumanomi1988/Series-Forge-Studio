@@ -36,10 +36,17 @@
       "id": "entrada",
       "type": "door",
       "wall": "right",
-      "offset": 1.2,
+      "offset": -1.2,
       "width": 1,
       "height": 2.1,
-      "sill": 0
+      "sill": 0,
+      "beyond": {
+        "kind": "corridor",
+        "wallColor": "#b9b2a4",
+        "floorColor": "#6d6a66",
+        "lightColor": "#ffe7c2",
+        "lightIntensity": 1.6
+      }
     },
     {
       "id": "dormitorio",
@@ -48,7 +55,14 @@
       "offset": 0.6,
       "width": 0.9,
       "height": 2.1,
-      "sill": 0
+      "sill": 0,
+      "beyond": {
+        "kind": "room",
+        "wallColor": "#5d6a86",
+        "floorColor": "#7d5f42",
+        "lightColor": "#8fa4ff",
+        "lightIntensity": 0.5
+      }
     }
   ],
   "sky": {
@@ -135,7 +149,7 @@
       "id": "silla-1",
       "propId": "silla",
       "position": [
-        0.3,
+        -0.2,
         0,
         0.2
       ],
@@ -146,7 +160,7 @@
       "id": "silla-2",
       "propId": "silla",
       "position": [
-        1.7,
+        2.2,
         0,
         0.2
       ],
@@ -265,7 +279,7 @@
     {
       "type": "clock",
       "wall": "right",
-      "offset": -1.2,
+      "offset": 0.9,
       "height": 2.2,
       "color": "#2a2a2a",
       "width": 0.3

@@ -36,10 +36,17 @@
       "id": "entrada",
       "type": "door",
       "wall": "right",
-      "offset": -1.2,
+      "offset": 1.2,
       "width": 1,
       "height": 2.15,
-      "sill": 0
+      "sill": 0,
+      "beyond": {
+        "kind": "street",
+        "wallColor": "#3a3f4c",
+        "floorColor": "#3b3e44",
+        "lightColor": "#ffd59a",
+        "lightIntensity": 3
+      }
     }
   ],
   "sky": {

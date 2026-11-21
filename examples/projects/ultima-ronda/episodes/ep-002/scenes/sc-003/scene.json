@@ -127,7 +127,7 @@
       "joint": "leaf",
       "after": "v0",
       "offset": 0.1,
-      "toDeg": -95,
+      "toDeg": 95,
       "durationSec": 0.8,
       "sound": "door-creak"
     },
@@ -199,7 +199,7 @@
       "joint": "leaf",
       "with": "lucia-sale",
       "offset": 1.4,
-      "toDeg": -95,
+      "toDeg": 95,
       "durationSec": 0.6,
       "sound": "door-creak"
     },

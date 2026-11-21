@@ -328,7 +328,7 @@
       "joint": "leaf",
       "after": "dani-a-puerta",
       "offset": 0.1,
-      "toDeg": -95,
+      "toDeg": 95,
       "durationSec": 0.8,
       "sound": "door-creak"
     },
@@ -432,7 +432,7 @@
       "joint": "leaf",
       "with": "marga-entra",
       "offset": -0.3,
-      "toDeg": -95,
+      "toDeg": 95,
       "durationSec": 0.6,
       "sound": "door-creak"
     },
@@ -532,7 +532,7 @@
       "joint": "leaf",
       "with": "salen-lucia",
       "offset": 0.8,
-      "toDeg": -95,
+      "toDeg": 95,
       "durationSec": 0.6,
       "sound": "door-creak"
     },
@@ -554,7 +554,7 @@
       "joint": "leaf",
       "with": "oscar-tras",
       "offset": 0.9,
-      "toDeg": -95,
+      "toDeg": 95,
       "durationSec": 0.6,
       "sound": "door-creak"
     },

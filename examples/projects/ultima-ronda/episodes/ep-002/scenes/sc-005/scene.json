@@ -290,7 +290,7 @@
       "joint": "leaf",
       "after": "dani-a-puerta",
       "offset": 0.1,
-      "toDeg": -95,
+      "toDeg": 95,
       "durationSec": 0.8,
       "sound": "door-creak"
     },
@@ -419,7 +419,7 @@
       "with": "timbre",
       "offset": 0.2,
       "target": "puerta",
-      "durationSec": 2.5
+      "durationSec": 3.2
     },
     {
       "id": "miran-puerta-d",
@@ -428,7 +428,7 @@
       "with": "timbre",
       "offset": 0.3,
       "target": "puerta",
-      "durationSec": 2
+      "durationSec": 3.2
     }
   ],
   "dialogue": [
@@ -713,7 +713,7 @@
       "text": "¿Esperas a alguien más?",
       "emotion": "surprise",
       "after": "timbre",
-      "offset": 0.9
+      "offset": 2.0
     },
     {
       "id": "d14",
@@ -748,9 +748,9 @@
     {
       "id": "ding",
       "kind": "sfx",
-      "sound": "robot-beep",
+      "sound": "doorbell",
       "with": "timbre",
-      "gainDb": -8
+      "gainDb": -6
     },
     {
       "id": "tension",

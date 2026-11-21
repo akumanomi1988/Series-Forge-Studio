@@ -152,7 +152,7 @@
       "prop": "puerta",
       "joint": "leaf",
       "at": 1.6,
-      "toDeg": -95,
+      "toDeg": 95,
       "durationSec": 0.8,
       "sound": "door-creak"
     },

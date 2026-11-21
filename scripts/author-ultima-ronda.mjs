@@ -204,7 +204,7 @@ w('environments/sirena/environment.json', {
   walls: { color: '#4a1a26', trimColor: '#24100f', sides: ['back', 'left', 'right'], panel: true },
   openings: [
     { id: 'ventana', type: 'window', wall: 'back', offset: 1.9, width: 2.0, height: 1.3, sill: 1.0, glow: '#4a3a9a' },
-    { id: 'entrada', type: 'door', wall: 'right', offset: -1.2, width: 1, height: 2.15, sill: 0 }
+    { id: 'entrada', type: 'door', wall: 'right', offset: 1.2, width: 1, height: 2.15, sill: 0, beyond: { kind: 'street', wallColor: '#3a3f4c', floorColor: '#3b3e44', lightColor: '#ffd59a', lightIntensity: 3 } }
   ],
   sky: { top: '#0d0a1c', bottom: '#1c1236' },
   lights: [
@@ -379,8 +379,8 @@ w('environments/piso-dani/environment.json', {
   walls: { color: '#d8d0c2', trimColor: '#9a8f80', sides: ['back', 'left', 'right'], panel: false },
   openings: [
     { id: 'ventanal', type: 'window', wall: 'back', offset: 1.3, width: 2.4, height: 1.6, sill: 0.7, glow: '#3a4a8a' },
-    { id: 'entrada', type: 'door', wall: 'right', offset: 1.2, width: 1, height: 2.1, sill: 0 },
-    { id: 'dormitorio', type: 'door', wall: 'left', offset: 0.6, width: 0.9, height: 2.1, sill: 0 }
+    { id: 'entrada', type: 'door', wall: 'right', offset: -1.2, width: 1, height: 2.1, sill: 0, beyond: { kind: 'corridor', wallColor: '#b9b2a4', floorColor: '#6d6a66', lightColor: '#ffe7c2', lightIntensity: 1.6 } },
+    { id: 'dormitorio', type: 'door', wall: 'left', offset: 0.6, width: 0.9, height: 2.1, sill: 0, beyond: { kind: 'room', wallColor: '#5d6a86', floorColor: '#7d5f42', lightColor: '#8fa4ff', lightIntensity: 0.5 } }
   ],
   sky: { top: '#0b1020', bottom: '#1a2240' },
   lights: [
@@ -392,8 +392,8 @@ w('environments/piso-dani/environment.json', {
   props: [
     { id: 'isla', propId: 'isla-cocina', position: [-1.7, 0, -1.6], yawDeg: 0, scale: 1 },
     { id: 'mesa-comedor', propId: 'mesa-comedor', position: [1.0, 0, 0.2], yawDeg: 0, scale: 1 },
-    { id: 'silla-1', propId: 'silla', position: [0.3, 0, 0.2], yawDeg: 90, scale: 1 },
-    { id: 'silla-2', propId: 'silla', position: [1.7, 0, 0.2], yawDeg: -90, scale: 1 },
+    { id: 'silla-1', propId: 'silla', position: [-0.2, 0, 0.2], yawDeg: 90, scale: 1 },
+    { id: 'silla-2', propId: 'silla', position: [2.2, 0, 0.2], yawDeg: -90, scale: 1 },
     { id: 'lampara', propId: 'lampara-comedor', position: [1.0, 0, 0.2], yawDeg: 0, scale: 1 },
     { id: 'sofa', propId: 'sofa-piso', position: [2.6, 0, -2.4], yawDeg: -25, scale: 1 },
     { id: 'mesita', propId: 'mesa-baja', position: [2.3, 0, -1.4], yawDeg: -25, scale: 1 },
@@ -406,7 +406,7 @@ w('environments/piso-dani/environment.json', {
   ],
   decor: [
     { type: 'poster', wall: 'back', offset: -1.4, height: 1.6, color: '#2e6f9e', width: 0.9 },
-    { type: 'clock', wall: 'right', offset: -1.2, height: 2.2, color: '#2a2a2a', width: 0.3 },
+    { type: 'clock', wall: 'right', offset: 0.9, height: 2.2, color: '#2a2a2a', width: 0.3 },
     { type: 'poster', wall: 'left', offset: -1.6, height: 1.7, color: '#c96a3a', width: 0.6 }
   ],
   walkable: { min: [-3.4, -2.9], max: [3.4, 2.8] }

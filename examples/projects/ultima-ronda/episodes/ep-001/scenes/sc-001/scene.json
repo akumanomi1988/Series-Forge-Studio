@@ -238,7 +238,7 @@
       "joint": "leaf",
       "after": "v1",
       "offset": 0.15,
-      "toDeg": -95,
+      "toDeg": 95,
       "durationSec": 0.9,
       "sound": "door-creak"
     },

@@ -20,7 +20,10 @@
     "handSize": 1,
     "footSize": 1.02,
     "skinColor": "#e0b08c",
-    "skinGloss": 0.18
+    "skinGloss": 0,
+    "pecs": 0.45,
+    "glutes": 0.3,
+    "thighs": 0.35
   },
   "face": {
     "eyeSize": 1,
@@ -42,7 +45,7 @@
     "style": "sidepart",
     "color": "#2b2018",
     "volume": 1.05,
-    "shine": 0.45
+    "shine": 0
   },
   "beard": {
     "style": "stubble",
@@ -76,5 +79,5 @@
     }
   ],
   "parts": [],
-  "outlineWidth": 0.011
+  "outlineWidth": 0.007
 }

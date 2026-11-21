@@ -7,7 +7,7 @@
     "headWidth": 1.02,
     "jaw": 0.4,
     "shoulderWidth": 0.4,
-    "hipWidth": 0.4,
+    "hipWidth": 0.39,
     "torsoScale": 1,
     "legScale": 0.96,
     "armScale": 1,
@@ -15,12 +15,16 @@
     "legThickness": 0.078,
     "chestDepth": 0.25,
     "belly": 0.12,
-    "chest": 0.6,
+    "chest": 0.3,
     "neckLength": 0.07,
     "handSize": 0.95,
     "footSize": 0.92,
     "skinColor": "#efc2a2",
-    "skinGloss": 0.3
+    "skinGloss": 0,
+    "bust": 0.75,
+    "waist": 0.5,
+    "glutes": 0.8,
+    "thighs": 0.65
   },
   "face": {
     "eyeSize": 1.05,
@@ -42,7 +46,7 @@
     "style": "bob",
     "color": "#b8361e",
     "volume": 1.15,
-    "shine": 0.5
+    "shine": 0
   },
   "beard": {
     "style": "none"
@@ -76,5 +80,5 @@
     }
   ],
   "parts": [],
-  "outlineWidth": 0.011
+  "outlineWidth": 0.007
 }

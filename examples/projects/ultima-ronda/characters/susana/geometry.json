@@ -15,12 +15,16 @@
     "legThickness": 0.07,
     "chestDepth": 0.23,
     "belly": 0,
-    "chest": 0.62,
+    "chest": 0.3,
     "neckLength": 0.085,
     "handSize": 0.9,
     "footSize": 0.88,
     "skinColor": "#c99272",
-    "skinGloss": 0.4
+    "skinGloss": 0,
+    "bust": 0.85,
+    "waist": 0.75,
+    "glutes": 0.85,
+    "thighs": 0.6
   },
   "face": {
     "eyeSize": 1.12,
@@ -42,7 +46,7 @@
     "style": "long",
     "color": "#3b1a12",
     "volume": 1.25,
-    "shine": 0.75
+    "shine": 0
   },
   "beard": {
     "style": "none"
@@ -71,5 +75,5 @@
     }
   ],
   "parts": [],
-  "outlineWidth": 0.01
+  "outlineWidth": 0.007
 }

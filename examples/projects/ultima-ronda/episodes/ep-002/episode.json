@@ -28,15 +28,19 @@
     },
     "bumpers": {
       "music": "sirena-cortinilla",
-      "gainDb": -12,
+      "gainDb": -10,
       "durationSec": 4.2,
-      "leadSec": 0.35
+      "leadSec": 1.1
     },
     "ending": {
       "music": "sirena-tema",
       "gainDb": -12,
       "durationSec": 8,
       "fadeOut": 2.5
+    },
+    "sceneFade": {
+      "durationSec": 1.3,
+      "holdSec": 0.9
     }
   },
   "render": {

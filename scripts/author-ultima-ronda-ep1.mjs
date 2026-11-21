@@ -39,7 +39,7 @@ w('episode.json', {
   score: {
     theme: { music: 'sirena-tema', gainDb: -12, durationSec: 8, fadeOut: 3 },
     underscore: { music: 'sirena-cama', gainDb: -21 },
-    bumpers: { music: 'sirena-cortinilla', gainDb: -12, durationSec: 4.2, leadSec: 0.35 },
+    bumpers: { music: 'sirena-cortinilla', gainDb: -10, durationSec: 4.2, leadSec: 1.1 }, sceneFade: { durationSec: 1.3, holdSec: 0.9 },
     ending: { music: 'sirena-tema', gainDb: -12, durationSec: 7, fadeOut: 2 }
   },
   render: { width: 1920, height: 1080, fps: 24, sampleRate: 48000, loudnessLufs: -16 }, status: 'draft'
@@ -197,7 +197,7 @@ w('scenes/sc-001/scene.json', {
   actions: [
     ...shake({ at: 0.3 }),
     { id: 'mira-reloj', type: 'lookAt', actor: 'susana', at: 0.2, target: [-0.4, 2.5, -3.2], durationSec: 2.6 },
-    { id: 'puerta-abre', type: 'propJoint', prop: 'puerta', joint: 'leaf', after: 'v1', offset: 0.15, toDeg: -95, durationSec: 0.9, sound: 'door-creak' },
+    { id: 'puerta-abre', type: 'propJoint', prop: 'puerta', joint: 'leaf', after: 'v1', offset: 0.15, toDeg: 95, durationSec: 0.9, sound: 'door-creak' },
     { id: 'dani-entra', type: 'walk', actor: 'dani', with: 'puerta-abre', offset: 0.35, to: [0.2, 0, 0.35], faceTo: 'susana' },
     { id: 'puerta-cierra', type: 'propJoint', prop: 'puerta', joint: 'leaf', with: 'dani-entra', offset: 2.2, toDeg: 0, durationSec: 0.8, sound: 'click' },
     { id: 'susana-mira-dani', type: 'lookAt', actor: 'susana', with: 'puerta-abre', offset: 0.4, target: 'dani', durationSec: 2 },

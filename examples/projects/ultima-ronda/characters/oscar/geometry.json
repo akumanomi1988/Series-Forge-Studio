@@ -20,7 +20,10 @@
     "handSize": 1.05,
     "footSize": 1.05,
     "skinColor": "#a86b4a",
-    "skinGloss": 0.3
+    "skinGloss": 0,
+    "pecs": 0.45,
+    "glutes": 0.35,
+    "thighs": 0.45
   },
   "face": {
     "eyeSize": 0.95,
@@ -42,7 +45,7 @@
     "style": "spiky",
     "color": "#141414",
     "volume": 0.9,
-    "shine": 0.6
+    "shine": 0
   },
   "beard": {
     "style": "goatee",
@@ -52,7 +55,7 @@
     "top": {
       "type": "tshirt",
       "color": "#d35400",
-      "neckline": "v",
+      "neckline": "crew",
       "fabric": "matte"
     },
     "bottom": {
@@ -73,5 +76,5 @@
     }
   ],
   "parts": [],
-  "outlineWidth": 0.011
+  "outlineWidth": 0.007
 }

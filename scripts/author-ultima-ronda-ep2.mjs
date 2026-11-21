@@ -42,7 +42,7 @@ w('episode.json', {
   score: {
     theme: { music: 'sirena-tema', gainDb: -12, durationSec: 9, fadeOut: 3 },
     underscore: { music: 'sirena-cama', gainDb: -22 },
-    bumpers: { music: 'sirena-cortinilla', gainDb: -12, durationSec: 4.2, leadSec: 0.35 },
+    bumpers: { music: 'sirena-cortinilla', gainDb: -10, durationSec: 4.2, leadSec: 1.1 }, sceneFade: { durationSec: 1.3, holdSec: 0.9 },
     ending: { music: 'sirena-tema', gainDb: -12, durationSec: 8, fadeOut: 2.5 }
   },
   render: { width: 1920, height: 1080, fps: 24, sampleRate: 48000, loudnessLufs: -16 }, status: 'draft'
@@ -141,7 +141,7 @@ scene('sc-002', 'La técnica del espejo', 'Dani cocina el risotto de su abuela; 
   actions: [
     { id: 'remueve-1', type: 'play', actor: 'dani', at: 0.3, clip: 'point', target: 'olla', durationSec: 1.6 },
     { id: 'mira-olla', type: 'lookAt', actor: 'dani', at: 0.2, target: 'olla', durationSec: 2.6 },
-    { id: 'abre', type: 'propJoint', prop: 'puerta', joint: 'leaf', at: 1.6, toDeg: -95, durationSec: 0.8, sound: 'door-creak' },
+    { id: 'abre', type: 'propJoint', prop: 'puerta', joint: 'leaf', at: 1.6, toDeg: 95, durationSec: 0.8, sound: 'door-creak' },
     { id: 'oscar-entra', type: 'walk', actor: 'oscar', with: 'abre', offset: 0.3, to: [-0.45, 0, -2.2], faceTo: 'dani' },
     { id: 'cierra', type: 'propJoint', prop: 'puerta', joint: 'leaf', with: 'oscar-entra', offset: 1.8, toDeg: 0, durationSec: 0.8, sound: 'click' },
     { id: 'da-colonia', type: 'give', actor: 'oscar', after: 'o3', offset: -1.6, prop: 'colonia', to: 'dani', durationSec: 1.4 },
@@ -200,14 +200,14 @@ scene('sc-003', 'La de las lentejuelas', 'Susana se despide de Marga para ir a l
     { id: 'i-sale', with: 'lucia-sale', offset: 0.6, durationSec: 2.4, camera: BAR.wide }
   ],
   actions: [
-    { id: 'abre', type: 'propJoint', prop: 'puerta', joint: 'leaf', after: 'v0', offset: 0.1, toDeg: -95, durationSec: 0.8, sound: 'door-creak' },
+    { id: 'abre', type: 'propJoint', prop: 'puerta', joint: 'leaf', after: 'v0', offset: 0.1, toDeg: 95, durationSec: 0.8, sound: 'door-creak' },
     { id: 'lucia-entra', type: 'walk', actor: 'lucia', with: 'abre', offset: 0.3, to: [0.75, 0, -0.55], faceTo: 'marga' },
     { id: 'cierra', type: 'propJoint', prop: 'puerta', joint: 'leaf', with: 'lucia-entra', offset: 2.2, toDeg: 0, durationSec: 0.8, sound: 'click' },
     { id: 'susana-gira', type: 'turn', actor: 'susana', with: 'l1', offset: 0.2, towards: 'lucia', durationSec: 0.8 },
     { id: 'susana-frena', type: 'play', actor: 'susana', with: 'v3', clip: 'dismiss', durationSec: 1.1 },
     { id: 'marga-brazos', type: 'play', actor: 'marga', with: 'm4', clip: 'hands-on-hips', durationSec: 2.2 },
     { id: 'lucia-sale', type: 'walk', actor: 'lucia', after: 'l8', offset: 0.1, to: [5.0, 0, -1.2] },
-    { id: 'abre-2', type: 'propJoint', prop: 'puerta', joint: 'leaf', with: 'lucia-sale', offset: 1.4, toDeg: -95, durationSec: 0.6, sound: 'door-creak' },
+    { id: 'abre-2', type: 'propJoint', prop: 'puerta', joint: 'leaf', with: 'lucia-sale', offset: 1.4, toDeg: 95, durationSec: 0.6, sound: 'door-creak' },
     { id: 'cierra-2', type: 'propJoint', prop: 'puerta', joint: 'leaf', with: 'lucia-sale', offset: 3.4, toDeg: 0, durationSec: 0.6, sound: 'click' },
     { id: 'susana-vuelve', type: 'turn', actor: 'susana', after: 'l8', offset: 1.0, towards: 'marga', durationSec: 0.8 }
   ],
@@ -329,7 +329,7 @@ scene('sc-005', 'Crujiente', 'Óscar se esconde en el dormitorio; llega Susana; 
     { id: 'empuja', type: 'play', actor: 'dani', with: 'd0', clip: 'point', target: 'puerta-cuarto', durationSec: 1.5 },
     { id: 'oscar-huye', type: 'walk', actor: 'oscar', with: 'o0', offset: 0.8, to: [-4.6, 0, 0.6], gait: 'walk-brisk' },
     { id: 'dani-a-puerta', type: 'walk', actor: 'dani', after: 'oscar-huye', offset: -1.6, to: [2.9, 0, 1.0], faceTo: 'puerta' },
-    { id: 'abre', type: 'propJoint', prop: 'puerta', joint: 'leaf', after: 'dani-a-puerta', offset: 0.1, toDeg: -95, durationSec: 0.8, sound: 'door-creak' },
+    { id: 'abre', type: 'propJoint', prop: 'puerta', joint: 'leaf', after: 'dani-a-puerta', offset: 0.1, toDeg: 95, durationSec: 0.8, sound: 'door-creak' },
     { id: 'susana-entra', type: 'walk', actor: 'susana', with: 'abre', offset: 0.3, to: [2.35, 0, 1.35], faceTo: 'dani' },
     { id: 'cierra', type: 'propJoint', prop: 'puerta', joint: 'leaf', with: 'susana-entra', offset: 1.8, toDeg: 0, durationSec: 0.8, sound: 'click' },
     { id: 'susana-mira-olla', type: 'lookAt', actor: 'susana', with: 'v5', target: 'olla', durationSec: 1.6 },
@@ -342,8 +342,8 @@ scene('sc-005', 'Crujiente', 'Óscar se esconde en el dormitorio; llega Susana; 
     { id: 'pasion', type: 'effect', effect: 'glow', prop: 'altavoz', part: 'anillo', with: 'o2', offset: -0.6, until: 'd14', intensity: 1.5 },
     { id: 'dani-tapa', type: 'play', actor: 'dani', with: 'd12', clip: 'facepalm', durationSec: 1.6 },
     { id: 'timbre', type: 'effect', effect: 'flicker', prop: 'lampara', after: 'd13', offset: 0.2, durationSec: 0.15 },
-    { id: 'miran-puerta-v', type: 'lookAt', actor: 'susana', with: 'timbre', offset: 0.2, target: 'puerta', durationSec: 2.5 },
-    { id: 'miran-puerta-d', type: 'lookAt', actor: 'dani', with: 'timbre', offset: 0.3, target: 'puerta', durationSec: 2.0 }
+    { id: 'miran-puerta-v', type: 'lookAt', actor: 'susana', with: 'timbre', offset: 0.2, target: 'puerta', durationSec: 3.2 },
+    { id: 'miran-puerta-d', type: 'lookAt', actor: 'dani', with: 'timbre', offset: 0.3, target: 'puerta', durationSec: 3.2 }
   ],
   dialogue: [
     L('d0', 'dani', 'oscar', '¡Ya está aquí! ¡Al dormitorio!', 'fear', { at: 0.6, intensity: 1.2 }),
@@ -383,12 +383,12 @@ scene('sc-005', 'Crujiente', 'Óscar se esconde en el dormitorio; llega Susana; 
     L('d12', 'dani', 'susana', '«Noches de pasión, volumen tres».', 'sad'),
     L('v14', 'susana', 'dani', '¿Y el uno y el dos?', 'smirk', { intensity: 1.2 }),
     L('d13', 'dani', 'susana', 'Se quemaron. Como el risotto.', 'nervous'),
-    L('v15', 'susana', 'dani', '¿Esperas a alguien más?', 'surprise', { after: 'timbre', offset: 0.9 }),
+    L('v15', 'susana', 'dani', '¿Esperas a alguien más?', 'surprise', { after: 'timbre', offset: 2.0 }),
     L('d14', 'dani', 'susana', 'Espero que no.', 'fear', { pauseAfter: 0.3 })
   ],
   sound: [AMB_PISO,
     { id: 'balada', kind: 'music', sound: 'pasion-vol3', with: 'pasion', durationSec: 11, gainDb: -15, fadeIn: 0.3, fadeOut: 1.5, duck: true },
-    { id: 'ding', kind: 'sfx', sound: 'robot-beep', with: 'timbre', gainDb: -8 },
+    { id: 'ding', kind: 'sfx', sound: 'doorbell', with: 'timbre', gainDb: -6 },
     STING({ with: 'timbre', offset: 0.6 })]
 });
 
@@ -426,7 +426,7 @@ scene('sc-006', 'Todos los ex', 'Lucía irrumpe con champán; Óscar sale del do
     { id: 'dani-se-levanta', type: 'stand', actor: 'dani', at: 0.4, durationSec: 0.9 },
     { id: 'dani-a-puerta', type: 'walk', actor: 'dani', after: 'dani-se-levanta', to: [2.9, 0, 1.05], faceTo: 'puerta' },
     { id: 'susana-deja-copa', type: 'place', actor: 'susana', at: 0.6, prop: 'copa-2', on: ON_MESA(1.3, 0.48), durationSec: 1.0 },
-    { id: 'abre', type: 'propJoint', prop: 'puerta', joint: 'leaf', after: 'dani-a-puerta', offset: 0.1, toDeg: -95, durationSec: 0.8, sound: 'door-creak' },
+    { id: 'abre', type: 'propJoint', prop: 'puerta', joint: 'leaf', after: 'dani-a-puerta', offset: 0.1, toDeg: 95, durationSec: 0.8, sound: 'door-creak' },
     { id: 'lucia-entra', type: 'walk', actor: 'lucia', with: 'abre', offset: 0.3, to: [2.2, 0, 1.55], faceTo: 'dani' },
     { id: 'cierra-1', type: 'propJoint', prop: 'puerta', joint: 'leaf', with: 'lucia-entra', offset: 2.0, toDeg: 0, durationSec: 0.7, sound: 'click' },
     { id: 'dani-retrocede', type: 'walk', actor: 'dani', after: 'l1', offset: -0.5, to: [2.0, 0, 0.75], faceTo: 'lucia' },
@@ -435,7 +435,7 @@ scene('sc-006', 'Todos los ex', 'Lucía irrumpe con champán; Óscar sale del do
     { id: 'oscar-sale', type: 'walk', actor: 'oscar', after: 'l5', offset: 0.2, to: [-0.2, 0, 1.2], faceTo: 'lucia' },
     { id: 'abre-cuarto', type: 'propJoint', prop: 'puerta-cuarto', joint: 'leaf', with: 'oscar-sale', toDeg: 95, durationSec: 0.6, sound: 'door-creak' },
     { id: 'marga-entra', type: 'walk', actor: 'marga', after: 'o2', offset: 0.1, to: [3.15, 0, 0.55], faceTo: 'susana' },
-    { id: 'abre-2', type: 'propJoint', prop: 'puerta', joint: 'leaf', with: 'marga-entra', offset: -0.3, toDeg: -95, durationSec: 0.6, sound: 'door-creak' },
+    { id: 'abre-2', type: 'propJoint', prop: 'puerta', joint: 'leaf', with: 'marga-entra', offset: -0.3, toDeg: 95, durationSec: 0.6, sound: 'door-creak' },
     { id: 'cierra-2', type: 'propJoint', prop: 'puerta', joint: 'leaf', with: 'marga-entra', offset: 2.2, toDeg: 0, durationSec: 0.7, sound: 'click' },
     { id: 'marga-ve', type: 'lookAt', actor: 'marga', with: 'm1', offset: 1.4, target: 'oscar', durationSec: 3 },
     { id: 'marga-deja', type: 'place', actor: 'marga', after: 'm3', offset: 0.1, prop: 'tarta', on: ON_MESA(1.55, -0.12), durationSec: 1.0 },
@@ -445,9 +445,9 @@ scene('sc-006', 'Todos los ex', 'Lucía irrumpe con champán; Óscar sale del do
     { id: 'todos-dani-m', type: 'lookAt', actor: 'marga', with: 'l8', offset: 1.6, target: 'dani', durationSec: 3 },
     { id: 'todos-dani-o', type: 'lookAt', actor: 'oscar', with: 'l8', offset: 1.7, target: 'dani', durationSec: 3 },
     { id: 'salen-lucia', type: 'walk', actor: 'lucia', after: 'l10c', offset: 1.6, to: [4.8, 0, 1.2] },
-    { id: 'abre-3', type: 'propJoint', prop: 'puerta', joint: 'leaf', with: 'salen-lucia', offset: 0.8, toDeg: -95, durationSec: 0.6, sound: 'door-creak' },
+    { id: 'abre-3', type: 'propJoint', prop: 'puerta', joint: 'leaf', with: 'salen-lucia', offset: 0.8, toDeg: 95, durationSec: 0.6, sound: 'door-creak' },
     { id: 'cierra-3', type: 'propJoint', prop: 'puerta', joint: 'leaf', with: 'salen-lucia', offset: 2.8, toDeg: 0, durationSec: 0.6, sound: 'click' },
-    { id: 'abre-4', type: 'propJoint', prop: 'puerta', joint: 'leaf', with: 'oscar-tras', offset: 0.9, toDeg: -95, durationSec: 0.6, sound: 'door-creak' },
+    { id: 'abre-4', type: 'propJoint', prop: 'puerta', joint: 'leaf', with: 'oscar-tras', offset: 0.9, toDeg: 95, durationSec: 0.6, sound: 'door-creak' },
     { id: 'oscar-tras', type: 'walk', actor: 'oscar', after: 'm7', offset: 0.1, to: [4.9, 0, 1.5] },
     { id: 'marga-tras', type: 'walk', actor: 'marga', after: 'oscar-tras', offset: -1.6, to: [5.3, 0, 1.2] },
     { id: 'cierra', type: 'propJoint', prop: 'puerta', joint: 'leaf', after: 'marga-tras', offset: -0.2, toDeg: 0, durationSec: 0.8, sound: 'click' }
@@ -568,7 +568,7 @@ scene('sc-008', 'Veinte euros', 'A las dos menos cinco, Óscar vuelve al Sirena 
     { id: 'oscar-sienta', type: 'sit', actor: 'oscar', at: 0, prop: 'taburete-2', durationSec: 0.3 },
     { id: 'marga-coge', type: 'pickUp', actor: 'marga', after: 'o1', offset: 0.1, prop: 'colonia', hand: 'right', durationSec: 1.0 },
     { id: 'marga-mira', type: 'hold', actor: 'marga', after: 'marga-coge', hand: 'right', pose: 'show', durationSec: 0.5 },
-    { id: 'abre', type: 'propJoint', prop: 'puerta', joint: 'leaf', after: 'o5', offset: 0.1, toDeg: -95, durationSec: 0.8, sound: 'door-creak' },
+    { id: 'abre', type: 'propJoint', prop: 'puerta', joint: 'leaf', after: 'o5', offset: 0.1, toDeg: 95, durationSec: 0.8, sound: 'door-creak' },
     { id: 'susana-entra', type: 'walk', actor: 'susana', with: 'abre', offset: 0.3, to: [0.35, 0, 0.55], faceTo: 'marga' },
     { id: 'dani-entra', type: 'walk', actor: 'dani', with: 'abre', offset: 0.9, to: [1.05, 0, 0.35], faceTo: 'marga' },
     { id: 'cierra', type: 'propJoint', prop: 'puerta', joint: 'leaf', with: 'dani-entra', offset: 2.6, toDeg: 0, durationSec: 0.8, sound: 'click' }
