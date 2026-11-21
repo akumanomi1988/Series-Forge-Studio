@@ -11,11 +11,13 @@ import type { PropVisual } from './props.ts';
 import { buildEnvironment, updateEnvironmentLights } from './environment.ts';
 import type { EnvVisual } from './environment.ts';
 import { hash01, clamp, intervalWeight, smoothstep } from '../engine/math.ts';
+import { setRenderStyle } from './toon.ts';
 
 const COMPOSITE_VS = `varying vec2 vUv; void main(){ vUv = uv; gl_Position = vec4(position.xy, 0.0, 1.0); }`;
 const COMPOSITE_FS = `
 uniform sampler2D tA; uniform sampler2D tB; uniform float mode; uniform float progress; uniform float fade; uniform float aspect; uniform float vignette;
 uniform sampler2D tN; uniform sampler2D tD; uniform float ink; uniform vec2 texel; uniform float cNear; uniform float cFar;
+uniform float ao; uniform float focal; uniform float tone; uniform float exposure; uniform float sat;
 varying vec2 vUv;
 float linZ(vec2 uv) { float d = texture2D(tD, uv).x; return cNear * cFar / (cFar - d * (cFar - cNear)); }
 /** Fine toon ink: contours where depth jumps (silhouettes, an arm over the body) or the surface turns sharply
@@ -34,8 +36,25 @@ float inkAt(vec2 uv) {
   }
   return e;
 }
+/** Screen-space ambient occlusion from the depth of the same frame: 16 samples on a spiral of 0.3 m (projected),
+ * occluders closer than the centre and within range darken it. Soft contact shadows under chins, arms, furniture. */
+float aoAt(vec2 uv) {
+  float zc = linZ(uv); if (zc > cFar * 0.9) return 1.0;
+  float rUv = 0.3 * focal / zc; float occ = 0.0;
+  for (int i = 0; i < 16; i++) {
+    float f = (float(i) + 0.5) / 16.0, a = float(i) * 2.39996;
+    vec2 o = vec2(cos(a) / aspect, sin(a)) * rUv * sqrt(f);
+    float zs = linZ(uv + o), d = zc - zs;
+    occ += smoothstep(0.02, 0.12, d) * (1.0 - smoothstep(0.35, 0.8, d));
+  }
+  return 1.0 - occ / 16.0;
+}
+vec3 aces(vec3 x) { return clamp((x * (2.51 * x + 0.03)) / (x * (2.43 * x + 0.59) + 0.14), 0.0, 1.0); }
 void main(){
   vec4 b = texture2D(tB, vUv);
+  if (ao > 0.0) b.rgb *= mix(1.0, aoAt(vUv), ao);
+  if (tone > 0.5) b.rgb = aces(b.rgb * exposure);
+  if (sat < 1.0) { float l = dot(b.rgb, vec3(0.299, 0.587, 0.114)); b.rgb = mix(vec3(l), b.rgb, sat) * (0.9 + 0.1 * sat); }
   if (ink > 0.0) b.rgb = mix(b.rgb, b.rgb * 0.12 + vec3(0.02, 0.02, 0.035), inkAt(vUv) * ink);
   vec4 c = b;
   if (mode > 0.5 && mode < 1.5) { c = mix(texture2D(tA, vUv), b, smoothstep(0.0, 1.0, progress)); }
@@ -87,7 +106,7 @@ export class Stage {
     this.rtN = new THREE.WebGLRenderTarget(opts.width, opts.height, { samples: 0 });
     this.rtN.depthTexture = new THREE.DepthTexture(opts.width, opts.height);
     const px = Math.max(1, opts.height / 1080 * 1.4);
-    this.composite = new THREE.ShaderMaterial({ vertexShader: COMPOSITE_VS, fragmentShader: COMPOSITE_FS, uniforms: { tA: { value: this.rtA.texture }, tB: { value: this.rtB.texture }, mode: { value: 0 }, progress: { value: 1 }, fade: { value: 1 }, aspect: { value: opts.width / opts.height }, vignette: { value: this.vignette }, tN: { value: this.rtN.texture }, tD: { value: this.rtN.depthTexture }, ink: { value: this.ink }, texel: { value: new THREE.Vector2(px / opts.width, px / opts.height) }, cNear: { value: 0.05 }, cFar: { value: 200 } }, depthTest: false, depthWrite: false });
+    this.composite = new THREE.ShaderMaterial({ vertexShader: COMPOSITE_VS, fragmentShader: COMPOSITE_FS, uniforms: { tA: { value: this.rtA.texture }, tB: { value: this.rtB.texture }, mode: { value: 0 }, progress: { value: 1 }, fade: { value: 1 }, aspect: { value: opts.width / opts.height }, vignette: { value: this.vignette }, tN: { value: this.rtN.texture }, tD: { value: this.rtN.depthTexture }, ink: { value: this.ink }, ao: { value: 0 }, focal: { value: 1 }, tone: { value: 0 }, exposure: { value: 1 }, sat: { value: 1 }, texel: { value: new THREE.Vector2(px / opts.width, px / opts.height) }, cNear: { value: 0.05 }, cFar: { value: 200 } }, depthTest: false, depthWrite: false });
     this.renderer.shadowMap.autoUpdate = false;
     this.quadScene.add(new THREE.Mesh(new THREE.PlaneGeometry(2, 2), this.composite));
     this.scene.add(this.world);
@@ -103,14 +122,23 @@ export class Stage {
     this.scene.remove(this.world); this.world = new THREE.Group(); this.scene.add(this.world);
     this.actors.clear(); this.props.clear(); this.effects = []; this.env = null; this.evaluator = null; this.resolved = null; this.scene.fog = null;
   }
+  /** 'soft': stylised 3D (no ink, ambient occlusion, filmic tone mapping, soft shadows); 'toon': cel + ink */
+  style: 'toon' | 'soft' = 'toon';
   load(resolved: ResolvedScene, lib: AssetLibrary) {
     this.clear();
+    this.style = lib.style ?? 'toon';
+    setRenderStyle(this.style);
+    const soft = this.style === 'soft';
+    this.ink = soft ? 0 : 0.9;
+    this.renderer.shadowMap.type = soft ? THREE.VSMShadowMap : THREE.PCFSoftShadowMap;
+    this.composite.uniforms.ao.value = soft ? 0.85 : 0; this.composite.uniforms.tone.value = soft ? 1 : 0; this.composite.uniforms.exposure.value = soft ? 1.25 : 1;
     this.resolved = resolved;
     this.evaluator = new SceneEvaluator(resolved, lib);
     const envDef = resolved.environmentId ? lib.environments[resolved.environmentId] : null;
     if (envDef) {
       const placed = resolved.props.flatMap(p => { const g = p.segments[0]; return g.kind === 'static' && lib.props[p.propId] ? [{ id: p.id, geo: lib.props[p.propId], position: g.position, yawDeg: g.yawDeg, scale: p.scale }] : []; });
       this.env = buildEnvironment(envDef, placed); this.world.add(this.env.group);
+      if (soft) this.env.group.traverse(o => { const l = o as THREE.DirectionalLight; if (l.isLight && l.castShadow && l.shadow) { l.shadow.radius = 3; l.shadow.blurSamples = 12; l.shadow.bias = -0.0006; } });
       this.scene.background = this.env.background; this.scene.fog = (this.env.group.userData.fog as THREE.Fog) ?? null;
     } else { this.scene.background = new THREE.Color('#2a3442'); const env = buildEnvironment({ schemaVersion: 2, kind: 'exterior', size: [12, 4, 12], floor: { color: '#4b5866', pattern: 'tiles' }, walls: { color: '#3d5266', trimColor: '#2a3a48', sides: [], panel: false }, openings: [], sky: { top: '#1d2b3c', bottom: '#2a3442' }, lights: [], ambient: { sky: '#dfe9ff', ground: '#3a4250', intensity: 1.4 }, props: [], decor: [] }); this.env = env; this.world.add(env.group); }
     for (const a of resolved.actors) {
@@ -193,7 +221,11 @@ export class Stage {
   setTime(t: number): ShotEval | null {
     const ev = this.evaluator, sc = this.resolved;
     if (!ev || !sc) return null;
-    const time = clamp(t, 0, sc.durationSec);
+    const real = clamp(t, 0, sc.durationSec);
+    // freeze frame: picture (poses, props, camera) held at the start of the effect while the sound goes on
+    const frz = sc.effects.find(e => e.effect === 'freeze' && real >= e.start && real < e.end);
+    const time = frz ? frz.start : real;
+    this.composite.uniforms.sat.value = frz ? 1 - 0.45 * clamp((real - frz.start) / 0.25, 0, 1) : 1;
     // camera first so look-at "camera" targets are exact
     const shot = evaluateShots(ev, sc, time, this.width / this.height);
     ev.cameraPos.copy((this.freeCamera ?? shot.camera).position);
@@ -217,7 +249,7 @@ export class Stage {
       mode = { dissolve: 1, fade: 2, iris: 3, wipe: 4 }[shot.transition.type];
       if ((mode === 1 || mode === 4) && shot.transition.previous) this.applyCamera(this.prevCamera, shot.transition.previous); else if (mode === 1 || mode === 4) mode = 0;
     }
-    if (!this.freeCamera && sc.transitionOut?.type === 'fade') fade = smoothstep((sc.durationSec - time) / Math.max(0.01, sc.transitionOut.durationSec));
+    if (!this.freeCamera && sc.transitionOut?.type === 'fade') fade = smoothstep((sc.durationSec - real) / Math.max(0.01, sc.transitionOut.durationSec));
     this.composite.uniforms.mode.value = mode; this.composite.uniforms.progress.value = progress; this.composite.uniforms.fade.value = fade; this.composite.uniforms.vignette.value = this.vignette;
     return shot;
   }
@@ -230,7 +262,7 @@ export class Stage {
     r.shadowMap.needsUpdate = true;
     if (mode === 1 || mode === 4) { r.setRenderTarget(this.rtA); r.render(this.scene, this.prevCamera); }
     r.setRenderTarget(this.rtB); r.render(this.scene, this.camera);
-    if (this.ink > 0) this.renderNormals();
+    if (this.ink > 0 || this.style === 'soft') this.renderNormals();
     this.composite.uniforms.ink.value = this.ink;
     r.setRenderTarget(null); r.render(this.quadScene, this.quadCam);
   }
@@ -248,6 +280,7 @@ export class Stage {
     this.scene.overrideMaterial = null; this.scene.background = bg; this.scene.fog = fog;
     for (const o of hidden) o.visible = true;
     this.composite.uniforms.cNear.value = this.camera.near; this.composite.uniforms.cFar.value = this.camera.far;
+    this.composite.uniforms.focal.value = 0.5 / Math.tan((this.camera.fov * Math.PI) / 360);
   }
   /** Debug/QA info for the current frame. */
   info() { return { renderer: this.renderer.getContext().getParameter(this.renderer.getContext().RENDERER), calls: this.renderer.info.render.calls, triangles: this.renderer.info.render.triangles }; }

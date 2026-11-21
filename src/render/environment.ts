@@ -1,7 +1,7 @@
 /** Procedural toon environments (rooms and exteriors) from environment.json v2. */
 import * as THREE from 'three';
 import type { EnvironmentV2 } from '../engine/schema.ts';
-import { toon, withOutline, shade } from './toon.ts';
+import { toon, withOutline, shade, renderStyle } from './toon.ts';
 import { noise1 } from '../engine/math.ts';
 import { wallOpenings, beyondOf, beyondArea, WALL_T } from '../engine/layout.ts';
 import type { PlacedProp, Opening, Beyond } from '../engine/layout.ts';
@@ -33,7 +33,7 @@ export function buildEnvironment(env: EnvironmentV2, placed: PlacedProp[] = []):
   // floor
   const tex = floorTexture(env);
   if (tex) tex.repeat.set(W / 1.2, D / 1.2);
-  const floorMat = new THREE.MeshToonMaterial({ color: tex ? '#ffffff' : env.floor.color, map: tex ?? null, gradientMap: (toon('#fff') as THREE.MeshToonMaterial).gradientMap });
+  const floorMat = renderStyle() === 'soft' ? new THREE.MeshStandardMaterial({ color: tex ? '#ffffff' : env.floor.color, map: tex ?? null, roughness: 0.62, metalness: 0 }) : new THREE.MeshToonMaterial({ color: tex ? '#ffffff' : env.floor.color, map: tex ?? null, gradientMap: (toon('#fff') as THREE.MeshToonMaterial).gradientMap });
   const extent = env.kind === 'exterior' ? 4 : 1;
   const floor = new THREE.Mesh(new THREE.PlaneGeometry(W * extent, D * extent), floorMat);
   floor.rotation.x = -Math.PI / 2; floor.receiveShadow = true; floor.name = 'floor';

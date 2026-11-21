@@ -205,7 +205,8 @@ export class CharacterVisual {
     const waistY = (hipsY + spineY) / 2 + 0.03 * s;
     const coat = ['jacket', 'hoodie', 'labcoat'].includes(top.type) ? 1.07 : 1;
     const belly = b.belly * 0.07 * s;
-    const torsoColor = (y: number) => (top.type === 'overalls' ? (y < chestY + 0.02 * s ? pants : under) : top.type === 'dress' ? topColor : y < waistY - 0.015 * s ? (top.type === 'labcoat' ? topColor : pants) : top.type === 'vest' ? topColor : topColor);
+    const band = bottom.waistband ?? (top.type === 'dress' && bottom.fit === 'skater' ? shade(topColor, 0.72) : undefined);
+    const torsoColor = (y: number) => (top.type === 'overalls' ? (y < chestY + 0.02 * s ? pants : under) : top.type === 'dress' ? (band && Math.abs(y - (spineY + 0.025 * s)) < 0.014 * s ? band : topColor) : y < waistY - 0.015 * s ? (top.type === 'labcoat' ? topColor : pants) : top.type === 'vest' ? topColor : topColor);
     const tw = (y: number): W => {
       if (y < spineY - 0.04 * s) return [['hips', 1]];
       if (y < spineY + 0.04 * s) { const u = (y - (spineY - 0.04 * s)) / (0.08 * s); return [['hips', 1 - u], ['spine', u]]; }
@@ -356,13 +357,16 @@ export class CharacterVisual {
       const color = bottom.type === 'skirt' ? pants : topColor;
       const len = top.type === 'labcoat' ? d.legLen * 0.62 : bottom.type === 'skirt' ? d.legLen * 0.42 : d.legLen * 0.5;
       const y0 = waistY - 0.012 * s;
-      this.clothShell(top.type === 'labcoat' ? 'coat-tails' : 'skirt', y0, y0 - len, color, top.type === 'labcoat' ? { flare: 0.05, arc: [0.3, Math.PI * 2 - 0.3], legBlend: 0.35, foldAmp: 0.004 } : { flare: top.type === 'dress' ? 0.14 : 0.1, legBlend: 0.7 });
+      const fit = bottom.fit;
+      // a skater skirt starts at the natural waist (above the hips) and flares as a cone
+      const ys = fit === 'skater' ? spineY + 0.012 * s : y0;
+      this.clothShell(top.type === 'labcoat' ? 'coat-tails' : 'skirt', ys, y0 - len, color, top.type === 'labcoat' ? { flare: 0.05, arc: [0.3, Math.PI * 2 - 0.3], legBlend: 0.35, foldAmp: 0.004 } : fit === 'skater' ? { cone: 0.42, legBlend: 0.45, foldAmp: 0.01, folds: 13 } : { flare: fit === 'fitted' ? 0.03 : top.type === 'dress' ? 0.14 : 0.1, legBlend: 0.7 });
     }
   }
   /** A cloth surface that wraps the body from `y0` down to `y1` (skirt, dress, coat tails, apron): it starts on the
    * torso's own contour, hangs from the widest point of the hips/glutes, flares, gets folds towards the hem and is
    * skinned to the hips and, progressively, to the thighs, so it moves with the legs instead of floating. */
-  private clothShell(name: string, y0: number, y1: number, color: string, o: { flare?: number; arc?: [number, number]; offset?: number; legBlend?: number; folds?: number; foldAmp?: number }) {
+  private clothShell(name: string, y0: number, y1: number, color: string, o: { flare?: number; arc?: [number, number]; offset?: number; legBlend?: number; folds?: number; foldAmp?: number; /** flare as a cone from the top ring (m per m), never inside the body */ cone?: number }) {
     const d = this.d, s = d.scale, b = this.geo.body;
     const hipsY = this.boneWorldY('hips').y, torsoBottom = hipsY - 0.11 * s;
     const th = this.boneWorldY('leftThigh'), kn = this.boneWorldY('leftShin');
@@ -387,6 +391,11 @@ export class CharacterVisual {
       const fold = (o.foldAmp ?? 0.007) * s * Math.max(0, (u - 0.25) / 0.75);
       // the cloth covers the glutes with their own shape (never less than the body under it) and partly bridges the cleft
       rings.push({ y, rx: rxW + off + fl, rz: rzW + off + fl * 0.8, rzb: rzbW + glW * 0.4 + off + fl * 0.5, glute: glW * 1.04, bust, bw: this.torsoAt(y).bw, x: 0, z: 0, color, w: y > hipsY - 0.02 * s ? this.torsoW(y) : [['hips', 1]], legBlend: (o.legBlend ?? 0.55) * smoothstep(clamp((hipsY - 0.1 * s - y) / Math.max(0.05, len * 0.7), 0, 1)), fold, folds: o.folds ?? 11 });
+      if (o.cone && i > 0) {
+        const r0 = rings[0], last = rings[rings.length - 1], dy = y0 - y;
+        last.rx = Math.max(rx + off, r0.rx + o.cone * dy); last.rz = Math.max(rz + off, r0.rz + o.cone * 0.8 * dy);
+        last.rzb = Math.max(rzb + glute * 1.15 + off, ringVal(r0, 'rzb') + o.cone * 0.9 * dy); last.glute = 0; last.bust = 0;
+      }
     }
     // relax the profile along the length (the max() above leaves small kinks that toon shading would show)
     for (let pass = 0; pass < 3; pass++) for (const k of ['rx', 'rz', 'rzb'] as const) { const v = rings.map(r => r[k] ?? r.rz); for (let i = 1; i < rings.length - 1; i++) if (rings[i].y < hipsY) rings[i][k] = 0.25 * v[i - 1] + 0.5 * v[i] + 0.25 * v[i + 1]; }
@@ -403,7 +412,7 @@ export class CharacterVisual {
     mesh.bind(skeleton, new THREE.Matrix4());
     this.rig.group.add(mesh);
     withOutline(mesh, this.geo.outlineWidth * this.d.scale);
-    (mesh.children[0] as THREE.Object3D).frustumCulled = false;
+    if (mesh.children[0]) mesh.children[0].frustumCulled = false;
   }
 
   private buildHead() {
@@ -652,6 +661,13 @@ export class CharacterVisual {
       cap.position.set(0, -tl.y - ah * 0.42, 0.02 * s);
       toe.add(withOutline(cap, 0.006 * s));
       const toeSole = new THREE.Mesh(roundedBox(d.legR * 1.6, ah * 0.28, fl * 0.3), toon(sole)); toeSole.position.set(0, -tl.y - ah * 0.86, 0.03 * s); toe.add(toeSole);
+      if (sh.type === 'heels') {
+        // slim pump: lower, narrower shell, a thin stiletto under the heel and an ankle strap
+        heel.scale.set(d.legR * 0.62, ah * 0.4, fl * 0.4); heel.position.set(0, -ah * 0.5, fl * 0.06);
+        soleM.scale.set(0.62, 0.4, 0.95); cap.scale.set(d.legR * 0.58, ah * 0.28, fl * 0.3);
+        const post = new THREE.Mesh(new THREE.CylinderGeometry(0.007 * s, 0.011 * s, ah * 0.78, 10), toon(sh.color)); post.position.set(0, -ah * 0.6, -fl * 0.13); foot.add(post);
+        const strap = new THREE.Mesh(new THREE.TorusGeometry(d.legR * 0.62, 0.006 * s, 6, 20), toon(sh.color)); strap.rotation.x = Math.PI / 2; strap.position.set(0, ah * 0.05, 0.005 * s); foot.add(strap);
+      }
       if (sh.type === 'boots') { const cuff = new THREE.Mesh(new THREE.CylinderGeometry(d.legR * 0.95, d.legR * 0.9, ah * 0.9, 28), toon(sh.color)); cuff.position.y = ah * 0.25; foot.add(withOutline(cuff, 0.005 * s)); }
       if (sh.type === 'sneakers') { const lace = new THREE.Mesh(new THREE.BoxGeometry(d.legR * 0.7, 0.008 * s, fl * 0.25), toon('#f2f2ee')); lace.position.set(0, ah * 0.22, fl * 0.2); lace.rotation.x = 0.35; foot.add(lace); }
     }

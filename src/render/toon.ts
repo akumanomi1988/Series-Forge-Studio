@@ -12,13 +12,19 @@ export function toonGradient(): THREE.DataTexture {
   return gradient;
 }
 const cache = new Map<string, THREE.Material>();
+/** 'toon': cel bands + ink outlines. 'soft': stylised 3D (physically based diffuse, soft shadows, ambient occlusion,
+ * no outlines), the look of modern low-poly animation. Set by the stage from the project before building a scene. */
+export type RenderStyle = 'toon' | 'soft';
+let STYLE: RenderStyle = 'toon';
+export function setRenderStyle(s: RenderStyle | undefined): void { STYLE = s ?? 'toon'; }
+export function renderStyle(): RenderStyle { return STYLE; }
 /** Neckline drawn per pixel on the torso (crisp anti-aliased edge at any distance). The torso carries a "neck"
  * attribute (sin a, cos a, depth below the neck base); the shader paints skin inside the neckline shape. */
 export interface NecklineSpec { kind: 'v' | 'scoop' | 'plunge' | 'off-shoulder'; depth: number; offDepth: number; scale: number; skin: string; skinGloss: number; cleavage: boolean }
 const NECK_KIND = { v: 1, scoop: 2, plunge: 3, 'off-shoulder': 4 } as const;
 /** Cel-shaded specular: a hard-edged highlight (Blinn-Phong thresholded into one band) from every directional, point
  * and spot light, plus a fresnel rim sheen. Strength comes from a uniform or from a per-vertex "gloss" attribute. */
-function addGloss(m: THREE.MeshToonMaterial, gloss: number, perVertex: boolean, shininess: number, neck?: NecklineSpec) {
+function addGloss(m: THREE.MeshToonMaterial | THREE.MeshStandardMaterial, gloss: number, perVertex: boolean, shininess: number, neck?: NecklineSpec) {
   m.onBeforeCompile = shader => {
     shader.uniforms.sfGloss = { value: gloss }; shader.uniforms.sfShininess = { value: shininess };
     if (neck) Object.assign(shader.uniforms, {
@@ -66,10 +72,12 @@ float sfNeckMask(out float shadow) {
   m.customProgramCacheKey = () => `sfgloss|${perVertex}|${neck ? 'neck' : ''}`;
 }
 export function toon(color: string | number, opts: { vertexColors?: boolean; emissive?: string; emissiveIntensity?: number; transparent?: boolean; opacity?: number; side?: THREE.Side; gloss?: number; glossAttr?: boolean; shininess?: number; neckline?: NecklineSpec } = {}): THREE.MeshToonMaterial {
-  const key = JSON.stringify([color, opts]);
+  const key = JSON.stringify([STYLE, color, opts]);
   const hit = cache.get(key);
   if (hit) return hit as THREE.MeshToonMaterial;
-  const m = new THREE.MeshToonMaterial({ color: new THREE.Color(color), gradientMap: toonGradient(), vertexColors: !!opts.vertexColors, transparent: !!opts.transparent, opacity: opts.opacity ?? 1, side: opts.side ?? THREE.FrontSide });
+  const base = { color: new THREE.Color(color), vertexColors: !!opts.vertexColors, transparent: !!opts.transparent, opacity: opts.opacity ?? 1, side: opts.side ?? THREE.FrontSide };
+  // the soft style keeps the same API (callers treat it as a toon material: color, emissive, opacity)
+  const m = (STYLE === 'soft' ? new THREE.MeshStandardMaterial({ ...base, roughness: 0.78, metalness: 0 }) : new THREE.MeshToonMaterial({ ...base, gradientMap: toonGradient() })) as unknown as THREE.MeshToonMaterial;
   if (opts.emissive) { m.emissive = new THREE.Color(opts.emissive); m.emissiveIntensity = opts.emissiveIntensity ?? 1; }
   if (opts.glossAttr || (opts.gloss ?? 0) > 0 || opts.neckline) addGloss(m, opts.gloss ?? 0, !!opts.glossAttr, opts.shininess ?? 40, opts.neckline);
   cache.set(key, m);
@@ -94,7 +102,7 @@ export function outlineMaterial(width: number, color = '#1a1d26'): THREE.MeshBas
 }
 /** Adds an outline twin to a mesh (shares geometry; skinned meshes share the skeleton). */
 export function withOutline<T extends THREE.Mesh>(mesh: T, width: number, color?: string): T {
-  if (width <= 0) return mesh;
+  if (width <= 0 || STYLE === 'soft') return mesh;
   let twin: THREE.Mesh;
   if ((mesh as unknown as THREE.SkinnedMesh).isSkinnedMesh) {
     const sm = mesh as unknown as THREE.SkinnedMesh;
