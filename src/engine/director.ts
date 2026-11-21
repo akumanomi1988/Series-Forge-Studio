@@ -4,9 +4,11 @@
 import { angleDiff, clamp, dist2D, hash01, rotateY, yawTowards, lerp } from './math.ts';
 import type { Vec3 } from './math.ts';
 import { humanoidDims } from './humanoid.ts';
-import { SceneEvaluator, DEFAULT_WALK, walkProfile } from './pose.ts';
+import { SceneEvaluator, DEFAULT_WALK, walkProfile, rootAt } from './pose.ts';
 import type { Action, DialogueLine, SceneV2, Locomotion, PropGeometry, Shot, SoundEvent } from './schema.ts';
 import { CameraSchema } from './schema.ts';
+import { wallOpenings, walkableAreas, footprint, buildNav, findPath, polyLength, polyAt, rectDistance } from './layout.ts';
+import type { PlacedProp, Rect } from './layout.ts';
 import type { ActorTimeline, AssetLibrary, AudioCue, EffectInstance, HandInstance, PropTimeline, ResolvedScene, ResolvedShot, TargetRef, Step } from './timeline.ts';
 
 export interface SpeechInfo { duration: number; visemes: [number, string][]; file?: string; estimated?: boolean }
@@ -104,40 +106,59 @@ export function compileScene(scene: SceneV2, lib: AssetLibrary, opts: DirectorOp
     }
     return end;
   }
-  function planWalk(id: string, start: number, dest: Vec3, gaitName?: string, speedOverride?: number): number {
+  function planWalk(id: string, start: number, dest: Vec3, gaitName?: string, speedOverride?: number, route?: Vec3[]): number {
     let r = rootState(id);
-    const D = dist2D(r.from, dest);
+    const path: Vec3[] = route && route.length > 2 ? route.map(p => [p[0], 0, p[2]] as Vec3) : [[r.from[0], 0, r.from[2]], [dest[0], 0, dest[2]]];
+    path[0] = [r.from[0], 0, r.from[2]];
+    const D = polyLength(path);
     if (D < 0.05) return start;
-    const pathYaw = yawTowards(r.from, dest);
+    const d0 = polyAt(path, Math.min(D, 0.3)).dir, d1 = polyAt(path, Math.max(0, D - 0.05)).dir;
+    const pathYaw = Math.atan2(d0[0], d0[1]) * 180 / Math.PI, endYawRaw = Math.atan2(d1[0], d1[1]) * 180 / Math.PI;
     let t0 = start;
-    if (Math.abs(angleDiff(r.yawFrom, pathYaw)) > 30) t0 = planTurn(id, start, pathYaw, clamp(0.25 + Math.abs(angleDiff(r.yawFrom, pathYaw)) / 360, 0.3, 0.9));
+    // a small change of heading is taken while walking; a big one is a turn on the spot first
+    if (Math.abs(angleDiff(r.yawFrom, pathYaw)) > 55) t0 = planTurn(id, start, pathYaw, clamp(0.25 + Math.abs(angleDiff(r.yawFrom, pathYaw)) / 360, 0.3, 0.9));
     r = rootState(id);
     const g = gaitOf(id, gaitName);
     const speed = speedOverride ?? g.speed;
-    const T = D / (speed * 0.8);
+    const T = D / (speed * 0.8) + (path.length > 2 ? 0.15 * Math.min(4, path.length / 5) : 0);
     const end = t0 + T;
     const yaw = r.yawFrom + angleDiff(r.yawFrom, pathYaw);
+    const yawEnd = yaw + angleDiff(yaw, path.length > 2 ? endYawRaw : pathYaw);
     r.end = t0;
-    actor(id).root.push({ start: t0, end, kind: 'walk', from: r.from, to: [dest[0], 0, dest[2]], yawFrom: yaw, yawTo: yaw, gait: g });
-    actor(id).root.push({ start: end, end: INF, kind: 'hold', from: [dest[0], 0, dest[2]], to: [dest[0], 0, dest[2]], yawFrom: yaw, yawTo: yaw });
+    actor(id).root.push({ start: t0, end, kind: 'walk', from: r.from, to: [dest[0], 0, dest[2]], yawFrom: yaw, yawTo: yawEnd, gait: g, path: path.length > 2 ? path : undefined });
+    actor(id).root.push({ start: end, end: INF, kind: 'hold', from: [dest[0], 0, dest[2]], to: [dest[0], 0, dest[2]], yawFrom: yawEnd, yawTo: yawEnd });
     const dims = dimsOf(id);
     const h = 0.72 * dims.scale * g.strideScale * Math.min(1.25, speed / 1.25) ** 0.35;
     const N = Math.max(2, Math.round(D / h) + 1);
-    const dir: Vec3 = [(dest[0] - r.from[0]) / D, 0, (dest[2] - r.from[2]) / D];
-    // first foot: the one on the outer side of a previous turn, else left
     let foot: 'left' | 'right' = hash01(id, start) > 0.5 ? 'left' : 'right';
     for (let k = 0; k < N; k++) {
       const ts = t0 + k * T / N, te = t0 + (k + 1) * T / N;
-      const off = rotateY([(foot === 'left' ? 1 : -1) * dims.hipHalf, 0, 0], yaw);
-      let to: Vec3;
-      if (k >= N - 2) to = [dest[0] + off[0], 0, dest[2] + off[2]];
-      else { const u = walkProfile((te - t0) / T); const bx = lerp(r.from[0], dest[0], u), bz = lerp(r.from[2], dest[2], u); to = [bx + dir[0] * h * 0.5 + off[0], 0, bz + dir[2] * h * 0.5 + off[2]]; }
+      let to: Vec3, fy: number;
+      if (k >= N - 2) { fy = yawEnd; const off = rotateY([(foot === 'left' ? 1 : -1) * dims.hipHalf, 0, 0], fy); to = [dest[0] + off[0], 0, dest[2] + off[2]]; }
+      else {
+        const sArc = Math.min(D, walkProfile((te - t0) / T) * D + h * 0.5), at = polyAt(path, sArc);
+        fy = yaw + angleDiff(yaw, Math.atan2(at.dir[0], at.dir[1]) * 180 / Math.PI);
+        const off = rotateY([(foot === 'left' ? 1 : -1) * dims.hipHalf, 0, 0], fy);
+        to = [at.pos[0] + off[0], 0, at.pos[2] + off[2]];
+      }
       const from = lastPlant(id, foot);
-      actor(id).steps.push({ foot, start: ts, end: te, from: from.pos, to, yawFrom: from.yaw, yawTo: yaw, lift: g.stepHeight * dims.scale });
+      actor(id).steps.push({ foot, start: ts, end: te, from: from.pos, to, yawFrom: from.yaw, yawTo: fy, lift: g.stepHeight * dims.scale });
       sfx('footstep', te - 0.02, g.gait === 'run' ? -14 : g.gait === 'sneak' ? -28 : -19, { actor: id, pan: clamp(to[0] / 6, -0.8, 0.8) });
       foot = foot === 'left' ? 'right' : 'left';
     }
     return end;
+  }
+  // ---------------- set layout: walls with door holes, walkable areas, furniture footprints
+  const placedAt = (t: number, exclude: string[] = []): PlacedProp[] => props.filter(p => !exclude.includes(p.id)).flatMap(p => {
+    let seg = p.segments[0]; for (const g of p.segments) if (g.start <= t) seg = g;
+    return seg.kind === 'static' ? [{ id: p.id, geo: lib.props[p.propId], position: seg.position, yawDeg: seg.yawDeg, scale: p.scale }] : [];
+  });
+  const openings = env ? wallOpenings(env, placedAt(0)) : [];
+  const areas = walkableAreas(env ?? null, openings);
+  const BODY_R = 0.2;
+  const rectsAt = (t: number, exclude: string[] = []) => placedAt(t, exclude).map(footprint).filter((r): r is Rect => !!r);
+  function navFor(self: string, t: number, exclude: string[] = []) {
+    return buildNav(areas, rectsAt(t, exclude), othersAt(self, t).map(o => ({ x: o[0], z: o[2], r: 0.2 })), BODY_R);
   }
   /** Other actors' ground positions at time t (planning view). */
   function othersAt(self: string, t: number): Vec3[] { return actors.filter(a => a.id !== self).map(a => { let seg = a.root[0]; for (const s of a.root) if (s.start <= t) seg = s; return seg.kind === 'walk' ? seg.to : seg.from; }); }
@@ -161,17 +182,13 @@ export function compileScene(scene: SceneV2, lib: AssetLibrary, opts: DirectorOp
     }
     return p;
   }
-  /** Straight walk, or two legs around the first actor blocking the path. */
-  function walkAround(id: string, start: number, dest: Vec3, gait?: string, speed?: number): number {
+  /** Walk along the shortest free route (around furniture, walls and people, through door gaps). */
+  function walkAround(id: string, start: number, dest: Vec3, gait?: string, speed?: number, exclude: string[] = []): number {
     const from = rootState(id).from;
-    const dx = dest[0] - from[0], dz = dest[2] - from[2], L2 = dx * dx + dz * dz || 1, L = Math.sqrt(L2);
-    const block = othersAt(id, start).map(o => { const u = clamp(((o[0] - from[0]) * dx + (o[2] - from[2]) * dz) / L2, 0, 1); const px = from[0] + dx * u, pz = from[2] + dz * u; return { o, d: Math.hypot(o[0] - px, o[2] - pz), u, side: Math.sign((o[0] - from[0]) * dz - (o[2] - from[2]) * dx) || 1 }; })
-      .filter(b => b.d < 0.55 && b.u > 0.05 && b.u < 0.95).sort((a, b) => a.u - b.u)[0];
-    if (!block) return planWalk(id, start, dest, gait, speed);
-    const nx = -dz / L * block.side, nz = dx / L * block.side;
-    const wp: Vec3 = [block.o[0] - nx * 0.8, 0, block.o[2] - nz * 0.8];
-    const mid = planWalk(id, start, wp, gait, speed);
-    return planWalk(id, mid, dest, gait, speed);
+    const nav = navFor(id, start, exclude);
+    const route = findPath(nav, [from[0], from[2]], [dest[0], dest[2]]);
+    if (!route) { warnings.push(`colision ${id}: no hay ruta libre hasta [${dest[0].toFixed(2)}, ${dest[2].toFixed(2)}] en ${start.toFixed(2)} s; camina en línea recta`); return planWalk(id, start, dest, gait, speed); }
+    return planWalk(id, start, dest, gait, speed, route.map(p => [p[0], 0, p[1]] as Vec3));
   }
   function holdPose(pose: string, hand: 'left' | 'right'): TargetRef {
     const s = hand === 'left' ? 1 : -1;
@@ -228,8 +245,11 @@ export function compileScene(scene: SceneV2, lib: AssetLibrary, opts: DirectorOp
   const untilFx: { ref: string; idx: number; src: string }[] = [];
   const pending = new Set(items);
   // voices never overlap: a line that would start before the previous one ends waits for it (+ a breath)
+  // turn-taking: a breath when the same character goes on, a real beat when another one answers, and a longer
+  // one before a reaction (surprise, fear, sadness, thinking): the silence is part of the joke or of the tension
   const LINE_GAP = 0.12;
-  let lastLineEnd = -Infinity;
+  let lastLineEnd = -Infinity, lastLineActor = '';
+  const gapBefore = (l: DialogueLine) => { if (!lastLineActor) return LINE_GAP; const emo = resolveEmotion(l.emotion) ?? ''; return (l.actor === lastLineActor ? 0.16 : 0.34) + (['surprise', 'fear', 'sad', 'thinking', 'worried'].includes(emo) ? 0.25 : 0); };
   const startOf = (it: Item): number | null => {
     let s: number;
     if (it.at !== undefined) s = it.at + it.offset;
@@ -238,7 +258,7 @@ export function compileScene(scene: SceneV2, lib: AssetLibrary, opts: DirectorOp
       if (ref.start === undefined) return null;
       s = Math.max(0, (it.after ? ref.end! : ref.start) + it.offset);
     }
-    return it.kind === 'line' ? Math.max(s, lastLineEnd + LINE_GAP) : s;
+    return it.kind === 'line' ? Math.max(s, lastLineEnd + gapBefore(it.data as DialogueLine)) : s;
   };
   let guard = 0;
   while (pending.size) {
@@ -249,7 +269,7 @@ export function compileScene(scene: SceneV2, lib: AssetLibrary, opts: DirectorOp
     pending.delete(best);
     best.start = bestT;
     best.end = execute(best, bestT);
-    if (best.kind === 'line') lastLineEnd = Math.max(lastLineEnd, best.end);
+    if (best.kind === 'line') { lastLineEnd = Math.max(lastLineEnd, best.end); lastLineActor = (best.data as DialogueLine).actor; }
   }
   for (const u of untilFx) { const ref = byId.get(u.ref); if (!ref) throw new Error(`Efecto ${u.src}: until desconocido ${u.ref}`); effects[u.idx].end = Math.max(effects[u.idx].start + 0.05, ref.start!); }
 
@@ -411,10 +431,17 @@ export function compileScene(scene: SceneV2, lib: AssetLibrary, opts: DirectorOp
         const seat = pointOf({ kind: 'prop', prop: a.prop, anchor: a.anchor }, s);
         const pw = evaluator.propWorld(a.prop, s)!.matrix.elements;
         const seatYaw = Math.atan2(pw[8], pw[10]) * 180 / Math.PI + (anchor.rotationDeg?.[1] ?? 0);
-        const front = rotateY([0, 0, 0.32 * dimsOf(a.actor).scale], seatYaw);
-        const standPos: Vec3 = [seat[0] + front[0], 0, seat[2] + front[2]];
+        // stand in front of the seat; if a table is there, beside the seat (the chair is not an obstacle for its sitter)
+        const near = rectsAt(s, [a.prop]), others = othersAt(a.actor, s);
+        const roomy = (c: Vec3) => near.every(r => rectDistance(r, c[0], c[2]) > 0.1) && others.every(o => dist2D(o, c) > 0.45);
+        const cands = ([[0, 0.32], [50, 0.42], [-50, 0.42], [90, 0.5], [-90, 0.5], [90, 0.64], [-90, 0.64], [130, 0.55], [-130, 0.55]] as const).map(([da, dd]) => { const f = rotateY([0, 0, dd * dimsOf(a.actor).scale], seatYaw + da); return [seat[0] + f[0], 0, seat[2] + f[2]] as Vec3; });
+        const standPos = cands.find(roomy) ?? cands[0];
         let t = s;
-        if (dist2D(rootState(a.actor).from, standPos) > 0.08) t = planWalk(a.actor, t, standPos, undefined, 0.8);
+        const tl0 = actor(a.actor);
+        if (s <= 0.5 && tl0.root.length === 1 && dist2D(tl0.root[0].from, seat) < 1.0) {
+          // the scene starts with this actor already on the seat: place the body there, no walk-up
+          const r0 = tl0.root[0]; r0.from = [...standPos] as Vec3; r0.to = [...standPos] as Vec3; r0.yawFrom = r0.yawTo = seatYaw;
+        } else if (dist2D(rootState(a.actor).from, standPos) > 0.08) t = walkAround(a.actor, t, standPos, undefined, 0.8, [a.prop]);
         t = planTurn(a.actor, t, seatYaw);
         tl.sits.push({ start: t, end: INF, seat, yawDeg: seatYaw, fadeIn: d, fadeOut: d });
         sfx('chair-creak', t + d * 0.85, -18);
@@ -463,12 +490,16 @@ export function compileScene(scene: SceneV2, lib: AssetLibrary, opts: DirectorOp
 
   // ---------------- automatic gaze between characters during dialogue
   if (scene.autoLook && actors.length > 1) {
+    // only between characters on the set: someone behind a door does not stare through the wall
+    const inRoom = (tl: ActorTimeline, t: number) => { if (env?.kind !== 'room') return true; const p = rootStateAt(tl, t); return Math.abs(p[0]) < env.size[0] / 2 && p[2] > -env.size[2] / 2 && p[2] < env.size[2] / 2 + 1.5; };
     for (const l of scene.dialogue) {
       const sp = actor(l.actor).speech.find(x => x.lineId === l.id)!;
+      if (!inRoom(actor(l.actor), sp.start)) continue;
       for (const other of actors) {
+        if (!inRoom(other, sp.start)) continue;
         const explicit = (tl: ActorTimeline, a0: number, b0: number) => tl.looks.some(x => x.source !== 'auto' && x.start < b0 && x.end > a0);
         if (other.id === l.actor) {
-          const to = l.to && actors.some(a => a.id === l.to) ? l.to : actors.filter(a => a.id !== l.actor).sort((p, q) => dist2D(rootStateAt(p, sp.start), rootStateAt(actor(l.actor), sp.start)) - dist2D(rootStateAt(q, sp.start), rootStateAt(actor(l.actor), sp.start)))[0]?.id;
+          const to = l.to && actors.some(a => a.id === l.to) ? l.to : actors.filter(a => a.id !== l.actor && inRoom(a, sp.start)).sort((p, q) => dist2D(rootStateAt(p, sp.start), rootStateAt(actor(l.actor), sp.start)) - dist2D(rootStateAt(q, sp.start), rootStateAt(actor(l.actor), sp.start)))[0]?.id;
           if (to && !explicit(other, sp.start, sp.end)) pushAutoLook(other, sp.start - 0.1, sp.end + 0.3, to);
         } else if (!explicit(other, sp.start, sp.end)) pushAutoLook(other, sp.start + 0.18, sp.end + 0.5, l.actor);
       }
@@ -478,7 +509,7 @@ export function compileScene(scene: SceneV2, lib: AssetLibrary, opts: DirectorOp
   function pushAutoLook(tl: ActorTimeline, start: number, endT: number, target: string) {
     const prev = [...tl.looks].reverse().find(x => x.source === 'auto');
     if (prev && prev.target.kind === 'actor' && prev.target.actor === target && start - prev.end < 1.2) { prev.end = Math.max(prev.end, endT); return; }
-    tl.looks.push({ start, end: Math.min(endT, duration), target: { kind: 'actor', actor: target, bone: 'head' }, mode: 'head', fade: 0.35, source: 'auto' });
+    tl.looks.push({ start, end: Math.min(endT, duration), target: { kind: 'actor', actor: target, bone: 'head' }, mode: 'head', fade: 0.45, source: 'auto' });
   }
   // ---------------- automatic acting (speaker gestures + listener reactions)
   if (scene.autoActing > 0) autoActing(scene.autoActing);
@@ -510,7 +541,7 @@ export function compileScene(scene: SceneV2, lib: AssetLibrary, opts: DirectorOp
         else if (emo === 'angry' && d > 0.9) pick = { clip: 'angry-gesture', w: 0.8, at: Math.min(0.6, d * 0.3) };
         else if (emo === 'nervous' && d > 1.4) pick = { clip: 'nervous', loop: true, w: 0.7 };
         else if (emo === 'thinking' && d > 1.2) pick = { clip: 'think', w: 0.85 };
-        else if ((emo === 'laugh' || /\b(ja ?ja|je ?je)\b/.test(txt)) && d > 0.8) pick = { clip: 'laugh-body', loop: true, w: 0.7 };
+        else if ((emo === 'laugh' || /\b(ja ?ja|je ?je)\b/.test(txt)) && d > 0.8) pick = { clip: 'laugh-body', w: 0.5 };
         else if (txt.includes('?') && d > 1.0) pick = { clip: emo === 'surprise' || emo === 'worried' || h < 0.4 ? 'shrug' : 'present', w: 0.75, at: Math.max(0.2, d - 1.4) };
         else if (/\b(mira|fíjate|toma|aquí|esto|este|esta)\b/.test(txt) && d > 1.0) pick = { clip: 'present', w: 0.8, at: 0.15 };
         else if (/\b(da igual|bah|olvídalo|déjalo|tranquil[oa])\b/.test(txt) && d > 0.9) pick = { clip: 'dismiss', w: 0.8, at: 0.2 };
@@ -627,6 +658,22 @@ export function compileScene(scene: SceneV2, lib: AssetLibrary, opts: DirectorOp
   }
   resolved.subtitles.sort((a, b) => a.start - b.start);
   audio.sort((a, b) => a.start - b.start || a.id.localeCompare(b.id));
+  // ---------------- collision QA: a standing body centre inside furniture or a wall (seated actors are on their seat)
+  {
+    const seen = new Set<string>();
+    for (const a of actors) for (let t = 0; t <= duration; t += 0.2) {
+      if (a.sits.some(x => t > x.start - 0.3 && t < x.end + x.fadeOut + 0.3)) continue;
+      const p = rootAt(a, t).position;
+      for (const r of rectsAt(t)) {
+        if (rectDistance(r, p[0], p[2]) > (r.seat ? -0.14 : -0.06)) continue;
+        const key = `${a.id}|${r.id}`; if (seen.has(key)) continue; seen.add(key);
+        warnings.push(`colision ${a.id}: atraviesa ${r.id} en ${t.toFixed(1)} s`);
+      }
+      if (env?.kind === 'room' && !areas.some(ar => p[0] > ar.x0 - 0.02 && p[0] < ar.x1 + 0.02 && p[2] > ar.z0 - 0.02 && p[2] < ar.z1 + 0.02)) {
+        const key = `${a.id}|wall`; if (!seen.has(key)) { seen.add(key); warnings.push(`colision ${a.id}: atraviesa una pared en ${t.toFixed(1)} s ([${p[0].toFixed(2)}, ${p[2].toFixed(2)}])`); }
+      }
+    }
+  }
   return resolved;
 }
 

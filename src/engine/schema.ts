@@ -29,7 +29,13 @@ export const BodySchema = z.object({
   handSize: num(0.5, 2).default(1),
   skinColor: color.default('#e0ac85'),
   /** Toon specular highlight + rim sheen on the skin (0 = matte cartoon skin, 0.5 = glowing, 1 = oiled). */
-  skinGloss: num(0, 1).default(0)
+  skinGloss: num(0, 1).default(0),
+  /** Body shape (0 = straight): bust volume, waist cinch, glute volume, thigh fullness, pectoral definition. */
+  bust: num(0, 1).default(0),
+  waist: num(0, 1).default(0),
+  glutes: num(0, 1).default(0.25),
+  thighs: num(0, 1).default(0.3),
+  pecs: num(0, 1).default(0)
 }).strict();
 export const FaceSchema = z.object({
   eyeSize: num(0.4, 2.5).default(1),
@@ -240,13 +246,19 @@ export const PropGeometrySchema = z.object({
 }).strict();
 export type PropGeometry = z.infer<typeof PropGeometrySchema>;
 
+/** What is seen (and walkable) through a door or window: a corridor, a street, another room or nothing (dark). */
+export const BeyondSchema = z.object({
+  kind: z.enum(['corridor', 'street', 'room', 'dark']).default('corridor'),
+  depth: num(0.5, 30).optional(), width: num(0.5, 40).optional(),
+  wallColor: color.optional(), floorColor: color.optional(), lightColor: color.optional(), lightIntensity: num(0, 20).optional()
+}).strict();
 export const EnvironmentSchemaV2 = z.object({
   schemaVersion: z.literal(2),
   kind: z.enum(['room', 'exterior']).default('room'),
   size: vec3.default([10, 4, 8]),
   floor: z.object({ color: color.default('#5b6470'), pattern: z.enum(['tiles', 'planks', 'concrete', 'grass', 'asphalt', 'plain']).default('tiles'), secondaryColor: color.optional() }).strict().default({ color: '#5b6470', pattern: 'tiles' }),
   walls: z.object({ color: color.default('#3d5266'), trimColor: color.default('#2a3a48'), sides: z.array(z.enum(['back', 'left', 'right'])).default(['back', 'left', 'right']), panel: z.boolean().default(true) }).strict().default({ color: '#3d5266', trimColor: '#2a3a48', sides: ['back', 'left', 'right'], panel: true }),
-  openings: z.array(z.object({ id: z.string().max(40), type: z.enum(['window', 'door']), wall: z.enum(['back', 'left', 'right']), offset: num(-50, 50), width: num(0.2, 20), height: num(0.2, 20), sill: num(0, 20).default(0), glow: color.optional() }).strict()).default([]),
+  openings: z.array(z.object({ id: z.string().max(40), type: z.enum(['window', 'door']), wall: z.enum(['back', 'left', 'right']), offset: num(-50, 50), width: num(0.2, 20), height: num(0.2, 20), sill: num(0, 20).default(0), glow: color.optional(), beyond: BeyondSchema.optional() }).strict()).default([]),
   sky: z.object({ top: color.default('#1d2b3c'), bottom: color.default('#41566e') }).strict().default({ top: '#1d2b3c', bottom: '#41566e' }),
   lights: z.array(z.object({ type: z.enum(['key', 'fill', 'rim', 'point', 'spot']), position: vec3, target: vec3.optional(), color: color.default('#ffffff'), intensity: num(0, 100).default(1), distance: num(0, 200).optional(), castShadow: z.boolean().default(false), flicker: num(0, 1).default(0) }).strict()).max(16).default([]),
   ambient: z.object({ sky: color.default('#dfe9ff'), ground: color.default('#3a4250'), intensity: num(0, 10).default(1.4) }).strict().default({ sky: '#dfe9ff', ground: '#3a4250', intensity: 1.4 }),
@@ -386,7 +398,10 @@ export const EpisodeSchema = z.object({
     theme: z.object({ music: slug, gainDb: num(-60, 12).default(-12), durationSec: num(1, 120).default(9), fadeOut: num(0, 10).default(2.5) }).strict().optional(),
     underscore: z.object({ music: slug, gainDb: num(-60, 12).default(-22), fadeIn: num(0, 10).default(2), fadeOut: num(0, 10).default(1.5) }).strict().optional(),
     bumpers: z.object({ music: slug, gainDb: num(-60, 12).default(-11), durationSec: num(0.5, 20).optional(), leadSec: num(0, 5).default(0.3), scenes: z.array(z.string().regex(/^sc-\d{3,4}$/)).optional() }).strict().optional(),
-    ending: z.object({ music: slug, gainDb: num(-60, 12).default(-12), durationSec: num(1, 120).default(7), fadeOut: num(0, 10).default(1.5) }).strict().optional()
+    ending: z.object({ music: slug, gainDb: num(-60, 12).default(-12), durationSec: num(1, 120).default(7), fadeOut: num(0, 10).default(1.5) }).strict().optional(),
+    /** Fade to black between scenes (out at the end of a scene, in at the start of the next; continuous scenes cut).
+     * The scene keeps `holdSec` of silence after its last event before fading, so a line never fades with it. */
+    sceneFade: z.object({ durationSec: num(0.2, 5).default(1.2), holdSec: num(0, 5).default(0.8) }).strict().optional()
   }).strict().optional(),
   /** Voice engine for every character of this episode (uses voice.json alternatives); 'auto' = each voice.json provider. */
   voiceProvider: z.enum(['auto', ...VOICE_PROVIDERS]).optional(),
@@ -400,7 +415,7 @@ export const SfxSchema = z.object({
   schemaVersion: z.literal(2),
   id: slug,
   kind: z.enum(['sfx', 'ambience']),
-  generator: z.enum(['metal-impact', 'footstep', 'door-creak', 'robot-beep', 'servo', 'sparks', 'workshop-hum', 'whoosh', 'click', 'thud', 'room-tone', 'rain', 'wind', 'birds', 'traffic', 'file']),
+  generator: z.enum(['metal-impact', 'footstep', 'door-creak', 'robot-beep', 'doorbell', 'servo', 'sparks', 'workshop-hum', 'whoosh', 'click', 'thud', 'room-tone', 'rain', 'wind', 'birds', 'traffic', 'file']),
   params: z.record(z.string(), z.union([z.number(), z.string(), z.boolean()])).default({}),
   durationSec: num(0.02, 600).default(1),
   seed: z.number().int().default(1),

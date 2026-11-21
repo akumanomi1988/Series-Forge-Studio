@@ -16,6 +16,8 @@ export interface RootSegment {
   start: number; end: number; kind: 'hold' | 'walk' | 'turn';
   from: Vec3; to: Vec3; yawFrom: number; yawTo: number;
   gait?: Locomotion; ease?: string;
+  /** walk along a polyline (from ... to) instead of a straight line: routes around furniture and through doors */
+  path?: Vec3[];
 }
 export interface ClipInstance { clip: string; start: number; end: number; speed: number; fadeIn: number; fadeOut: number; loop: boolean; weight: number; target?: TargetRef; source?: string }
 export interface LookInstance { start: number; end: number; target: TargetRef; mode: 'eyes' | 'head' | 'chest'; fade: number; source?: string }

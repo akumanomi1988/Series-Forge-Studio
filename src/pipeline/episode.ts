@@ -88,8 +88,12 @@ export async function compileEpisode(project: string, episode: string, settings:
   const voiceProvider = settings.voiceProvider ?? ep.episode.voiceProvider ?? (p.meta.voiceProvider as string | undefined) ?? 'auto';
   for (const sid of sceneIds) {
     if (frame >= maxFrames) break;
-    const scene = ep.scenes[sid];
-    if (!scene) throw new Error(`Escena inválida o inexistente: ${sid}`);
+    const scene0 = ep.scenes[sid];
+    if (!scene0) throw new Error(`Escena inválida o inexistente: ${sid}`);
+    // slow fades between scenes (not into a continuous scene: that is the same action going on)
+    const fadeSpec = ep.episode.score?.sceneFade, idx = sceneIds.indexOf(sid), nextScene = ep.scenes[sceneIds[idx + 1]];
+    const fadeOut = !!fadeSpec && idx < sceneIds.length - 1 && !nextScene?.continuous && !scene0.transitionOut;
+    const scene = fadeOut ? { ...scene0, transitionOut: { type: 'fade' as const, durationSec: fadeSpec!.durationSec }, tailSec: Math.max(scene0.tailSec, fadeSpec!.holdSec + fadeSpec!.durationSec) } : scene0;
     // speech
     const speech: Record<string, SpeechInfo> = {};
     for (const line of scene.dialogue) {
@@ -104,6 +108,7 @@ export async function compileEpisode(project: string, episode: string, settings:
       plan.speech[line.id] = { file: r.file, duration: r.duration, cached: r.cached, provider: r.provider, method: r.alignment.method, key: r.key };
     }
     const resolved = compileScene(scene, lib, { speech });
+    if (fadeSpec && idx > 0 && !scene.continuous && resolved.shots[0] && !resolved.shots[0].transitionIn) resolved.shots[0].transitionIn = { type: 'fade', durationSec: fadeSpec.durationSec };
     if (scene.continuous && resolvedAll.length) {
       const env = scene.environmentId ? p.environments[scene.environmentId] : null;
       for (const e of racord(resolvedAll[resolvedAll.length - 1], scene, env && env.env.kind === 'room' ? env.env.size : undefined)) resolved.warnings.push(e);

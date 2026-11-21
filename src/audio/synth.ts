@@ -48,6 +48,12 @@ export function generateSfx(def: SfxDef): Float32Array {
       break;
     }
     case 'robot-beep': { const notes = String(p.notes ?? '1320,990,1480').split(',').map(Number); const nd = dur / notes.length; for (let i = 0; i < N; i++) { const t = i / SR, k = Math.min(notes.length - 1, Math.floor(t / nd)), lt = t - k * nd; const sq = Math.sign(Math.sin(TAU * notes[k] * t)) * 0.4 + Math.sin(TAU * notes[k] * t) * 0.6; x[i] = sq * Math.min(1, lt / 0.004) * Math.min(1, (nd - lt) / 0.01) * 0.6; } const lp = new Biquad('lp', 5000); for (let i = 0; i < N; i++) x[i] = lp.run(x[i]); break; }
+    case 'doorbell': { // two-tone chime ("din-don"): struck bars with inharmonic partials, soft attack, long decay
+      const notes = String(p.notes ?? '659,523').split(',').map(Number), gap = n(p, 'gap', 0.62), tau = n(p, 'decay', 0.85);
+      const partials: [number, number, number][] = [[1, 1, 1], [2.76, 0.32, 0.45], [5.4, 0.12, 0.25], [0.5, 0.18, 1.4]]; // ratio, gain, decay factor
+      notes.forEach((f, k) => { const t0 = k * gap; for (let i = Math.floor(t0 * SR); i < N; i++) { const t = i / SR - t0; const env = Math.min(1, t / 0.006); let v = 0; for (const [r, g, d] of partials) v += g * Math.sin(TAU * f * r * t) * Math.exp(-t / (tau * d)); x[i] += v * env * 0.55 * (k ? 0.92 : 1); } });
+      const lp = new Biquad('lp', 4200); for (let i = 0; i < N; i++) x[i] = Math.tanh(lp.run(x[i]) * 1.2); break;
+    }
     case 'servo': { const f0 = n(p, 'freq', 180); let ph = 0; const bp = new Biquad('bp', 1200, 2); for (let i = 0; i < N; i++) { const t = i / SR, u = t / dur; const f = f0 * (1 + 0.6 * Math.sin(Math.PI * u)); ph += f / SR; const saw = 2 * (ph % 1) - 1; x[i] = (bp.run(saw) * 2 + saw * 0.15) * Math.sin(Math.PI * u) * (0.8 + 0.2 * Math.sin(TAU * 31 * t)); } break; }
     case 'sparks': { const hp = new Biquad('hp', 1800); for (let i = 0; i < N; i++) { const t = i / SR; const crackle = rnd() < 0.004 * (1 - t / dur) * 3 ? 1 : 0; x[i] = hp.run((rnd() * 2 - 1) * (0.08 + crackle * 6)) * Math.exp(-t / (dur * 0.5)); } const zapF = 260; for (let i = 0; i < Math.min(N, SR * 0.25); i++) { const t = i / SR; x[i] += Math.sign(Math.sin(TAU * zapF * t * (1 + 3 * t))) * 0.25 * Math.exp(-t / 0.08); } break; }
     case 'whoosh': { const bp = new Biquad('bp', 400, 1.5); for (let i = 0; i < N; i++) { const t = i / SR, u = t / dur; bp.set('bp', 300 + 2500 * Math.sin(Math.PI * u), 1.5); x[i] = bp.run(rnd() * 2 - 1) * Math.sin(Math.PI * u) ** 2; } break; }

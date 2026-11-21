@@ -180,6 +180,8 @@ export async function validateEpisode(project: string, episode: string): Promise
   add('dialogue.noOverlap', overlaps.length === 0, { overlaps: overlaps.slice(0, 20) });
   const rac = plan.scenes.flatMap(s => s.warnings.filter(w => w.startsWith('racord')).map(w => `${s.id}: ${w}`));
   add('continuity.racord', rac.length === 0, { errors: rac });
+  const col = plan.scenes.flatMap(s => s.warnings.filter(w => w.startsWith('colision')).map(w => `${s.id}: ${w}`));
+  add('blocking.noCollisions', col.length === 0, { errors: col });
   return finish();
   async function finish() {
     const ok = checks.filter(c => c.severity !== 'warning').every(c => c.ok);

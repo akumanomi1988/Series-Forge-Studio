@@ -1,0 +1,18 @@
+{
+  "schemaVersion": 2,
+  "id": "doorbell",
+  "kind": "sfx",
+  "generator": "doorbell",
+  "params": {
+    "notes": "659,523",
+    "gap": 0.62,
+    "decay": 0.85
+  },
+  "durationSec": 2.4,
+  "seed": 1,
+  "license": {
+    "id": "procedural-original",
+    "source": "Series Forge procedural synthesis",
+    "commercialUse": "allowed"
+  }
+}

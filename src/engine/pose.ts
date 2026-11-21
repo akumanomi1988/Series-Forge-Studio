@@ -2,6 +2,7 @@
  * Shared verbatim by the browser editor, the headless exporter and Node tests. */
 import * as THREE from 'three';
 import { DEG, clamp, lerp, ease, intervalWeight, rotateY, smoothstep, angleDiff, noise1, hash01 } from './math.ts';
+import { polyLength, polyAt } from './layout.ts';
 import type { Vec3 } from './math.ts';
 import { humanoidSkeleton, HUMANOID_BONES, LAYER_MASKS, JOINT_LIMITS } from './humanoid.ts';
 import type { HumanoidDims } from './humanoid.ts';
@@ -53,6 +54,17 @@ export function rootAt(tl: ActorTimeline, t: number): { position: Vec3; yaw: num
   let seg = segs[0];
   for (const s of segs) { if (s.start <= t) seg = s; else break; }
   const u = seg.end > seg.start ? clamp((t - seg.start) / (seg.end - seg.start), 0, 1) : 1;
+  if (seg.kind === 'walk' && seg.path && seg.path.length > 2) {
+    const L = polyLength(seg.path), sArc = walkProfile(u) * L;
+    const { pos } = polyAt(seg.path, sArc);
+    // heading: average direction around the current point, so corners are turned progressively
+    const a = polyAt(seg.path, Math.max(0, sArc - 0.18)).dir, b = polyAt(seg.path, Math.min(L, sArc + 0.18)).dir;
+    let yaw = seg.yawFrom + angleDiff(seg.yawFrom, Math.atan2(a[0] + b[0], a[1] + b[1]) / DEG);
+    // match the planned headings exactly at both ends (no snap into the following hold or turn)
+    const kIn = smoothstep(clamp(1 - u / 0.12, 0, 1)), kOut = smoothstep(clamp((u - 0.85) / 0.15, 0, 1));
+    yaw += angleDiff(yaw, seg.yawFrom) * kIn; yaw += angleDiff(yaw, seg.yawTo) * kOut;
+    return { position: pos, yaw, seg, u };
+  }
   if (seg.kind === 'walk') {
     const p = walkProfile(u);
     return { position: [lerp(seg.from[0], seg.to[0], p), lerp(seg.from[1], seg.to[1], p), lerp(seg.from[2], seg.to[2], p)], yaw: seg.yawTo, seg, u };
@@ -209,10 +221,14 @@ export function evaluateActor(rig: RigInstance, tl: ActorTimeline, assets: Chara
   // head tilt/nod from the face (expressive accents) + speech head motion
   const head = rig.bone('head');
   applyEulerAdd(head, [faceRes.face.headNodDeg ?? 0, 0, faceRes.face.headTiltDeg ?? 0], 1);
-  if (faceRes.speaking > 0) {
-    const nod = noise1(hash01(tl.id) * 1000, t * 2.2) * 4 + faceRes.mouthEnergy * 3;
-    applyEulerAdd(head, [nod, noise1(hash01(tl.id, 'y') * 1000, t * 1.3) * 3, noise1(hash01(tl.id, 'z') * 1000, t * 1.1) * 2], faceRes.speaking);
-    applyEulerAdd(rig.bone('chest'), [noise1(hash01(tl.id, 'c') * 1000, t * 1.7) * 1.5, 0, 0], faceRes.speaking);
+  // fades in and out over a third of a second (the lip-sync weight switches in 60 ms and would pop the head)
+  let talkW = 0;
+  for (const sp of tl.speech) if (t > sp.start - 0.35 && t < sp.end + 0.45) talkW = Math.max(talkW, intervalWeight(t, sp.start - 0.3, sp.end + 0.4, 0.3, 0.4));
+  if (talkW > 0) {
+    // slow, phrase-level head motion only: following the mouth syllable by syllable reads as trembling
+    const nod = noise1(hash01(tl.id) * 1000, t * 1.1) * 2.6;
+    applyEulerAdd(head, [nod, noise1(hash01(tl.id, 'y') * 1000, t * 0.7) * 2.4, noise1(hash01(tl.id, 'z') * 1000, t * 0.55) * 1.6], talkW);
+    applyEulerAdd(rig.bone('chest'), [noise1(hash01(tl.id, 'c') * 1000, t * 0.6) * 1.0, 0, 0], talkW);
   }
   // 5) hips offsets: crouch / sit
   let hipsOffset = new THREE.Vector3(), spinePitch = 0;
@@ -247,14 +263,19 @@ export function evaluateActor(rig: RigInstance, tl: ActorTimeline, assets: Chara
       if (!p) continue;
       const headPos = rig.worldPos('head').add(_v2.set(0, dims.headCenter, 0));
       const local = p.clone().sub(headPos).applyAxisAngle(new THREE.Vector3(0, 1, 0), -root.yaw * DEG);
-      const yaw = clamp(Math.atan2(local.x, local.z) / DEG, -115, 115);
+      const rawYaw = Math.atan2(local.x, local.z) / DEG;
+      // a target behind the body is not looked at (the clamp would flip the head from one shoulder to the other)
+      const wBehind = clamp((150 - Math.abs(rawYaw)) / 45, 0, 1);
+      if (wBehind <= 0) continue;
+      const yaw = clamp(rawYaw, -105, 105);
       const pitch = clamp(-Math.atan2(local.y, Math.hypot(local.x, local.z)) / DEG, -40, 40);
       const share = look.mode === 'eyes' ? [0, 0, 0.15] : look.mode === 'chest' ? [0.35, 0.25, 0.4] : [0.15, 0.3, 0.55];
       // remove the yaw already applied by the base pose so the head really reaches the target
-      applyEulerAdd(rig.bone('chest'), [pitch * share[0] * 0.3, yaw * share[0], 0], w);
-      applyEulerAdd(rig.bone('neck'), [pitch * share[1], yaw * share[1], 0], w);
-      applyEulerAdd(head, [pitch * share[2], yaw * share[2], 0], w);
-      gazePoint = w > 0.5 ? p : gazePoint;
+      const wl = w * wBehind;
+      applyEulerAdd(rig.bone('chest'), [pitch * share[0] * 0.3, yaw * share[0], 0], wl);
+      applyEulerAdd(rig.bone('neck'), [pitch * share[1], yaw * share[1], 0], wl);
+      applyEulerAdd(head, [pitch * share[2], yaw * share[2], 0], wl);
+      gazePoint = wl > 0.5 ? p : gazePoint;
     }
   }
   rig.group.updateMatrixWorld(true);

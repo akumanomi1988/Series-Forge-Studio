@@ -66,11 +66,12 @@ const clips = [
     { chain: 'leftArm', target: { bone: 'hips', offset: [0.03, 0.2, 0.24], space: 'bone' }, weight: [[0, 1], [1.6, 1]] },
     { chain: 'rightArm', target: { bone: 'hips', offset: [-0.03, 0.22, 0.25], space: 'bone' }, weight: [[0, 1], [1.6, 1]] }
   ], grip: { left: 0.5, right: 0.5 } }),
-  clip('laugh-body', 'Sacudidas de risa (aditivo).', 0.5, { layer: 'additive', loop: true, tracks: [
-    rot('chest', [[0, [0, 0, 0]], [0.12, [5, 0, 0]], [0.25, [0, 0, 0]], [0.37, [5, 0, 0]], [0.5, [0, 0, 0]]]),
-    rot('head', [[0, [-6, 0, 0]], [0.12, [-2, 0, 0]], [0.25, [-6, 0, 0]], [0.37, [-2, 0, 0]], [0.5, [-6, 0, 0]]]),
-    rot('leftShoulder', [[0, [0, 0, 0]], [0.12, [0, 0, 5]], [0.25, [0, 0, 0]], [0.37, [0, 0, 5]], [0.5, [0, 0, 0]]]),
-    rot('rightShoulder', [[0, [0, 0, 0]], [0.12, [0, 0, -5]], [0.25, [0, 0, 0]], [0.37, [0, 0, -5]], [0.5, [0, 0, 0]]])
+  // a soft, slow laugh: about 1.7 shakes per second with small angles (fast shaking read as trembling on screen)
+  clip('laugh-body', 'Risa contenida: hombros y pecho suben y bajan suavemente (aditivo).', 1.2, { layer: 'additive', loop: true, tracks: [
+    rot('chest', [[0, [0, 0, 0]], [0.3, [2.5, 0, 0]], [0.6, [0.5, 0, 0]], [0.9, [2.2, 0, 0]], [1.2, [0, 0, 0]]]),
+    rot('head', [[0, [-3, 0, 0]], [0.3, [-1, 0, 1]], [0.6, [-3, 0, 0]], [0.9, [-1.5, 0, -1]], [1.2, [-3, 0, 0]]]),
+    rot('leftShoulder', [[0, [0, 0, 0]], [0.3, [0, 0, 2.5]], [0.6, [0, 0, 0.5]], [0.9, [0, 0, 2]], [1.2, [0, 0, 0]]]),
+    rot('rightShoulder', [[0, [0, 0, 0]], [0.3, [0, 0, -2.5]], [0.6, [0, 0, -0.5]], [0.9, [0, 0, -2]], [1.2, [0, 0, 0]]])
   ] }),
   clip('angry-gesture', 'Gesto de enfado con el puño derecho.', 1.4, { layer: 'arms', tracks: [
     rot('rightUpperArm', [[0, [0, 0, -6]], [0.3, [-40, 0, -18]], [0.55, [-35, 0, -18]], [0.75, [-45, 0, -18]], [1.1, [-40, 0, -18]], [1.4, [0, 0, -6]]]),
