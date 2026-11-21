@@ -37,10 +37,10 @@ w('episode.json', {
   schemaVersion: 2, id: 'ep-001', type: 'episode', name: 'Punto dos', number: 1,
   scenes: ['sc-001', 'sc-002', 'sc-003'], targetDurationSec: 150,
   score: {
-    theme: { music: 'sirena-tema', gainDb: -12, durationSec: 8, fadeOut: 3 },
-    underscore: { music: 'sirena-cama', gainDb: -21 },
-    bumpers: { music: 'sirena-cortinilla', gainDb: -10, durationSec: 4.2, leadSec: 1.1 }, sceneFade: { durationSec: 1.3, holdSec: 0.9 },
-    ending: { music: 'sirena-tema', gainDb: -12, durationSec: 7, fadeOut: 2 }
+    theme: { music: 'sirena-tema', gainDb: -4, durationSec: 8, fadeOut: 3 },
+    underscore: { music: 'sirena-cama', gainDb: -14 },
+    bumpers: { music: 'sirena-cortinilla', gainDb: -4, durationSec: 4.2, leadSec: 1.1 }, sceneFade: { durationSec: 1.3, holdSec: 0.9 },
+    ending: { music: 'sirena-tema', gainDb: -4, durationSec: 7, fadeOut: 2 }
   },
   render: { width: 1920, height: 1080, fps: 24, sampleRate: 48000, loudnessLufs: -16 }, status: 'draft'
 });
@@ -332,8 +332,8 @@ w('scenes/sc-003/scene.json', {
     L('v19', 'susana', 'Pues mañana... va a hacer mucho calor.', 'smirk', { intensity: 1.4, pauseAfter: 0.2 })
   ],
   sound: [AMB,
-    { id: 'romance', kind: 'music', sound: 'sirena-romance', with: 'd16', offset: -0.3, durationSec: 14, gainDb: -17, fadeIn: 1.5, fadeOut: 2.5, duck: true },
+    { id: 'romance', kind: 'music', sound: 'sirena-romance', with: 'd16', offset: -0.3, durationSec: 14, gainDb: -10, fadeIn: 1.5, fadeOut: 2.5, duck: true },
     { id: 'clic-luz', kind: 'sfx', sound: 'click', with: 'luz-vuelve', gainDb: -5 },
-    { id: 'remate', kind: 'music', sound: 'sirena-remate', after: 'v19', offset: 0.05, durationSec: 1.8, gainDb: -9, duck: false }]
+    { id: 'remate', kind: 'music', sound: 'sirena-remate', after: 'v19', offset: 0.05, durationSec: 1.8, gainDb: -2, duck: false }]
 });
 console.log('ok');
