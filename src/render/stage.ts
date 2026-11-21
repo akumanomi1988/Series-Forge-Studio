@@ -15,9 +15,28 @@ import { hash01, clamp, intervalWeight, smoothstep } from '../engine/math.ts';
 const COMPOSITE_VS = `varying vec2 vUv; void main(){ vUv = uv; gl_Position = vec4(position.xy, 0.0, 1.0); }`;
 const COMPOSITE_FS = `
 uniform sampler2D tA; uniform sampler2D tB; uniform float mode; uniform float progress; uniform float fade; uniform float aspect; uniform float vignette;
+uniform sampler2D tN; uniform sampler2D tD; uniform float ink; uniform vec2 texel; uniform float cNear; uniform float cFar;
 varying vec2 vUv;
+float linZ(vec2 uv) { float d = texture2D(tD, uv).x; return cNear * cFar / (cFar - d * (cFar - cNear)); }
+/** Fine toon ink: contours where depth jumps (silhouettes, an arm over the body) or the surface turns sharply
+ * (the curve of a breast or a glute, folds, edges of furniture). Soft 1-2 px lines, thinner with distance. */
+float inkAt(vec2 uv) {
+  float zc = linZ(uv); vec3 nc = texture2D(tN, uv).xyz * 2.0 - 1.0;
+  if (zc > cFar * 0.9) return 0.0;
+  float e = 0.0;
+  for (int i = 0; i < 8; i++) {
+    float a = float(i) * 0.785398;
+    vec2 o = vec2(cos(a), sin(a)) * texel;
+    float zn = linZ(uv + o); vec3 nn = texture2D(tN, uv + o).xyz * 2.0 - 1.0;
+    float dz = (zn - zc) / zc; // positive: the neighbour is behind (we are the near side of a silhouette)
+    e = max(e, smoothstep(0.012, 0.035, dz));
+    e = max(e, smoothstep(0.9, 0.62, dot(nc, nn)) * 0.9);
+  }
+  return e;
+}
 void main(){
   vec4 b = texture2D(tB, vUv);
+  if (ink > 0.0) b.rgb = mix(b.rgb, b.rgb * 0.12 + vec3(0.02, 0.02, 0.035), inkAt(vUv) * ink);
   vec4 c = b;
   if (mode > 0.5 && mode < 1.5) { c = mix(texture2D(tA, vUv), b, smoothstep(0.0, 1.0, progress)); }
   else if (mode > 1.5 && mode < 2.5) { c = b * smoothstep(0.0, 1.0, progress); }
@@ -37,7 +56,10 @@ export class Stage {
   readonly scene = new THREE.Scene();
   readonly camera = new THREE.PerspectiveCamera(32, 16 / 9, 0.05, 200);
   private prevCamera = new THREE.PerspectiveCamera(32, 16 / 9, 0.05, 200);
-  private rtA: THREE.WebGLRenderTarget; private rtB: THREE.WebGLRenderTarget;
+  private rtA: THREE.WebGLRenderTarget; private rtB: THREE.WebGLRenderTarget; private rtN: THREE.WebGLRenderTarget;
+  private normalMat = new THREE.MeshNormalMaterial({ side: THREE.DoubleSide });
+  /** strength of the fine ink lines (0 = off) */
+  ink = 0.9;
   private quadScene = new THREE.Scene(); private quadCam = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1); private composite: THREE.ShaderMaterial;
   evaluator: SceneEvaluator | null = null;
   resolved: ResolvedScene | null = null;
@@ -62,14 +84,19 @@ export class Stage {
     const samples = opts.antialias === false ? 0 : 4;
     this.rtA = new THREE.WebGLRenderTarget(opts.width, opts.height, { samples, type: THREE.HalfFloatType });
     this.rtB = new THREE.WebGLRenderTarget(opts.width, opts.height, { samples, type: THREE.HalfFloatType });
-    this.composite = new THREE.ShaderMaterial({ vertexShader: COMPOSITE_VS, fragmentShader: COMPOSITE_FS, uniforms: { tA: { value: this.rtA.texture }, tB: { value: this.rtB.texture }, mode: { value: 0 }, progress: { value: 1 }, fade: { value: 1 }, aspect: { value: opts.width / opts.height }, vignette: { value: this.vignette } }, depthTest: false, depthWrite: false });
+    this.rtN = new THREE.WebGLRenderTarget(opts.width, opts.height, { samples: 0 });
+    this.rtN.depthTexture = new THREE.DepthTexture(opts.width, opts.height);
+    const px = Math.max(1, opts.height / 1080 * 1.4);
+    this.composite = new THREE.ShaderMaterial({ vertexShader: COMPOSITE_VS, fragmentShader: COMPOSITE_FS, uniforms: { tA: { value: this.rtA.texture }, tB: { value: this.rtB.texture }, mode: { value: 0 }, progress: { value: 1 }, fade: { value: 1 }, aspect: { value: opts.width / opts.height }, vignette: { value: this.vignette }, tN: { value: this.rtN.texture }, tD: { value: this.rtN.depthTexture }, ink: { value: this.ink }, texel: { value: new THREE.Vector2(px / opts.width, px / opts.height) }, cNear: { value: 0.05 }, cFar: { value: 200 } }, depthTest: false, depthWrite: false });
+    this.renderer.shadowMap.autoUpdate = false;
     this.quadScene.add(new THREE.Mesh(new THREE.PlaneGeometry(2, 2), this.composite));
     this.scene.add(this.world);
   }
   resize(width: number, height: number) {
     this.width = width; this.height = height;
-    this.renderer.setSize(width, height, false); this.rtA.setSize(width, height); this.rtB.setSize(width, height);
+    this.renderer.setSize(width, height, false); this.rtA.setSize(width, height); this.rtB.setSize(width, height); this.rtN.setSize(width, height);
     this.composite.uniforms.aspect.value = width / height;
+    const px = Math.max(1, height / 1080 * 1.4); (this.composite.uniforms.texel.value as THREE.Vector2).set(px / width, px / height);
   }
   clear() {
     this.world.traverse(o => { const m = o as THREE.Mesh; if (m.isMesh) m.geometry?.dispose(); });
@@ -82,7 +109,8 @@ export class Stage {
     this.evaluator = new SceneEvaluator(resolved, lib);
     const envDef = resolved.environmentId ? lib.environments[resolved.environmentId] : null;
     if (envDef) {
-      this.env = buildEnvironment(envDef); this.world.add(this.env.group);
+      const placed = resolved.props.flatMap(p => { const g = p.segments[0]; return g.kind === 'static' && lib.props[p.propId] ? [{ id: p.id, geo: lib.props[p.propId], position: g.position, yawDeg: g.yawDeg, scale: p.scale }] : []; });
+      this.env = buildEnvironment(envDef, placed); this.world.add(this.env.group);
       this.scene.background = this.env.background; this.scene.fog = (this.env.group.userData.fog as THREE.Fog) ?? null;
     } else { this.scene.background = new THREE.Color('#2a3442'); const env = buildEnvironment({ schemaVersion: 2, kind: 'exterior', size: [12, 4, 12], floor: { color: '#4b5866', pattern: 'tiles' }, walls: { color: '#3d5266', trimColor: '#2a3a48', sides: [], panel: false }, openings: [], sky: { top: '#1d2b3c', bottom: '#2a3442' }, lights: [], ambient: { sky: '#dfe9ff', ground: '#3a4250', intensity: 1.4 }, props: [], decor: [] }); this.env = env; this.world.add(env.group); }
     for (const a of resolved.actors) {
@@ -199,11 +227,29 @@ export class Stage {
   render() {
     const r = this.renderer;
     const mode = this.composite.uniforms.mode.value as number;
+    r.shadowMap.needsUpdate = true;
     if (mode === 1 || mode === 4) { r.setRenderTarget(this.rtA); r.render(this.scene, this.prevCamera); }
     r.setRenderTarget(this.rtB); r.render(this.scene, this.camera);
+    if (this.ink > 0) this.renderNormals();
+    this.composite.uniforms.ink.value = this.ink;
     r.setRenderTarget(null); r.render(this.quadScene, this.quadCam);
+  }
+  /** View-space normals + depth of the same frame (shadows reused), for the ink lines. Outline hulls, particles and
+   * transparent things are hidden: they would draw lines of their own. */
+  private renderNormals() {
+    const r = this.renderer, hidden: THREE.Object3D[] = [];
+    this.scene.traverse(o => { if (!o.visible) return; const m = (o as THREE.Mesh).material as THREE.Material | undefined; if (o.userData.outline || o.userData.noInk || (o as THREE.Points).isPoints || (m && (m as THREE.Material).transparent)) { o.visible = false; hidden.push(o); } });
+    const bg = this.scene.background, fog = this.scene.fog;
+    this.scene.background = null; this.scene.fog = null; this.scene.overrideMaterial = this.normalMat;
+    const cc = r.getClearColor(new THREE.Color()), ca = r.getClearAlpha();
+    r.setClearColor(0x8080ff, 1);
+    r.setRenderTarget(this.rtN); r.clear(); r.render(this.scene, this.camera);
+    r.setClearColor(cc, ca);
+    this.scene.overrideMaterial = null; this.scene.background = bg; this.scene.fog = fog;
+    for (const o of hidden) o.visible = true;
+    this.composite.uniforms.cNear.value = this.camera.near; this.composite.uniforms.cFar.value = this.camera.far;
   }
   /** Debug/QA info for the current frame. */
   info() { return { renderer: this.renderer.getContext().getParameter(this.renderer.getContext().RENDERER), calls: this.renderer.info.render.calls, triangles: this.renderer.info.render.triangles }; }
-  dispose() { this.clear(); this.rtA.dispose(); this.rtB.dispose(); this.renderer.dispose(); }
+  dispose() { this.clear(); this.rtA.dispose(); this.rtB.dispose(); this.rtN.dispose(); this.renderer.dispose(); }
 }

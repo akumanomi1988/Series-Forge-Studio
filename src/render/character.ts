@@ -7,7 +7,7 @@ import type { RigInstance, ActorPose } from '../engine/pose.ts';
 import type { FaceState } from '../engine/face.ts';
 import { toon, flat, withOutline, shade, mix } from './toon.ts';
 import type { NecklineSpec } from './toon.ts';
-import { clamp, lerp, DEG } from '../engine/math.ts';
+import { clamp, lerp, DEG, smoothstep } from '../engine/math.ts';
 
 type W = [string, number][];
 /** Box with rounded edges (superellipsoid): no hard corners on soles and small clothing parts. */
@@ -17,10 +17,20 @@ function roundedBox(w: number, h: number, d: number, r = 0.3): THREE.BufferGeome
   for (let i = 0; i < pa.count; i++) pa.setXYZ(i, k(pa.getX(i)) * w / 2, k(pa.getY(i)) * h / 2, k(pa.getZ(i)) * d / 2);
   g.computeVertexNormals(); return g;
 }
-interface Ring { y: number; rx: number; rz: number; x: number; z: number; color: string; w: W; gloss?: number; /** depth below the neck base (torso only: per-pixel neckline) */ neck?: number }
-/** Specular strength of each fabric (toon highlight + sheen). */
+interface Ring {
+  y: number; rx: number; rz: number; x: number; z: number; color: string; w: W; gloss?: number;
+  /** depth below the neck base (torso only: per-pixel neckline) */ neck?: number;
+  /** back half depth (defaults to rz): a flatter back, a rounder seat */ rzb?: number;
+  /** radial volume of the two bust lobes (front, ±0.6 rad) and of the two glute lobes (back), metres */ bust?: number; glute?: number;
+  /** angular width of the bust lobes (narrow = breasts, wide = pectorals) */ bw?: number;
+  /** radial cloth folds: amplitude (m) and count around the ring */ fold?: number; folds?: number;
+  /** skirt cloth: share of each vertex skinned to the thigh on its side (0 = follows the hips) */ legBlend?: number;
+}
+/** Specular strength of each fabric. Characters are matte now (toon shadows only); kept for the schema. */
 export const FABRIC_GLOSS: Record<string, number> = { matte: 0, satin: 0.55, silk: 0.75, leather: 0.45, sequin: 0.95 };
 
+const RING_KEYS = ['rx', 'rz', 'x', 'z', 'rzb', 'bust', 'glute', 'fold'] as const;
+const ringVal = (r: Ring, k: typeof RING_KEYS[number]) => k === 'rzb' ? (r.rzb ?? r.rz) : (r[k] ?? 0);
 /** Inserts Catmull-Rom midpoints between rings of the same colour so profiles read as curves, not polygons. */
 function smoothRings(input: Ring[], passes = 1): Ring[] {
   let rs = input;
@@ -31,22 +41,43 @@ function smoothRings(input: Ring[], passes = 1): Ring[] {
       out.push(r);
       if (!n || n.color !== r.color || Math.abs(n.y - r.y) < 0.006) continue;
       const a = rs[j - 1] ?? r, b = rs[j + 2] ?? n;
-      const cr = (k: 'rx' | 'rz' | 'x' | 'z') => (-a[k] + 9 * r[k] + 9 * n[k] - b[k]) / 16;
+      const cr = (k: typeof RING_KEYS[number]) => (-ringVal(a, k) + 9 * ringVal(r, k) + 9 * ringVal(n, k) - ringVal(b, k)) / 16;
       const wm = new Map<string, number>(); for (const [bn, v] of [...r.w, ...n.w]) wm.set(bn, (wm.get(bn) ?? 0) + v / 2);
-      out.push({ y: (r.y + n.y) / 2, rx: Math.max(cr('rx'), Math.min(r.rx, n.rx) * 0.9), rz: Math.max(cr('rz'), Math.min(r.rz, n.rz) * 0.9), x: cr('x'), z: cr('z'), color: r.color, w: [...wm], gloss: ((r.gloss ?? 0) + (n.gloss ?? 0)) / 2, neck: r.neck !== undefined && n.neck !== undefined ? (r.neck + n.neck) / 2 : r.neck });
+      const m: Ring = { y: (r.y + n.y) / 2, rx: Math.max(cr('rx'), Math.min(r.rx, n.rx) * 0.9), rz: Math.max(cr('rz'), Math.min(r.rz, n.rz) * 0.9), x: cr('x'), z: cr('z'), color: r.color, w: [...wm], gloss: ((r.gloss ?? 0) + (n.gloss ?? 0)) / 2, neck: r.neck !== undefined && n.neck !== undefined ? (r.neck + n.neck) / 2 : r.neck };
+      if (r.rzb !== undefined || n.rzb !== undefined) m.rzb = Math.max(cr('rzb'), Math.min(ringVal(r, 'rzb'), ringVal(n, 'rzb')) * 0.9);
+      if (r.bust || n.bust) m.bust = Math.max(0, cr('bust'));
+      if (r.glute || n.glute) m.glute = Math.max(0, cr('glute'));
+      if (r.fold || n.fold) { m.fold = Math.max(0, cr('fold')); m.folds = r.folds ?? n.folds; }
+      if (r.bw || n.bw) m.bw = r.bw ?? n.bw;
+      if (r.legBlend !== undefined || n.legBlend !== undefined) m.legBlend = ((r.legBlend ?? 0) + (n.legBlend ?? 0)) / 2;
+      out.push(m);
     }
     rs = out;
   }
   return rs;
 }
-function tubeGeometry(raw: Ring[], boneIndex: Map<string, number>, seg = 18, capTop = true, capBottom = true): THREE.BufferGeometry {
-  const input = smoothRings(raw, 2);
+const wrapA = (a: number) => Math.atan2(Math.sin(a), Math.cos(a));
+const lobe = (a: number, c: number, sg: number) => Math.exp(-((wrapA(a - c) / sg) ** 2));
+/** Surface point of a ring at angle a (a = 0 is the front, +x is the character's left). */
+function ringPoint(r: Ring, a: number): [number, number] {
+  const sa = Math.sin(a), ca = Math.cos(a);
+  let px = sa * r.rx, pz = ca * (ca >= 0 ? r.rz : (r.rzb ?? r.rz));
+  const bw = r.bw ?? 0.36;
+  const bump = (r.bust ?? 0) * (lobe(a, 0.6, bw) + lobe(a, -0.6, bw)) + (r.glute ?? 0) * (lobe(a, Math.PI - 0.5, 0.45) + lobe(a, Math.PI + 0.5, 0.45)) + (r.fold ?? 0) * Math.sin((r.folds ?? 9) * a);
+  px += sa * bump; pz += ca * bump;
+  return [r.x + px, r.z + pz];
+}
+interface TubeOpts { seg?: number; capTop?: boolean; capBottom?: boolean; arc?: [number, number]; passes?: number }
+function tubeGeometry(raw: Ring[], boneIndex: Map<string, number>, seg = 18, capTop = true, capBottom = true, opts: TubeOpts = {}): THREE.BufferGeometry {
+  const input = smoothRings(raw, opts.passes ?? 2);
+  const [a0, a1] = opts.arc ?? [0, Math.PI * 2];
+  const closed = !opts.arc;
   const rings: Ring[] = [];
   for (let j = 0; j < input.length; j++) {
     const r = input[j], n = input[j + 1];
     rings.push(r);
     if (n && n.color !== r.color && Math.abs(n.y - r.y) > 0.004) {
-      const m = (k: number): Ring => ({ y: lerp(r.y, n.y, 0.5) + k, rx: lerp(r.rx, n.rx, 0.5), rz: lerp(r.rz, n.rz, 0.5), x: lerp(r.x, n.x, 0.5), z: lerp(r.z, n.z, 0.5), color: k > 0 ? r.color : n.color, w: k > 0 ? r.w : n.w });
+      const m = (k: number): Ring => ({ ...(k > 0 ? r : n), y: lerp(r.y, n.y, 0.5) + k, rx: lerp(r.rx, n.rx, 0.5), rz: lerp(r.rz, n.rz, 0.5), rzb: lerp(ringVal(r, 'rzb'), ringVal(n, 'rzb'), 0.5), bust: lerp(r.bust ?? 0, n.bust ?? 0, 0.5), glute: lerp(r.glute ?? 0, n.glute ?? 0, 0.5), x: lerp(r.x, n.x, 0.5), z: lerp(r.z, n.z, 0.5), color: k > 0 ? r.color : n.color, w: k > 0 ? r.w : n.w });
       rings.push(m(0.0008), m(-0.0008));
     }
   }
@@ -58,7 +89,13 @@ function tubeGeometry(raw: Ring[], boneIndex: Map<string, number>, seg = 18, cap
     const ws = [...w].sort((a, b) => b[1] - a[1]).slice(0, 4); const tot = ws.reduce((s, x) => s + x[1], 0) || 1;
     for (let k = 0; k < 4; k++) { si.push(ws[k] ? boneIndex.get(ws[k][0]) ?? 0 : 0); sw.push(ws[k] ? ws[k][1] / tot : 0); }
   };
-  for (const r of rings) for (let i = 0; i <= seg; i++) { const a = (i / seg) * Math.PI * 2; pushV(r.x + Math.sin(a) * r.rx, r.y, r.z + Math.cos(a) * r.rz, r.color, r.w, r.gloss ?? 0); if (hasNeck) nk.push(Math.sin(a), Math.cos(a), r.neck ?? -1); }
+  /** cloth that follows the thighs: blend the ring weights with the thigh on the vertex's side (more at the front) */
+  const vw = (r: Ring, a: number): W => {
+    if (!r.legBlend) return r.w;
+    const k = r.legBlend * (0.55 + 0.45 * Math.cos(a)), sa = Math.sin(a);
+    return [...r.w.map(([b, v]) => [b, v * (1 - k)] as [string, number]), ['leftThigh', k * (0.5 + 0.5 * sa)], ['rightThigh', k * (0.5 - 0.5 * sa)]];
+  };
+  for (const r of rings) for (let i = 0; i <= seg; i++) { const a = a0 + (a1 - a0) * (i / seg); const [x, z] = ringPoint(r, a); pushV(x, r.y, z, r.color, vw(r, a), r.gloss ?? 0); if (hasNeck) nk.push(Math.sin(a), Math.cos(a), r.neck ?? -1); }
   for (let j = 0; j < rings.length - 1; j++) for (let i = 0; i < seg; i++) {
     const a = j * (seg + 1) + i, b = a + seg + 1;
     // rings ordered top->bottom: wind so normals face outward
@@ -67,11 +104,11 @@ function tubeGeometry(raw: Ring[], boneIndex: Map<string, number>, seg = 18, cap
   const cap = (r: Ring, top: boolean) => {
     const center = pos.length / 3; pushV(r.x, r.y + (top ? r.rx * 0.35 : -r.rx * 0.35), r.z, r.color, r.w, r.gloss ?? 0); if (hasNeck) nk.push(0, -1, -1);
     const base = pos.length / 3;
-    for (let i = 0; i <= seg; i++) { const a = (i / seg) * Math.PI * 2; pushV(r.x + Math.sin(a) * r.rx, r.y, r.z + Math.cos(a) * r.rz, r.color, r.w, r.gloss ?? 0); if (hasNeck) nk.push(0, -1, -1); }
+    for (let i = 0; i <= seg; i++) { const a = a0 + (a1 - a0) * (i / seg); const [x, z] = ringPoint(r, a); pushV(x, r.y, z, r.color, vw(r, a), r.gloss ?? 0); if (hasNeck) nk.push(0, -1, -1); }
     for (let i = 0; i < seg; i++) top ? idx.push(center, base + i, base + i + 1) : idx.push(center, base + i + 1, base + i);
   };
-  if (capTop) cap(rings[0], true);
-  if (capBottom) cap(rings[rings.length - 1], false);
+  if (capTop && closed) cap(rings[0], true);
+  if (capBottom && closed) cap(rings[rings.length - 1], false);
   const g = new THREE.BufferGeometry();
   g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
   g.setAttribute('color', new THREE.Float32BufferAttribute(col, 3));
@@ -81,6 +118,50 @@ function tubeGeometry(raw: Ring[], boneIndex: Map<string, number>, seg = 18, cap
   if (hasNeck) g.setAttribute('neck', new THREE.Float32BufferAttribute(nk, 3));
   g.setIndex(idx);
   g.computeVertexNormals();
+  // the first and last column of a closed tube are the same points: share their normals (no seam line)
+  if (closed) { const nr = g.attributes.normal as THREE.BufferAttribute; for (let j = 0; j < rings.length; j++) { const i0 = j * (seg + 1), i1 = i0 + seg; const v = new THREE.Vector3(nr.getX(i0) + nr.getX(i1), nr.getY(i0) + nr.getY(i1), nr.getZ(i0) + nr.getZ(i1)).normalize(); nr.setXYZ(i0, v.x, v.y, v.z); nr.setXYZ(i1, v.x, v.y, v.z); } }
+  return g;
+}
+/** Monotone cubic interpolation (Fritsch–Carlson) through (xs ascending, ys). */
+function pchip(xs: number[], ys: number[]): (x: number) => number {
+  const n = xs.length, dx: number[] = [], m: number[] = [], t: number[] = new Array(n).fill(0);
+  for (let i = 0; i < n - 1; i++) { dx.push(xs[i + 1] - xs[i]); m.push((ys[i + 1] - ys[i]) / (xs[i + 1] - xs[i])); }
+  t[0] = m[0]; t[n - 1] = m[n - 2];
+  for (let i = 1; i < n - 1; i++) t[i] = m[i - 1] * m[i] <= 0 ? 0 : (3 * (dx[i - 1] + dx[i])) / ((2 * dx[i] + dx[i - 1]) / m[i - 1] + (dx[i] + 2 * dx[i - 1]) / m[i]);
+  return (x: number) => {
+    if (x <= xs[0]) return ys[0]; if (x >= xs[n - 1]) return ys[n - 1];
+    let i = 0; while (i < n - 2 && x > xs[i + 1]) i++;
+    const h = dx[i], u = (x - xs[i]) / h, u2 = u * u, u3 = u2 * u;
+    return (2 * u3 - 3 * u2 + 1) * ys[i] + (u3 - 2 * u2 + u) * h * t[i] + (-2 * u3 + 3 * u2) * ys[i + 1] + (u3 - u2) * h * t[i + 1];
+  };
+}
+/** Closed "slab" of hair: an outer and an inner surface along rings of arcs, joined at the sides, top and hem.
+ * Lock grooves come from a radial ripple; the hem is cut into pointed locks. Vertex colours darken the inside. */
+function hairShell(rings: { y: number; rx: number; rz: number; z: number; x?: number }[], arc: [number, number], thick: number, locks: number, tip: number, color: string, seg = 56): THREE.BufferGeometry {
+  const pos: number[] = [], col: number[] = [], idx: number[] = [];
+  const cOut = new THREE.Color(color), cIn = new THREE.Color(color).multiplyScalar(0.62);
+  const nR = rings.length, cols = seg + 1;
+  const pt = (j: number, i: number, inner: boolean) => {
+    const r = rings[j], a = arc[0] + (arc[1] - arc[0]) * (i / seg);
+    const ripple = 1 + 0.035 * Math.cos(locks * a) * Math.min(1, j / 2);
+    const k = inner ? 1 - thick / Math.max(r.rx, r.rz) : 1;
+    // the last ring is cut into pointed locks
+    const dy = j === nR - 1 ? -tip * (0.5 + 0.5 * Math.cos(locks * a)) : 0;
+    return [(r.x ?? 0) + Math.sin(a) * r.rx * ripple * k, r.y + dy, r.z + Math.cos(a) * r.rz * ripple * k];
+  };
+  for (const inner of [false, true]) for (let j = 0; j < nR; j++) for (let i = 0; i <= seg; i++) { pos.push(...pt(j, i, inner)); const cc = inner ? cIn : cOut; col.push(cc.r, cc.g, cc.b); }
+  const O = (j: number, i: number) => j * cols + i, I = (j: number, i: number) => nR * cols + j * cols + i;
+  for (let j = 0; j < nR - 1; j++) for (let i = 0; i < seg; i++) {
+    idx.push(O(j, i), O(j + 1, i), O(j, i + 1), O(j, i + 1), O(j + 1, i), O(j + 1, i + 1));
+    idx.push(I(j, i), I(j, i + 1), I(j + 1, i), I(j, i + 1), I(j + 1, i + 1), I(j + 1, i));
+  }
+  // side edges, top and hem: stitch outer to inner
+  for (let j = 0; j < nR - 1; j++) { idx.push(O(j, 0), I(j, 0), O(j + 1, 0), O(j + 1, 0), I(j, 0), I(j + 1, 0)); idx.push(O(j, seg), O(j + 1, seg), I(j, seg), I(j, seg), O(j + 1, seg), I(j + 1, seg)); }
+  for (let i = 0; i < seg; i++) { idx.push(O(0, i), O(0, i + 1), I(0, i), I(0, i), O(0, i + 1), I(0, i + 1)); const L = nR - 1; idx.push(O(L, i), I(L, i), O(L, i + 1), O(L, i + 1), I(L, i), I(L, i + 1)); }
+  const g = new THREE.BufferGeometry();
+  g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
+  g.setAttribute('color', new THREE.Float32BufferAttribute(col, 3));
+  g.setIndex(idx); g.computeVertexNormals();
   return g;
 }
 /** Blend weights between two bones around a joint height. */
@@ -94,6 +175,12 @@ export class CharacterVisual {
   private fingers: { left: THREE.Object3D[]; right: THREE.Object3D[] } = { left: [], right: [] };
   readonly rig: RigInstance;
   readonly geo: CharacterGeometry;
+  private skeleton!: THREE.Skeleton;
+  private boneIndex!: Map<string, number>;
+  /** body contour at a height (torso), and the torso skinning weights: clothes wrap the real body */
+  private torsoAt!: (y: number) => { rx: number; rz: number; rzb: number; bust: number; glute: number; bw: number };
+  private torsoW!: (y: number) => W;
+  private skullGeo!: THREE.BufferGeometry;
   constructor(rig: RigInstance, geo: CharacterGeometry) {
     this.rig = rig; this.geo = geo; this.root = rig.group;
     rig.resetToRest(); rig.group.position.set(0, 0, 0); rig.group.rotation.set(0, 0, 0); rig.group.updateMatrixWorld(true);
@@ -109,6 +196,7 @@ export class CharacterVisual {
     const bones = [...this.rig.bones.values()];
     const boneIndex = new Map(bones.map((x, i) => [x.name, i]));
     const skeleton = new THREE.Skeleton(bones);
+    this.skeleton = skeleton; this.boneIndex = boneIndex;
     const skin = b.skinColor, top = g.outfit.top, bottom = g.outfit.bottom;
     const topColor = top.color, under = top.secondaryColor ?? shade(top.color, 0.8);
     const pants = bottom.color;
@@ -125,55 +213,70 @@ export class CharacterVisual {
       if (y < neckY - 0.02 * s) return [['chest', 1]];
       return [['chest', 0.6], ['neck', 0.4]];
     };
-    const torsoProfile: [number, number, number][] = [ // y, rx, rz
-      [neckY + 0.01 * s, d.armR * 1.2, d.armR * 1.1],
-      [neckY - 0.008 * s, d.chestRx * 0.5, d.chestRz * 0.62],
-      [neckY - 0.03 * s, d.shoulderX * 0.66, d.chestRz * 0.74],
-      [shoulderY + 0.012 * s, d.shoulderX * 0.84, d.chestRz * 0.84],
-      [shoulderY - 0.025 * s, d.shoulderX * 0.9, d.chestRz * (0.95 + 0.1 * b.chest)],
-      [shoulderY - 0.07 * s, d.chestRx * 1.04, d.chestRz * (1.05 + 0.15 * b.chest)],
-      [chestY, d.chestRx, d.chestRz * (1.02 + 0.1 * b.chest)],
-      [(chestY + spineY) / 2, (d.chestRx + d.waistRx) / 2 + belly * 0.5, d.chestRz * 0.95 + belly * 0.7],
-      [waistY, d.waistRx + belly * 0.4, d.chestRz * 0.9 + belly],
-      [hipsY + 0.01 * s, d.hipRx, d.chestRz * 0.95 + belly * 0.4],
-      [hipsY - 0.07 * s, d.hipRx * 0.92, d.chestRz * 0.85],
-      [hipsY - 0.11 * s, d.hipRx * 0.55, d.chestRz * 0.55]
+    this.torsoW = tw;
+    // base silhouette (y, half width, front depth, back depth) through anatomical key heights; volumes (bust, glutes)
+    // are added as lobes on top, so clothes (vertex colours on the same surface) follow the body's curves
+    const wc = b.waist;
+    const keys: [number, number, number, number][] = [
+      [neckY + 0.01 * s, d.armR * 1.2, d.armR * 1.1, d.armR * 1.1],
+      [neckY - 0.008 * s, d.chestRx * 0.5, d.chestRz * 0.62, d.chestRz * 0.62],
+      [neckY - 0.03 * s, d.shoulderX * 0.66, d.chestRz * 0.74, d.chestRz * 0.74],
+      [shoulderY + 0.012 * s, d.shoulderX * 0.84, d.chestRz * 0.84, d.chestRz * 0.84],
+      [shoulderY - 0.025 * s, d.shoulderX * 0.9, d.chestRz * (0.95 + 0.1 * b.chest), d.chestRz * 0.95],
+      [shoulderY - 0.07 * s, d.chestRx * 1.04, d.chestRz * (1.05 + 0.15 * b.chest), d.chestRz * 0.98],
+      [chestY, d.chestRx * (1 - 0.05 * wc), d.chestRz * (1.02 + 0.1 * b.chest), d.chestRz * 0.95],
+      [(chestY + spineY) / 2, ((d.chestRx + d.waistRx) / 2) * (1 - 0.1 * wc) + belly * 0.5, d.chestRz * 0.95 + belly * 0.7, d.chestRz * 0.9 * (1 - 0.06 * wc)],
+      // natural waist (narrowest) a bit above the spine joint, widest hips low (at the hip joints): a long, smooth
+      // waist-to-hip curve instead of a step; the waist never goes below ~2/3 of the hips
+      [spineY + 0.025 * s, Math.max(d.waistRx * (1 - 0.1 * wc), d.hipRx * 0.66) + belly * 0.4, d.chestRz * 0.9 * (1 - 0.08 * wc) + belly, d.chestRz * 0.88 * (1 - 0.12 * wc)],
+      [hipsY + 0.035 * s, lerp(Math.max(d.waistRx, d.hipRx * 0.66), d.hipRx, 0.62) + belly * 0.4, d.chestRz * 0.93 + belly * 0.6, d.chestRz * 0.9],
+      [hipsY - 0.035 * s, d.hipRx * (1 + 0.03 * wc), d.chestRz * 0.92 + belly * 0.3, d.chestRz * 0.95],
+      [hipsY - 0.08 * s, d.hipRx * 0.92, d.chestRz * 0.84, d.chestRz * 0.88],
+      [hipsY - 0.11 * s, d.hipRx * 0.7, d.chestRz * 0.6, d.chestRz * 0.66]
     ];
-    const skinG = b.skinGloss, topG = FABRIC_GLOSS[top.fabric] ?? 0, botG = FABRIC_GLOSS[bottom.fabric] ?? 0;
+    const mono = keys.filter((k, i) => i === 0 || k[0] < keys[i - 1][0] - 0.004);
+    const asc = [...mono].reverse();
+    const fRx = pchip(asc.map(k => k[0]), asc.map(k => k[1])), fRz = pchip(asc.map(k => k[0]), asc.map(k => k[2])), fRzb = pchip(asc.map(k => k[0]), asc.map(k => k[3]));
+    // bust (or pectorals) and glutes: teardrop profiles, softer above the peak than below it
+    const bustB = b.bust * 0.085 * s + b.pecs * 0.026 * s, bustY = shoulderY - (0.12 + 0.025 * b.bust) * s, bustW = b.bust >= b.pecs ? 0.36 : 0.55;
+    const gl = b.glutes * 0.075 * s, gluteY = hipsY - 0.055 * s;
+    const bustAt = (y: number) => bustB * Math.exp(-(((y - bustY) / ((y > bustY ? 0.075 : 0.042) * s)) ** 2));
+    const gluteAt = (y: number) => gl * Math.exp(-(((y - gluteY) / ((y > gluteY ? 0.075 : 0.05) * s)) ** 2));
+    const ys = new Set<number>(mono.map(k => k[0]));
+    const yTop = mono[0][0], yBot = mono[mono.length - 1][0];
+    for (let y = yTop - 0.02 * s; y > yBot + 0.005; y -= 0.022 * s) ys.add(y);
+    for (let y = bustY + 0.09 * s; y > bustY - 0.08 * s; y -= 0.014 * s) if (y < yTop - 0.01 && y > yBot) ys.add(y);
+    for (let y = gluteY + 0.07 * s; y > yBot + 0.004; y -= 0.014 * s) if (y < yTop) ys.add(y);
+    const torsoProfile = [...ys].sort((p, q) => q - p).filter((y, i, a) => i === 0 || a[i - 1] - y > 0.004);
+    this.torsoAt = (y: number) => ({ rx: fRx(y), rz: fRz(y), rzb: fRzb(y), bust: bustAt(y), glute: gluteAt(y), bw: bustW });
+    const skinG = 0, topG = 0, botG = 0; // matte: toon shadows only, no specular on people
     const glossOf = (c: string) => c === skin ? skinG : c === pants && top.type !== 'overalls' ? botG : topG;
     // neckline: a skin region on the front of the torso (a = 0 is the front), shaped per type, with a soft cleavage shadow
     const neckBase = neckY - 0.02 * s, NECK: Record<string, number> = { v: 0.13, scoop: 0.1, plunge: 0.21, 'off-shoulder': 0.05 };
     const depth = (NECK[top.neckline] ?? 0) * s;
-    const neckSpec: NecklineSpec | undefined = depth > 0 ? { kind: top.neckline as NecklineSpec['kind'], depth, offDepth: neckBase - (shoulderY - 0.045 * s), scale: s, skin, skinGloss: skinG, cleavage: b.chest >= 0.35 } : undefined;
-    if (depth > 0) for (const y of [neckBase + 0.004 * s, neckBase - depth * 0.5, neckBase - depth - 0.01 * s]) { // a few rings so the torso follows the cut smoothly
-      const i = torsoProfile.findIndex(p => p[0] < y); if (i <= 0) continue;
-      const p0 = torsoProfile[i - 1], p1 = torsoProfile[i], u = (p0[0] - y) / Math.max(1e-6, p0[0] - p1[0]);
-      torsoProfile.splice(i, 0, [y, lerp(p0[1], p1[1], u), lerp(p0[2], p1[2], u)]);
-    }
+    const neckSpec: NecklineSpec | undefined = depth > 0 ? { kind: top.neckline as NecklineSpec['kind'], depth, offDepth: neckBase - (shoulderY - 0.045 * s), scale: s, skin, skinGloss: 0, cleavage: b.bust >= 0.3 } : undefined;
     const rings: Ring[] = [];
     for (let i = 0; i < torsoProfile.length; i++) {
-      const [y, rx, rz] = torsoProfile[i];
+      const y = torsoProfile[i];
       const k = y > neckY - 0.02 * s ? 1 : coat;
       const color = y > neckY - 0.005 * s ? (top.type === 'tanktop' || top.type === 'dress' ? skin : topColor) : torsoColor(y);
       // duplicate ring at the shirt/pants boundary for a crisp edge
-      if (i > 0 && torsoColor(torsoProfile[i - 1][0]) !== color && y < neckY - 0.02 * s) {
-        const by = waistY - 0.015 * s, prev = torsoProfile[i - 1];
-        const u = (by - prev[0]) / (y - prev[0]);
-        const brx = lerp(prev[1], rx, u) * k, brz = lerp(prev[2], rz, u) * k;
-        rings.push({ y: by + 0.001, rx: brx * 1.03, rz: brz * 1.03, x: 0, z: 0, color: torsoColor(prev[0]), w: tw(by) });
-        rings.push({ y: by - 0.001, rx: brx, rz: brz, x: 0, z: 0, color, w: tw(by) });
+      if (i > 0 && torsoColor(torsoProfile[i - 1]) !== color && y < neckY - 0.02 * s) {
+        const by = waistY - 0.015 * s;
+        rings.push({ y: by + 0.001, rx: fRx(by) * k * 1.03, rz: fRz(by) * k * 1.03, rzb: fRzb(by) * k * 1.03, glute: gluteAt(by), x: 0, z: 0, color: torsoColor(torsoProfile[i - 1]), w: tw(by) });
+        rings.push({ y: by - 0.001, rx: fRx(by) * k, rz: fRz(by) * k, rzb: fRzb(by) * k, glute: gluteAt(by), x: 0, z: 0, color, w: tw(by) });
       }
       const neckColor = depth > 0 && y > neckY - 0.005 * s ? skin : color;
-      rings.push({ y, rx: rx * k, rz: rz * k, x: 0, z: 0.0, color: neckColor, w: tw(y), gloss: glossOf(neckColor), neck: depth > 0 ? neckBase - y : undefined });
+      rings.push({ y, rx: fRx(y) * k, rz: fRz(y) * k, rzb: fRzb(y) * k, bust: bustAt(y) * k, bw: bustW, glute: gluteAt(y), x: 0, z: 0.0, color: neckColor, w: tw(y), gloss: glossOf(neckColor), neck: depth > 0 ? neckBase - y : undefined });
     }
-    this.addSkinned(tubeGeometry(rings, boneIndex, depth > 0 ? 56 : 48), skeleton, 'torso', neckSpec);
+    this.addSkinned(tubeGeometry(rings, boneIndex, depth > 0 ? 64 : 56, true, true, { passes: 1 }), skeleton, 'torso', neckSpec);
     // neck
     const headY = this.boneWorldY('head').y;
     this.addSkinned(tubeGeometry(([
       { y: headY + d.headRy * 0.4, rx: d.headRx * 0.38, rz: d.headRz * 0.38, x: 0, z: -0.01 * s, color: skin, w: [['head', 1]] },
       { y: headY, rx: d.headRx * 0.36, rz: d.headRz * 0.38, x: 0, z: -0.01 * s, color: skin, w: [['head', 0.5], ['neck', 0.5]] },
       { y: neckY - 0.02 * s, rx: d.headRx * 0.42, rz: d.headRz * 0.42, x: 0, z: -0.01 * s, color: skin, w: [['neck', 0.5], ['chest', 0.5]] }
-    ] as Ring[]).map(r => ({ ...r, gloss: skinG })), boneIndex, 24, false, false), skeleton, 'neck');
+    ] as Ring[]), boneIndex, 24, false, false), skeleton, 'neck');
     // arms
     const sleeve = top.type === 'tanktop' || top.type === 'dress' ? 0 : top.type === 'tshirt' || top.type === 'vest' || top.type === 'overalls' ? 0.45 : 1.0;
     const sleeveColor = top.type === 'vest' || top.type === 'overalls' ? under : topColor;
@@ -211,7 +314,11 @@ export class CharacterVisual {
         if (i > 0 && lprof[i - 1][0] < shorts && u >= shorts && shorts < 1) { const yy = th.y - shorts * legLen; leg.push({ y: yy + 0.001, rx: d.legR * rf * 1.08, rz: d.legR * rf * 1.08, x: th.x, z: 0, color: pants, w: lw(yy) }); leg.push({ y: yy - 0.001, rx: d.legR * rf * 0.92, rz: d.legR * rf * 0.92, x: th.x, z: 0, color: skin, w: lw(yy) }); }
         const inPants = u <= shorts;
         const color = u >= bootTop ? g.outfit.shoes.color : inPants ? pants : skin;
-        leg.push({ y, rx: d.legR * rf * (inPants ? 1.04 : 0.92) * (u < 0 ? 1.2 : 1), rz: d.legR * rf * (inPants ? 1.04 : 0.92), x: th.x * (u < 0 ? 0.7 : 1), z: 0, color, w: lw(y) });
+        const fullness = 1 + 0.16 * b.thighs * clamp((0.5 - u) / 0.5, 0, 1);
+        const rzl = d.legR * rf * (inPants ? 1.04 : 0.92) * fullness;
+        // the seat continues into the back of the upper thigh
+        const seat = bottom.type === 'skirt' || top.type === 'dress' ? 1 : 1 + 0.6 * b.glutes * Math.exp(-(((u - 0.02) / 0.07) ** 2));
+        leg.push({ y, rx: d.legR * rf * (inPants ? 1.04 : 0.92) * (u < 0 ? 1.2 : 1) * fullness, rz: rzl, rzb: rzl * seat, x: th.x * (u < 0 ? 0.7 : 1), z: 0, color, w: lw(y) });
       }
       for (const r of leg) r.gloss = r.color === skin ? skinG : r.color === pants ? botG : 0;
       this.addSkinned(tubeGeometry(leg, boneIndex, 28, false, true), skeleton, `${side}Leg`);
@@ -248,16 +355,50 @@ export class CharacterVisual {
     if (top.type === 'labcoat' || top.type === 'dress' || bottom.type === 'skirt') {
       const color = bottom.type === 'skirt' ? pants : topColor;
       const len = top.type === 'labcoat' ? d.legLen * 0.62 : bottom.type === 'skirt' ? d.legLen * 0.42 : d.legLen * 0.5;
-      const open = top.type === 'labcoat' ? 0.5 : 0;
-      const skirt = new THREE.Mesh(new THREE.CylinderGeometry(d.hipRx * 1.12, d.hipRx * 1.6, len, 48, 1, true, open / 2 + Math.PI, Math.PI * 2 - open), toon(color, { side: THREE.DoubleSide, gloss: (bottom.type === 'skirt' ? FABRIC_GLOSS[bottom.fabric] : FABRIC_GLOSS[top.fabric]) * 0.6, shininess: 45 }));
-      skirt.scale.z = (d.chestRz * 1.1) / (d.hipRx * 1.12) + 0.2;
-      skirt.position.copy(toLocal(hips, new THREE.Vector3(0, waistY - 0.02 * s - len / 2, 0)));
-      skirt.rotation.y = Math.PI;
-      hips.add(withOutline(skirt, 0.005 * s));
+      const y0 = waistY - 0.012 * s;
+      this.clothShell(top.type === 'labcoat' ? 'coat-tails' : 'skirt', y0, y0 - len, color, top.type === 'labcoat' ? { flare: 0.05, arc: [0.3, Math.PI * 2 - 0.3], legBlend: 0.35, foldAmp: 0.004 } : { flare: top.type === 'dress' ? 0.14 : 0.1, legBlend: 0.7 });
     }
   }
+  /** A cloth surface that wraps the body from `y0` down to `y1` (skirt, dress, coat tails, apron): it starts on the
+   * torso's own contour, hangs from the widest point of the hips/glutes, flares, gets folds towards the hem and is
+   * skinned to the hips and, progressively, to the thighs, so it moves with the legs instead of floating. */
+  private clothShell(name: string, y0: number, y1: number, color: string, o: { flare?: number; arc?: [number, number]; offset?: number; legBlend?: number; folds?: number; foldAmp?: number }) {
+    const d = this.d, s = d.scale, b = this.geo.body;
+    const hipsY = this.boneWorldY('hips').y, torsoBottom = hipsY - 0.11 * s;
+    const th = this.boneWorldY('leftThigh'), kn = this.boneWorldY('leftShin');
+    const len = y0 - y1, off = (o.offset ?? 0.006) * s;
+    const N = Math.max(6, Math.round(len / (0.03 * s)));
+    const rings: Ring[] = [];
+    let rxW = 0, rzW = 0, rzbW = 0, glW = 0;
+    for (let i = 0; i <= N; i++) {
+      const u = i / N, y = y0 - u * len;
+      let rx: number, rz: number, rzb: number, glute: number, bust = 0;
+      if (y > torsoBottom) { const t = this.torsoAt(y); rx = t.rx; rz = t.rz; rzb = t.rzb; glute = t.glute; bust = t.bust; }
+      else {
+        // below the crotch the body is two thighs: the envelope spans both
+        const legU = clamp((th.y - y) / Math.max(0.05, th.y - kn.y), 0, 1);
+        const lr = d.legR * lerp(1.22, 0.95, legU) * (1 + 0.15 * b.thighs);
+        rx = Math.abs(th.x) + lr; rz = lr * 1.05; rzb = lr * 1.05; glute = this.torsoAt(torsoBottom).glute * Math.exp(-(((torsoBottom - y) / (0.06 * s)) ** 2));
+      }
+      // cloth hangs from the widest point above (it does not cling under the glutes) and flares towards the hem
+      const below = y < hipsY;
+      rxW = below ? Math.max(rxW * (1 - 0.04 * u), rx) : rx; rzW = below ? Math.max(rzW * (1 - 0.05 * u), rz) : rz; rzbW = below ? Math.max(rzbW * (1 - 0.1 * u), rzb) : rzb; glW = below ? Math.max(glW * 0.72, glute) : glute;
+      const fl = (o.flare ?? 0.12) * Math.max(0, hipsY - y);
+      const fold = (o.foldAmp ?? 0.007) * s * Math.max(0, (u - 0.25) / 0.75);
+      // the cloth covers the glutes with their own shape (never less than the body under it) and partly bridges the cleft
+      rings.push({ y, rx: rxW + off + fl, rz: rzW + off + fl * 0.8, rzb: rzbW + glW * 0.4 + off + fl * 0.5, glute: glW * 1.04, bust, bw: this.torsoAt(y).bw, x: 0, z: 0, color, w: y > hipsY - 0.02 * s ? this.torsoW(y) : [['hips', 1]], legBlend: (o.legBlend ?? 0.55) * smoothstep(clamp((hipsY - 0.1 * s - y) / Math.max(0.05, len * 0.7), 0, 1)), fold, folds: o.folds ?? 11 });
+    }
+    // relax the profile along the length (the max() above leaves small kinks that toon shading would show)
+    for (let pass = 0; pass < 3; pass++) for (const k of ['rx', 'rz', 'rzb'] as const) { const v = rings.map(r => r[k] ?? r.rz); for (let i = 1; i < rings.length - 1; i++) if (rings[i].y < hipsY) rings[i][k] = 0.25 * v[i - 1] + 0.5 * v[i] + 0.25 * v[i + 1]; }
+    const geo = tubeGeometry(rings, this.boneIndex, 72, false, false, { arc: o.arc, passes: 2 });
+    const mesh = new THREE.SkinnedMesh(geo, toon('#ffffff', { vertexColors: true, side: THREE.DoubleSide }));
+    mesh.name = name; mesh.frustumCulled = false; mesh.castShadow = true;
+    mesh.bind(this.skeleton, new THREE.Matrix4());
+    this.rig.group.add(mesh);
+    return mesh;
+  }
   private addSkinned(geo: THREE.BufferGeometry, skeleton: THREE.Skeleton, name: string, neckline?: NecklineSpec) {
-    const mesh = new THREE.SkinnedMesh(geo, toon('#ffffff', geo.userData.gloss ? { vertexColors: true, glossAttr: true, shininess: 70, neckline } : { vertexColors: true }));
+    const mesh = new THREE.SkinnedMesh(geo, toon('#ffffff', neckline ? { vertexColors: true, glossAttr: true, shininess: 70, neckline } : { vertexColors: true }));
     mesh.name = name; mesh.frustumCulled = false;
     mesh.bind(skeleton, new THREE.Matrix4());
     this.rig.group.add(mesh);
@@ -280,12 +421,12 @@ export class CharacterVisual {
       p.setXYZ(i, x * rx, y * ry, z * rz);
     }
     skullGeo.computeVertexNormals();
-    const skull = new THREE.Mesh(skullGeo, toon(g.body.skinColor)); skull.name = 'skull';
+    const skull = new THREE.Mesh(skullGeo, toon(g.body.skinColor)); skull.name = 'skull'; this.skullGeo = skullGeo;
     H.add(withOutline(skull, g.outlineWidth * s));
     const surfZ = (x: number, y: number, k = 1) => rz * k * Math.sqrt(Math.max(0.02, 1 - (x / (rx * k)) ** 2 - (y / (ry * k)) ** 2));
     // ears
     for (const sx of [1, -1]) {
-      if (f.earSize <= 0) break;
+      if (f.earSize <= 0 || ['long', 'bob'].includes(g.hair.style)) break; // covered by the hair
       const ear = new THREE.Mesh(new THREE.SphereGeometry(1, 26, 18), toon(shade(g.body.skinColor, 0.97)));
       ear.scale.set(0.035 * s * f.earSize, 0.075 * s * f.earSize, 0.05 * s * f.earSize);
       ear.position.set(sx * rx * 0.97, -ry * 0.05, -rz * 0.08); ear.rotation.y = sx * 0.3;
@@ -309,7 +450,7 @@ export class CharacterVisual {
     const lidColor = shade(g.body.skinColor, 0.93);
     const eyes: { group: THREE.Group; ball: THREE.Group; upper: THREE.Group; lower: THREE.Group; side: number }[] = [];
     for (const side of [1, -1]) {
-      const eg = new THREE.Group(); eg.position.set(side * eyeX, eyeY, surfZ(side * eyeX, eyeY) - re * 0.42); eg.scale.y = f.eyeShape === 'narrow' ? 0.7 : f.eyeShape === 'almond' ? 0.85 : 1.08;
+      const eg = new THREE.Group(); eg.userData.noInk = true; eg.position.set(side * eyeX, eyeY, surfZ(side * eyeX, eyeY) - re * 0.42); eg.scale.y = f.eyeShape === 'narrow' ? 0.7 : f.eyeShape === 'almond' ? 0.85 : 1.08;
       eg.rotation.y = side * 0.18;
       H.add(eg);
       const ball = new THREE.Group(); eg.add(ball);
@@ -331,7 +472,7 @@ export class CharacterVisual {
     const browColor = f.browColor ?? g.hair.color;
     const brows = [1, -1].map(side => {
       const m = new THREE.Mesh(new THREE.CapsuleGeometry(0.011 * s * f.browThickness, rx * 0.34, 8, 16), toon(browColor));
-      m.rotation.z = Math.PI / 2; const grp = new THREE.Group(); grp.add(m); H.add(grp); return { grp, side };
+      m.rotation.z = Math.PI / 2; const grp = new THREE.Group(); grp.userData.noInk = true; grp.add(m); H.add(grp); return { grp, side };
     });
     // mouth (dynamic)
     const beardFull = ['full', 'goatee', 'chinstrap'].includes(g.beard.style);
@@ -343,7 +484,7 @@ export class CharacterVisual {
     const stripIdx = (n: number) => { const idx: number[] = []; for (let i = 0; i < n; i++) idx.push(i * 2, i * 2 + 1, i * 2 + 2, i * 2 + 1, i * 2 + 3, i * 2 + 2); return idx; };
     fillGeo.setIndex(stripIdx(N)); teethGeo.setIndex(stripIdx(N)); tongueGeo.setIndex(stripIdx(N));
     const lineIdx: number[] = []; for (const off of [0, (N + 1) * 2]) for (let i = 0; i < N; i++) { const a = off + i * 2; lineIdx.push(a, a + 1, a + 2, a + 1, a + 3, a + 2); } lineGeo.setIndex(lineIdx);
-    const mouthGroup = new THREE.Group(); H.add(mouthGroup);
+    const mouthGroup = new THREE.Group(); mouthGroup.userData.noInk = true; H.add(mouthGroup);
     const fill = new THREE.Mesh(fillGeo, flat('#4a1820', { side: THREE.DoubleSide, polygonOffset: 2 }));
     const tongue = new THREE.Mesh(tongueGeo, flat('#c8566a', { side: THREE.DoubleSide, polygonOffset: 3 }));
     const teeth = new THREE.Mesh(teethGeo, flat('#fbfaf5', { side: THREE.DoubleSide, polygonOffset: 4 }));
@@ -400,7 +541,7 @@ export class CharacterVisual {
     this.buildHair(H, rx, ry, rz);
   }
   private buildHair(H: THREE.Group, rx: number, ry: number, rz: number) {
-    const hairGloss = this.geo.hair.shine > 0 ? { gloss: this.geo.hair.shine * 0.45, shininess: 80 } : {};
+    const hairGloss = {}; // matte hair: toon shadows only
     const g = this.geo, s = this.d.scale, hc = g.hair.color, v = g.hair.volume;
     const ow = 0.007 * s;
     const add = (m: THREE.Mesh, outline = true) => { H.add(outline ? withOutline(m, ow) : m); return m; };
@@ -418,9 +559,32 @@ export class CharacterVisual {
       case 'sidepart': cap(Math.PI * 0.52); { const sw = new THREE.Mesh(new THREE.SphereGeometry(1, 32, 20), toon(hc, hairGloss)); sw.scale.set(rx * 0.75, ry * 0.32, rz * 0.62); sw.position.set(rx * 0.32, ry * 0.72, rz * 0.32); sw.rotation.z = -0.35; add(sw); } break;
       case 'spiky': { cap(Math.PI * 0.48); for (let i = 0; i < 9; i++) { const a = (i / 9) * Math.PI * 2, el = 0.45 + 0.25 * ((i * 37) % 5) / 5; const c = new THREE.Mesh(new THREE.ConeGeometry(rx * 0.22, ry * 0.55 * v, 8), toon(hc, hairGloss)); const dir = new THREE.Vector3(Math.sin(a) * Math.cos(el) * 0.8, Math.sin(el) + 0.3, Math.cos(a) * Math.cos(el) * 0.6 - 0.25).normalize(); c.position.set(dir.x * rx * 0.85, dir.y * ry * 0.85, dir.z * rz * 0.85); c.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), dir); add(c); } break; }
       case 'mohawk': { cap(Math.PI * 0.45, 1.01, -0.48, mix(hc, g.body.skinColor, 0.55)); for (let i = 0; i < 6; i++) { const a = -0.4 + i * 0.32; const c = new THREE.Mesh(new THREE.ConeGeometry(rx * 0.12, ry * 0.5 * v, 6), toon(hc, hairGloss)); c.scale.z = 2.2; const dir = new THREE.Vector3(0, Math.cos(a), Math.sin(a) * 1.1).normalize(); c.position.set(0, dir.y * ry, dir.z * rz); c.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), dir); add(c); } break; }
-      case 'bob': { cap(Math.PI * 0.62, 1.1, -0.78); const back = new THREE.Mesh(new THREE.CylinderGeometry(rx * 1.1, rx * 1.18, ry * 1.05, 44, 1, true, Math.PI * 0.3, Math.PI * 1.4), toon(hc, { side: THREE.DoubleSide, ...hairGloss })); back.scale.z = rz / rx * 1.05; back.position.y = -ry * 0.2; add(back); const bang = new THREE.Mesh(new THREE.SphereGeometry(1, 20, 10, 0, Math.PI * 2, 0, Math.PI / 2), toon(hc, hairGloss)); bang.scale.set(rx * 0.95, ry * 0.24, rz * 0.5); bang.position.set(0, ry * 0.7, rz * 0.5); bang.rotation.x = 0.85; add(bang); break; }
-      case 'long': { cap(Math.PI * 0.58, 1.08, -0.5); const back = new THREE.Mesh(new THREE.CylinderGeometry(rx * 1.05, rx * 1.15, ry * 2.3 * v, 44, 1, true, Math.PI * 0.32, Math.PI * 1.36), toon(hc, { side: THREE.DoubleSide, ...hairGloss })); back.scale.z = rz / rx; back.position.set(0, -ry * 0.75, -rz * 0.08); add(back); break; }
-      case 'ponytail': { cap(Math.PI * 0.55, 1.07, -0.58); const tie = new THREE.Mesh(new THREE.SphereGeometry(rx * 0.16, 12, 8), toon(shade(hc, 0.7))); tie.position.set(0, ry * 0.35, -rz * 1.02); add(tie); const tail = new THREE.Mesh(new THREE.CapsuleGeometry(rx * 0.2, ry * 1.1 * v, 10, 20), toon(hc, hairGloss)); tail.position.set(0, -ry * 0.25, -rz * 1.18); tail.rotation.x = -0.25; tail.name = 'ponytail'; add(tail); break; }
+      case 'bob': {
+        cap(Math.PI * 0.62, 1.1, -0.78);
+        const shell = hairShell([
+          { y: ry * 0.42, rx: rx * 1.06, rz: rz * 1.06, z: -rz * 0.02 }, { y: ry * 0.05, rx: rx * 1.12, rz: rz * 1.1, z: -rz * 0.02 },
+          { y: -ry * 0.45, rx: rx * 1.13, rz: rz * 1.06, z: -rz * 0.06 }, { y: -ry * 0.85 * v, rx: rx * 1.16, rz: rz * 1.0, z: -rz * 0.1 }
+        ], [0.78, Math.PI * 2 - 0.78], 0.035 * s, 18, ry * 0.07, hc);
+        add(new THREE.Mesh(shell, toon('#ffffff', { vertexColors: true })));
+        const bang = new THREE.Mesh(new THREE.SphereGeometry(1, 20, 10, 0, Math.PI * 2, 0, Math.PI / 2), toon(hc)); bang.scale.set(rx * 0.95, ry * 0.24, rz * 0.5); bang.position.set(0, ry * 0.7, rz * 0.5); bang.rotation.x = 0.85; add(bang);
+        break;
+      }
+      case 'long': {
+        cap(Math.PI * 0.58, 1.08, -0.5);
+        // a thick mane: frames the face, falls behind the neck and spreads over the upper back, cut into locks
+        const L = Math.max(1, v);
+        const shell = hairShell([
+          { y: ry * 0.4, rx: rx * 1.06, rz: rz * 1.06, z: -rz * 0.02 }, { y: 0, rx: rx * 1.12, rz: rz * 1.1, z: -rz * 0.03 },
+          { y: -ry * 0.5, rx: rx * 1.1, rz: rz * 1.02, z: -rz * 0.1 }, { y: -ry * 0.95, rx: rx * 1.06, rz: rz * 0.86, z: -rz * 0.28 },
+          { y: -ry * 1.4, rx: rx * 1.12, rz: rz * 0.66, z: -rz * 0.6 }, { y: -ry * 1.85 * L, rx: rx * 1.22, rz: rz * 0.56, z: -rz * 0.8 },
+          { y: -ry * 2.3 * L, rx: rx * 1.18, rz: rz * 0.5, z: -rz * 0.88 }
+        ], [1.0, Math.PI * 2 - 1.0], 0.03 * s, 15, ry * 0.3, hc, 64);
+        add(new THREE.Mesh(shell, toon('#ffffff', { vertexColors: true })));
+        break;
+      }
+      case 'ponytail': { cap(Math.PI * 0.55, 1.07, -0.58); const tie = new THREE.Mesh(new THREE.SphereGeometry(rx * 0.16, 12, 8), toon(shade(hc, 0.7))); tie.position.set(0, ry * 0.35, -rz * 1.02); add(tie); const Lt = ry * 1.35 * v, prof: THREE.Vector2[] = []; for (let k = 0; k <= 14; k++) { const u = k / 14; prof.push(new THREE.Vector2(rx * (0.13 + 0.16 * Math.sin(Math.PI * Math.min(1, u * 1.35)) * (1 - u * 0.55)) * (u > 0.92 ? (1 - u) / 0.08 : 1) + 0.002, -u * Lt)); }
+        prof.reverse(); const tg = new THREE.LatheGeometry(prof, 20); const tp = tg.attributes.position as THREE.BufferAttribute; for (let i = 0; i < tp.count; i++) { const a = Math.atan2(tp.getX(i), tp.getZ(i)), r = 1 + 0.08 * Math.cos(7 * a); tp.setX(i, tp.getX(i) * r); tp.setZ(i, tp.getZ(i) * r); } tg.computeVertexNormals();
+        const tail = new THREE.Mesh(tg, toon(hc)); tail.position.set(0, ry * 0.3, -rz * 1.08); tail.rotation.x = 0.38; tail.name = 'ponytail'; add(tail); break; }
       case 'bun': { cap(Math.PI * 0.55, 1.07, -0.58); const bun = new THREE.Mesh(new THREE.SphereGeometry(rx * 0.38 * v, 28, 20), toon(hc, hairGloss)); bun.position.set(0, ry * 0.85, -rz * 0.55); add(bun); break; }
       case 'curly': { for (let i = 0; i < 46; i++) { const u = ((i * 0.618034) % 1), vv = (i / 46); const th = Math.acos(1 - vv * 1.15), ph = u * Math.PI * 2; if (Math.cos(th) < -0.05) continue; const dir = new THREE.Vector3(Math.sin(th) * Math.cos(ph), Math.cos(th), Math.sin(th) * Math.sin(ph)); if (dir.z > 0.55 && dir.y < 0.55) continue; const b = new THREE.Mesh(new THREE.SphereGeometry(rx * 0.24 * v, 16, 12), toon(hc, hairGloss)); b.position.set(dir.x * rx * 1.02, dir.y * ry * 1.02 + ry * 0.05, dir.z * rz * 1.02); add(b, false); } cap(Math.PI * 0.5, 1.04, -0.48); break; }
     }
@@ -429,7 +593,24 @@ export class CharacterVisual {
     const shell = (t0: number, t1: number, k: number, color: string, phiW = 2.5) => { const m = new THREE.Mesh(new THREE.SphereGeometry(1, 28, 14, Math.PI / 2 - phiW / 2, phiW, t0, t1 - t0), toon(color)); m.scale.set(rx * k, ry * k, rz * k); return m; };
     switch (g.beard.style) {
       case 'full': { const m = shell(Math.PI * 0.56, Math.PI * 0.97, 1.07, bc); add(m); const mus = new THREE.Mesh(new THREE.CapsuleGeometry(ry * 0.06, rx * 0.42, 8, 16), toon(bc)); mus.rotation.z = Math.PI / 2; mus.position.set(0, -ry * 0.3, rz * 0.98); add(mus); break; }
-      case 'stubble': H.add(shell(Math.PI * 0.58, Math.PI * 0.95, 1.006, mix(g.body.skinColor, bc, 0.35))); break;
+      case 'stubble': {
+        // a shadow of beard painted on a copy of the skull (same jaw shape): it fades into the skin, no edges
+        const sg = this.skullGeo.clone(), pa = sg.attributes.position as THREE.BufferAttribute, cols: number[] = [];
+        const skinC = new THREE.Color(g.body.skinColor), beardC = new THREE.Color(mix(g.body.skinColor, bc, 0.42)), cc = new THREE.Color();
+        for (let i = 0; i < pa.count; i++) {
+          const x = pa.getX(i) / rx, y = pa.getY(i) / ry, z = pa.getZ(i) / rz;
+          const k = smoothstep(clamp((-y - 0.12) / 0.25, 0, 1)) * smoothstep(clamp((z + 0.25) / 0.35, 0, 1)) * (1 - smoothstep(clamp((y + 0.98) / 0.1 + 1, 0, 1)) * 0);
+          cc.copy(skinC).lerp(beardC, k); cols.push(cc.r, cc.g, cc.b);
+          pa.setXYZ(i, pa.getX(i) * 1.004, pa.getY(i) * 1.004, pa.getZ(i) * 1.004); void x;
+        }
+        sg.setAttribute('color', new THREE.Float32BufferAttribute(cols, 3));
+        // keep only the lower face (where any vertex has some beard): the rest of the skull is not duplicated
+        const ix = sg.index!.array, keep: number[] = [], tint = (i: number) => Math.abs(cols[i * 3] - skinC.r) + Math.abs(cols[i * 3 + 1] - skinC.g) + Math.abs(cols[i * 3 + 2] - skinC.b) > 0.004;
+        for (let f = 0; f < ix.length; f += 3) if (tint(ix[f]) || tint(ix[f + 1]) || tint(ix[f + 2])) keep.push(ix[f], ix[f + 1], ix[f + 2]);
+        sg.setIndex(keep);
+        const st = new THREE.Mesh(sg, toon('#ffffff', { vertexColors: true })); st.userData.noInk = true; H.add(st);
+        break;
+      }
       case 'chinstrap': add(shell(Math.PI * 0.72, Math.PI * 0.95, 1.04, bc, 3)); break;
       case 'goatee': { const m = new THREE.Mesh(new THREE.SphereGeometry(1, 28, 16), toon(bc)); m.scale.set(rx * 0.22, ry * 0.22, rz * 0.2); m.position.set(0, -ry * 0.72, rz * 0.62); add(m); } // falls through to mustache
       // eslint-disable-next-line no-fallthrough
@@ -506,7 +687,13 @@ export class CharacterVisual {
         case 'headset': { const band = new THREE.Mesh(new THREE.TorusGeometry(rx * 1.08, 0.012 * s, 6, 24, Math.PI), toon(a.color)); band.position.y = 0; band.scale.y = ry / rx * 1.08; H.add(band); for (const sx of [1, -1]) { const cup = new THREE.Mesh(new THREE.CylinderGeometry(rx * 0.22, rx * 0.22, 0.04 * s, 16), toon(c2)); cup.rotation.z = Math.PI / 2; cup.position.set(sx * rx * 1.05, -ry * 0.05, 0); H.add(withOutline(cup, 0.004 * s)); } const mic = new THREE.Mesh(new THREE.CapsuleGeometry(0.006 * s, rx * 0.7, 10, 20), toon(a.color)); mic.rotation.set(0, 0, Math.PI / 2 - 0.2); mic.position.set(rx * 0.75, -ry * 0.35, rz * 0.65); mic.rotation.y = -0.9; H.add(mic); break; }
         case 'earrings': for (const sx of [1, -1]) { const e = new THREE.Mesh(new THREE.SphereGeometry(0.012 * s, 8, 6), toon(a.color)); e.position.set(sx * rx * 0.98, -ry * 0.38, -rz * 0.02); H.add(e); } break;
         case 'scarf': { const chest = this.rig.bone('chest'); const t = new THREE.Mesh(new THREE.TorusGeometry(1, 0.35, 8, 24), toon(a.color)); t.rotation.x = Math.PI / 2; t.scale.set(d.headRx * 0.6, d.headRz * 0.6, d.headRx * 0.6); t.position.copy(chest.worldToLocal(this.boneWorldY('neck').clone().add(new THREE.Vector3(0, -0.01 * s, 0)))); chest.add(withOutline(t, 0.004 * s)); break; }
-        case 'toolbelt': case 'apron': { const hips = this.rig.bone('hips'); const y = (this.boneWorldY('hips').y + this.boneWorldY('spine').y) / 2 - 0.02 * s; if (a.type === 'toolbelt') { const t = new THREE.Mesh(new THREE.TorusGeometry(1, 0.1, 6, 28), toon(a.color)); t.rotation.x = Math.PI / 2; t.scale.set(d.waistRx * 1.12 + g.body.belly * 0.03, d.chestRz * 1.02 + g.body.belly * 0.07, d.waistRx * 0.3); t.position.copy(hips.worldToLocal(new THREE.Vector3(0, y, 0))); hips.add(withOutline(t, 0.004 * s)); for (const [px, pz] of [[0.9, 0.3], [-0.9, 0.3], [0.6, 0.8]]) { const p = new THREE.Mesh(new THREE.BoxGeometry(0.06 * s, 0.08 * s, 0.035 * s), toon(c2)); p.position.copy(hips.worldToLocal(new THREE.Vector3(px * d.waistRx * 1.1, y - 0.045 * s, pz * d.chestRz * 1.05))); p.lookAt(hips.localToWorld(new THREE.Vector3(0, p.position.y, 0))); p.rotateY(Math.PI); hips.add(withOutline(p, 0.003 * s)); } const wrench = new THREE.Mesh(new THREE.BoxGeometry(0.012 * s, 0.12 * s, 0.02 * s), toon('#a7b0ba')); wrench.position.copy(hips.worldToLocal(new THREE.Vector3(-0.9 * d.waistRx * 1.1, y - 0.06 * s, 0.32 * d.chestRz + 0.03 * s))); hips.add(wrench); } else { const chest = this.rig.bone('chest'); const bib = new THREE.Mesh(new THREE.BoxGeometry(d.chestRx * 1.25, 0.24 * s, 0.012 * s), toon(a.color)); bib.position.copy(chest.worldToLocal(new THREE.Vector3(0, this.boneWorldY('chest').y + 0.02 * s, d.chestRz * 1.1 + 0.01 * s))); chest.add(withOutline(bib, 0.004 * s)); const skirt = new THREE.Mesh(new THREE.BoxGeometry(d.hipRx * 1.6, 0.42 * s, 0.012 * s), toon(a.color)); skirt.position.copy(hips.worldToLocal(new THREE.Vector3(0, y - 0.2 * s, d.chestRz * 1.05 + 0.02 * s))); hips.add(withOutline(skirt, 0.004 * s)); } break; }
+        case 'toolbelt': case 'apron': { const hips = this.rig.bone('hips'); const y = (this.boneWorldY('hips').y + this.boneWorldY('spine').y) / 2 - 0.02 * s; if (a.type === 'toolbelt') { const t = new THREE.Mesh(new THREE.TorusGeometry(1, 0.1, 6, 28), toon(a.color)); t.rotation.x = Math.PI / 2; t.scale.set(d.waistRx * 1.12 + g.body.belly * 0.03, d.chestRz * 1.02 + g.body.belly * 0.07, d.waistRx * 0.3); t.position.copy(hips.worldToLocal(new THREE.Vector3(0, y, 0))); hips.add(withOutline(t, 0.004 * s)); for (const [px, pz] of [[0.9, 0.3], [-0.9, 0.3], [0.6, 0.8]]) { const p = new THREE.Mesh(new THREE.BoxGeometry(0.06 * s, 0.08 * s, 0.035 * s), toon(c2)); p.position.copy(hips.worldToLocal(new THREE.Vector3(px * d.waistRx * 1.1, y - 0.045 * s, pz * d.chestRz * 1.05))); p.lookAt(hips.localToWorld(new THREE.Vector3(0, p.position.y, 0))); p.rotateY(Math.PI); hips.add(withOutline(p, 0.003 * s)); } const wrench = new THREE.Mesh(new THREE.BoxGeometry(0.012 * s, 0.12 * s, 0.02 * s), toon('#a7b0ba')); wrench.position.copy(hips.worldToLocal(new THREE.Vector3(-0.9 * d.waistRx * 1.1, y - 0.06 * s, 0.32 * d.chestRz + 0.03 * s))); hips.add(wrench); } else {
+            // a bib apron that wraps the front of the body from the chest to above the knees, tied at the waist
+            const yTop = this.boneWorldY('chest').y + 0.08 * s, yHem = y - 0.42 * s;
+            this.clothShell('apron', yTop, yHem, a.color, { arc: [-1.2, 1.2], offset: 0.012, flare: 0.06, legBlend: 0.6, foldAmp: 0.004, folds: 9 });
+            const tie = new THREE.Mesh(new THREE.TorusGeometry(1, 0.06, 6, 32), toon(a.color)); tie.rotation.x = Math.PI / 2; const wt = this.torsoAt(y + 0.01 * s); tie.scale.set(wt.rx * 1.06 + 0.012 * s, Math.max(wt.rz, wt.rzb) * 1.06 + 0.012 * s, 0.25 * wt.rx); tie.position.copy(hips.worldToLocal(new THREE.Vector3(0, y + 0.01 * s, 0))); hips.add(tie);
+            const strap = new THREE.Mesh(new THREE.TorusGeometry(1, 0.08, 6, 24), toon(a.color)); strap.rotation.x = Math.PI / 2 - 0.35; strap.scale.set(d.headRx * 0.58, d.headRz * 0.62, d.headRx * 0.5); const chest = this.rig.bone('chest'); strap.position.copy(chest.worldToLocal(this.boneWorldY('neck').clone().add(new THREE.Vector3(0, -0.03 * s, 0.01 * s)))); chest.add(strap);
+          } break; }
         case 'badge': { const chest = this.rig.bone('chest'); const b = new THREE.Mesh(new THREE.BoxGeometry(0.06 * s, 0.035 * s, 0.006 * s), toon(a.color)); b.position.copy(chest.worldToLocal(new THREE.Vector3(d.chestRx * 0.45, this.boneWorldY('chest').y + 0.05 * s, d.chestRz * 1.12 + 0.006 * s))); chest.add(withOutline(b, 0.002 * s)); break; }
         case 'watch': { const arm = this.rig.bone('leftLowerArm'); const w = new THREE.Mesh(new THREE.TorusGeometry(d.armR * 0.72, d.armR * 0.18, 6, 16), toon(a.color)); w.rotation.x = Math.PI / 2; w.position.set(0, -d.lowerArmLen * 0.88, 0); arm.add(w); break; }
         case 'backpack': { const chest = this.rig.bone('chest'); const b = new THREE.Mesh(new THREE.BoxGeometry(d.chestRx * 1.4, 0.38 * s, 0.16 * s), toon(a.color)); b.position.copy(chest.worldToLocal(new THREE.Vector3(0, this.boneWorldY('chest').y, -d.chestRz * 1.05 - 0.08 * s))); chest.add(withOutline(b, 0.005 * s)); break; }

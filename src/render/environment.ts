@@ -3,6 +3,8 @@ import * as THREE from 'three';
 import type { EnvironmentV2 } from '../engine/schema.ts';
 import { toon, withOutline, shade } from './toon.ts';
 import { noise1 } from '../engine/math.ts';
+import { wallOpenings, beyondOf, beyondArea, WALL_T } from '../engine/layout.ts';
+import type { PlacedProp, Opening, Beyond } from '../engine/layout.ts';
 
 export interface EnvVisual { group: THREE.Group; lights: { light: THREE.Light; base: number; flicker: number; seed: number }[]; background: THREE.Color }
 
@@ -24,7 +26,7 @@ function floorTexture(env: EnvironmentV2): THREE.CanvasTexture | null {
   return tex;
 }
 
-export function buildEnvironment(env: EnvironmentV2): EnvVisual {
+export function buildEnvironment(env: EnvironmentV2, placed: PlacedProp[] = []): EnvVisual {
   const group = new THREE.Group();
   const [W, H, D] = env.size;
   const lights: EnvVisual['lights'] = [];
@@ -39,11 +41,12 @@ export function buildEnvironment(env: EnvironmentV2): EnvVisual {
   group.add(floor);
   if (env.kind === 'room') {
     const wallMat = toon(env.walls.color), trim = toon(env.walls.trimColor);
-    const T = 0.12;
+    const T = WALL_T;
+    const openings = wallOpenings(env, placed);
     const wallSpec = { back: { len: W, pos: (o: number, y: number) => new THREE.Vector3(o, y, -D / 2), rotY: 0 }, left: { len: D, pos: (o: number, y: number) => new THREE.Vector3(-W / 2, y, o), rotY: Math.PI / 2 }, right: { len: D, pos: (o: number, y: number) => new THREE.Vector3(W / 2, y, -o), rotY: -Math.PI / 2 } } as const;
     for (const side of env.walls.sides) {
       const spec = wallSpec[side];
-      const holes = env.openings.filter(o => o.wall === side).sort((a, b) => a.offset - b.offset);
+      const holes = openings.filter(o => o.wall === side).sort((a, b) => a.offset - b.offset);
       // build wall from slabs around openings
       let cursor = -spec.len / 2;
       const slab = (x0: number, x1: number, y0: number, y1: number) => { if (x1 - x0 < 0.01 || y1 - y0 < 0.01) return; const m = new THREE.Mesh(new THREE.BoxGeometry(x1 - x0, y1 - y0, T), wallMat); m.position.copy(spec.pos((x0 + x1) / 2, (y0 + y1) / 2)); m.rotation.y = spec.rotY; m.receiveShadow = true; group.add(m); };
@@ -61,18 +64,22 @@ export function buildEnvironment(env: EnvironmentV2): EnvVisual {
           const mullion = new THREE.Mesh(new THREE.BoxGeometry(0.05, o.height, 0.06), trim); mullion.position.copy(glass.position); mullion.rotation.y = spec.rotY; group.add(mullion);
           const mull2 = new THREE.Mesh(new THREE.BoxGeometry(o.width, 0.05, 0.06), trim); mull2.position.copy(glass.position); mull2.rotation.y = spec.rotY; group.add(mull2);
         } else {
-          const dark = new THREE.Mesh(new THREE.PlaneGeometry(o.width, o.height), new THREE.MeshBasicMaterial({ color: o.glow ?? '#11161d' }));
-          dark.position.copy(spec.pos(o.offset, o.sill + o.height / 2)); dark.position.add(new THREE.Vector3(0, 0, 0)); dark.rotation.y = spec.rotY;
-          const back = dark.position.clone().add(new THREE.Vector3(0, 0, -0.5).applyAxisAngle(new THREE.Vector3(0, 1, 0), spec.rotY)); dark.position.copy(back); group.add(dark);
+          const b = beyondOf(o);
+          if (b) group.add(buildBeyond(env, o, b, lights));
         }
-        // frame as 3 thin bars (not a full box covering the hole)
-        for (const [w, h, dx, dy] of [[0.08, o.height + 0.08, -o.width / 2 - 0.04, 0], [0.08, o.height + 0.08, o.width / 2 + 0.04, 0], [o.width + 0.16, 0.08, 0, o.height / 2 + 0.04]] as const) { const bar = new THREE.Mesh(new THREE.BoxGeometry(w, h, T * 1.3), trim); bar.position.copy(spec.pos(o.offset + dx, o.sill + o.height / 2 + dy)); bar.rotation.y = spec.rotY; group.add(withOutline(bar, 0.006)); }
+        // frame as 3 thin bars (not a full box covering the hole); a door prop brings its own frame
+        if (!(o as { auto?: boolean }).auto) for (const [w, h, dx, dy] of [[0.08, o.height + 0.08, -o.width / 2 - 0.04, 0], [0.08, o.height + 0.08, o.width / 2 + 0.04, 0], [o.width + 0.16, 0.08, 0, o.height / 2 + 0.04]] as const) { const bar = new THREE.Mesh(new THREE.BoxGeometry(w, h, T * 1.3), trim); bar.position.copy(spec.pos(o.offset + dx, o.sill + o.height / 2 + dy)); bar.rotation.y = spec.rotY; group.add(withOutline(bar, 0.006)); }
         cursor = b;
       }
       slab(cursor, spec.len / 2, 0, H);
       // baseboard and panel line
       const base = new THREE.Mesh(new THREE.BoxGeometry(spec.len, 0.14, T * 1.4), trim); base.position.copy(spec.pos(0, 0.07)); base.rotation.y = spec.rotY; group.add(base);
       if (env.walls.panel) { const band = new THREE.Mesh(new THREE.BoxGeometry(spec.len, 0.06, T * 1.3), trim); band.position.copy(spec.pos(0, 1.15)); band.rotation.y = spec.rotY; group.add(band); const lower = new THREE.Mesh(new THREE.BoxGeometry(spec.len, 1.12, T * 1.05), toon(shade(env.walls.color, 0.85))); lower.position.copy(spec.pos(0, 0.58)); lower.rotation.y = spec.rotY; lower.receiveShadow = true; group.add(lower); }
+    }
+    // the fourth wall: seen from inside the room only (a camera outside looks through its back face)
+    if (!(env.walls.sides as string[]).includes('front')) {
+      const fw = new THREE.Mesh(new THREE.PlaneGeometry(W, H), toon(shade(env.walls.color, 0.92))); fw.position.set(0, H / 2, D / 2); fw.rotation.y = Math.PI; fw.userData.noInk = true; fw.name = 'fourth-wall'; group.add(fw);
+      const fb = new THREE.Mesh(new THREE.PlaneGeometry(W, 0.14), toon(env.walls.trimColor)); fb.position.set(0, 0.07, D / 2 - 0.005); fb.rotation.y = Math.PI; fb.userData.noInk = true; group.add(fb);
     }
     // decor
     for (const dcor of env.decor) {
@@ -111,6 +118,60 @@ export function buildEnvironment(env: EnvironmentV2): EnvVisual {
   });
   if (env.fog) group.userData.fog = new THREE.Fog(new THREE.Color(env.fog.color), env.fog.near, env.fog.far);
   return { group, lights, background: new THREE.Color(env.sky.bottom) };
+}
+/** The space seen (and walked) through a door: a building corridor, a night street, another room or darkness. */
+function buildBeyond(env: EnvironmentV2, o: Opening, b: Beyond, lights: EnvVisual['lights']): THREE.Group {
+  const g = new THREE.Group(); g.name = 'beyond:' + o.id;
+  const [x0, x1, z0, z1] = beyondArea(env, o, b), H = env.size[1];
+  const cx = (x0 + x1) / 2, cz = (z0 + z1) / 2, sx = x1 - x0, sz = z1 - z0;
+  // the far side is the one opposite the door; "inward" points from it back towards the door
+  const far = o.wall === 'back' ? new THREE.Vector3(cx, 0, z0) : o.wall === 'left' ? new THREE.Vector3(x0, 0, cz) : new THREE.Vector3(x1, 0, cz);
+  const farRot = o.wall === 'back' ? 0 : o.wall === 'left' ? Math.PI / 2 : -Math.PI / 2;
+  const along = o.wall === 'back' ? sx : sz, depth = o.wall === 'back' ? sz : sx;
+  const inward = new THREE.Vector3(0, 0, 1).applyAxisAngle(new THREE.Vector3(0, 1, 0), farRot);
+  const side = new THREE.Vector3(1, 0, 0).applyAxisAngle(new THREE.Vector3(0, 1, 0), farRot);
+  const toDoor = (d: number) => far.clone().addScaledVector(inward, d);
+  const lit = (c: string, k = 0.35) => toon(c, { emissive: c, emissiveIntensity: k });
+  const floorPlane = (w: number, d: number, c: string, at: THREE.Vector3, y: number, k?: number) => { const m = new THREE.Mesh(new THREE.PlaneGeometry(w, d), lit(c, k)); m.rotation.set(-Math.PI / 2, 0, farRot); m.position.copy(at).setY(y); m.receiveShadow = true; g.add(m); return m; };
+  const wallAt = (pos: THREE.Vector3, rotY: number, w: number, h: number, c: string, k?: number) => { const m = new THREE.Mesh(new THREE.BoxGeometry(w, h, 0.1), lit(c, k)); m.position.copy(pos).setY(h / 2); m.rotation.y = rotY; g.add(m); return m; };
+  const addLight = (pos: THREE.Vector3, color: string, intensity: number, distance: number) => { const l = new THREE.PointLight(new THREE.Color(color), intensity, distance, 2); l.position.copy(pos); g.add(l); lights.push({ light: l, base: intensity, flicker: 0, seed: 991 }); };
+  const wc = b.wallColor ?? '#a9a294', fc = b.floorColor ?? '#5d5a55', lc = b.lightColor ?? '#ffe2b8';
+  if (b.kind === 'dark') { const m = new THREE.Mesh(new THREE.BoxGeometry(sx, H, sz), new THREE.MeshBasicMaterial({ color: o.glow ?? '#07090c', side: THREE.BackSide })); m.position.set(cx, H / 2, cz); g.add(m); return g; }
+  if (b.kind === 'corridor' || b.kind === 'room') {
+    const mid = toDoor(depth / 2);
+    floorPlane(along, depth, fc, mid, 0.002, 0.15);
+    const ceil = floorPlane(along, depth, shade(wc, 0.8), mid, H, 0.2); ceil.rotation.x = Math.PI / 2;
+    wallAt(far, farRot, along, H, wc, 0.3);
+    for (const k of [1, -1]) wallAt(mid.clone().addScaledVector(side, k * along / 2), farRot + Math.PI / 2, depth, H, shade(wc, 0.9), 0.3);
+    const base = new THREE.Mesh(new THREE.BoxGeometry(along, 0.12, 0.04), toon(shade(wc, 0.6))); base.position.copy(toDoor(0.07)).setY(0.06); base.rotation.y = farRot; g.add(base);
+    if (b.kind === 'corridor') {
+      // the neighbour's door across the landing, with a number plate, a light switch and a ceiling lamp
+      const door = new THREE.Mesh(new THREE.BoxGeometry(0.95, 2.1, 0.06), toon('#4a2c1c')); door.position.copy(toDoor(0.08)).addScaledVector(side, -along * 0.2).setY(1.05); door.rotation.y = farRot; g.add(withOutline(door, 0.006));
+      const plate = new THREE.Mesh(new THREE.BoxGeometry(0.16, 0.1, 0.02), toon('#c9a640', { emissive: '#c9a640', emissiveIntensity: 0.3 })); plate.position.copy(door.position).addScaledVector(inward, 0.04).setY(1.62); plate.rotation.y = farRot; g.add(plate);
+      const knob = new THREE.Mesh(new THREE.SphereGeometry(0.03, 10, 8), toon('#d0c080')); knob.position.copy(door.position).addScaledVector(inward, 0.05).addScaledVector(side, 0.36).setY(1.0); g.add(knob);
+      const sw = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.12, 0.02), toon('#e8e4da')); sw.position.copy(toDoor(0.07)).addScaledVector(side, along * 0.12).setY(1.2); sw.rotation.y = farRot; g.add(sw);
+      const lamp = new THREE.Mesh(new THREE.CylinderGeometry(0.18, 0.18, 0.05, 20), new THREE.MeshBasicMaterial({ color: lc })); lamp.position.copy(mid).setY(H - 0.03); g.add(lamp);
+    } else {
+      const bed = new THREE.Mesh(new THREE.BoxGeometry(1.5, 0.45, 2), toon('#d8d2e8')); bed.position.copy(toDoor(1.05)).addScaledVector(side, along * 0.15).setY(0.22); bed.rotation.y = farRot; g.add(withOutline(bed, 0.008));
+      const pillow = new THREE.Mesh(new THREE.BoxGeometry(1.3, 0.14, 0.35), toon('#f0eef6')); pillow.position.copy(toDoor(0.3)).addScaledVector(side, along * 0.15).setY(0.52); pillow.rotation.y = farRot; g.add(pillow);
+    }
+    // the light sits at the far end so it barely reaches through the wall into the main set
+    addLight(toDoor(Math.min(0.6, depth * 0.3)).setY(H - 0.35), lc, b.lightIntensity ?? 1.4, Math.max(2, depth * 0.9));
+    return g;
+  }
+  // street at night: pavement with a kerb, asphalt with lane marks, the building across the street and a street lamp
+  floorPlane(along, 2.4, '#8d8b86', toDoor(depth - 1.2), 0.004, 0.12);
+  const kerb = new THREE.Mesh(new THREE.BoxGeometry(along, 0.12, 0.18), toon('#a8a49c')); kerb.position.copy(toDoor(depth - 2.45)).setY(0.06); kerb.rotation.y = farRot; g.add(kerb);
+  floorPlane(along, depth - 2.4, fc, toDoor((depth - 2.4) / 2), 0.002, 0.1);
+  for (let k = -3; k <= 3; k++) { const dash = new THREE.Mesh(new THREE.PlaneGeometry(1.2, 0.12), new THREE.MeshBasicMaterial({ color: '#c9c3a8' })); dash.rotation.set(-Math.PI / 2, 0, farRot + Math.PI / 2); dash.position.copy(toDoor((depth - 2.4) / 2)).addScaledVector(side, k * 2.4).setY(0.006); g.add(dash); }
+  const fh = H - 0.05; const facade = new THREE.Mesh(new THREE.BoxGeometry(along, fh, 0.3), toon(wc)); facade.position.copy(far).setY(fh / 2); facade.rotation.y = farRot; g.add(facade);
+  for (let fy = 0; fy < 2; fy++) for (let fx = -4; fx <= 4; fx++) { if (Math.abs(fx * 1.8) > along / 2 - 0.5) continue; const on = (fx * 7 + fy * 3 + 11) % 4 === 0; const w = new THREE.Mesh(new THREE.PlaneGeometry(0.9, 1.1), new THREE.MeshBasicMaterial({ color: on ? '#ffd98a' : '#1c2433' })); w.position.copy(far).addScaledVector(inward, 0.16).addScaledVector(side, fx * 1.8).setY(0.9 + fy * 1.5); w.rotation.y = farRot; g.add(w); }
+  const lampPos = toDoor(0.25).addScaledVector(side, along * 0.15);
+  const arm = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.06, 0.5), toon('#2c3440')); arm.position.copy(lampPos).setY(H - 0.45); arm.rotation.y = farRot; g.add(arm);
+  const head = new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.2, 0.3, 12), toon('#2c3440')); head.position.copy(lampPos).addScaledVector(inward, 0.25).setY(H - 0.6); g.add(withOutline(head, 0.006));
+  const bulb = new THREE.Mesh(new THREE.SphereGeometry(0.1, 12, 8), new THREE.MeshBasicMaterial({ color: b.lightColor ?? '#ffd59a' })); bulb.position.copy(head.position).setY(H - 0.76); g.add(bulb);
+  addLight(head.position.clone().setY(H - 0.9).addScaledVector(inward, 0.3), b.lightColor ?? '#ffd59a', b.lightIntensity ?? 3, Math.min(7.5, depth + 1));
+  return g;
 }
 export function updateEnvironmentLights(v: EnvVisual, t: number): void {
   for (const l of v.lights) if (l.flicker > 0) { const n = noise1(l.seed, t * 9) * 0.5 + noise1(l.seed + 1, t * 31) * 0.5; const drop = n < -0.55 ? 0.25 : 1; l.light.intensity = l.base * (1 - l.flicker * 0.25 * (1 - n)) * (l.flicker > 0.5 ? drop : 1); }
