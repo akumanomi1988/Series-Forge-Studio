@@ -10,10 +10,12 @@ fs.rmSync(path.join(P, 'scenes'), { recursive: true, force: true });
 
 const NAMES = { susana: 'SUSANA', dani: 'DANI', marga: 'MARGA', oscar: 'ÓSCAR', lucia: 'LUCÍA' };
 const L = (id, actor, to, text, emotion, extra = {}) => ({ id, actor, ...(to ? { to } : {}), text, ...(emotion ? { emotion } : {}), ...extra });
+// Dani tells the story looking back (voice-over, past tense): the series' narrative signature
+const VO = (id, text, extra = {}) => ({ id, actor: 'dani', voiceOver: true, text, emotion: 'smile', intensity: 0.7, direction: 'narrador, en pasado, tono íntimo y con humor', ...extra });
 const AMB_BAR = { id: 'ambiente', kind: 'ambience', sound: 'room-tone', at: 0, gainDb: -27, fadeIn: 0.3, fadeOut: 0.3 };
 const AMB_PISO = { id: 'ambiente', kind: 'ambience', sound: 'room-tone', at: 0, gainDb: -29, fadeIn: 0.3, fadeOut: 0.3 };
-const BUTTON = (after) => ({ id: 'remate', kind: 'music', sound: 'sirena-remate', after, offset: 0.05, durationSec: 1.8, gainDb: -9, duck: false });
-const STING = (w) => ({ id: 'tension', kind: 'music', sound: 'sirena-alarma', ...w, durationSec: 2.6, gainDb: -11, duck: false });
+const BUTTON = (after) => ({ id: 'remate', kind: 'music', sound: 'sirena-remate', after, offset: 0.05, durationSec: 1.8, gainDb: -2, duck: false });
+const STING = (w) => ({ id: 'tension', kind: 'music', sound: 'sirena-alarma', ...w, durationSec: 2.6, gainDb: -4, duck: false });
 const ON_BAR = (x, z) => [x, 1.06, z];
 const ON_ISLA = (x, z) => [x, 0.91, z];
 const ON_MESA = (x, z) => [x, 0.76, z];
@@ -38,12 +40,11 @@ const PISO = {
 // ------------------------------------------------------------------ episode
 w('episode.json', {
   schemaVersion: 2, id: 'ep-002', type: 'episode', name: 'Tormenta salvaje', number: 2,
-  scenes: ['sc-001', 'sc-002', 'sc-003', 'sc-004', 'sc-005', 'sc-006', 'sc-007', 'sc-008'], targetDurationSec: 960,
+  scenes: ['sc-000', 'sc-001', 'sc-002', 'sc-003', 'sc-004', 'sc-005', 'sc-006', 'sc-007', 'sc-008'], targetDurationSec: 960,
   score: {
-    theme: { music: 'sirena-tema', gainDb: -12, durationSec: 9, fadeOut: 3 },
-    underscore: { music: 'sirena-cama', gainDb: -22 },
-    bumpers: { music: 'sirena-cortinilla', gainDb: -10, durationSec: 4.2, leadSec: 1.1 }, sceneFade: { durationSec: 1.3, holdSec: 0.9 },
-    ending: { music: 'sirena-tema', gainDb: -12, durationSec: 8, fadeOut: 2.5 }
+    underscore: { music: 'sirena-cama', gainDb: -14 },
+    bumpers: { music: 'sirena-cortinilla', gainDb: -4, durationSec: 4.2, leadSec: 1.1 }, sceneFade: { durationSec: 1.3, holdSec: 0.9 },
+    ending: { music: 'sirena-tema', gainDb: -4, durationSec: 8, fadeOut: 2.5 }
   },
   render: { width: 1920, height: 1080, fps: 24, sampleRate: 48000, loudnessLufs: -16 }, status: 'draft'
 });
@@ -86,6 +87,47 @@ Lucía obliga a Dani a elegir. Dani, por fin sin lista: le hará la tienda, con 
 const scenes = {};
 const scene = (id, name, synopsis, envId, data) => { scenes[id] = { schemaVersion: 2, id, name, synopsis, environmentId: envId, durationSec: 'auto', tailSec: 0.6, autoLook: true, autoActing: 1, coverage: 'auto', ...data }; };
 
+// ---- APERTURA (flash-forward): the disaster at its peak, frozen; Dani tells us how he got there
+scene('sc-000', 'Tres horas después', 'El desastre en su punto álgido: la ex con champán, el amigo escondido, la exmujer con la tarta. Imagen congelada; Dani lo cuenta.', 'piso-dani', {
+  actors: [
+    { id: 'dani', characterId: 'dani', position: [2.35, 0, 0.85], yawDeg: 60, expression: 'fear', idle: 'idle' },
+    { id: 'susana', characterId: 'susana', position: [1.25, 0, 0.95], yawDeg: 80, expression: 'surprise', idle: 'idle-relaxed' },
+    { id: 'lucia', characterId: 'lucia', position: [2.25, 0, 1.75], yawDeg: -150, expression: 'joy', idle: 'idle-relaxed' },
+    { id: 'marga', characterId: 'marga', position: [3.1, 0, 0.55], yawDeg: -95, expression: 'surprise', idle: 'idle' },
+    { id: 'oscar', characterId: 'oscar', position: [-0.2, 0, 1.25], yawDeg: 85, expression: 'fear', idle: 'idle-relaxed' }
+  ],
+  props: [
+    { id: 'champan', propId: 'botella-vino', heldBy: { actor: 'lucia', hand: 'right' } },
+    { id: 'tarta', propId: 'caja-tarta', heldBy: { actor: 'marga', hand: 'left' } },
+    { id: 'olla', propId: 'olla', position: ON_ISLA(-2.25, -1.6) }
+  ],
+  shots: [
+    { id: 'i-caos', at: 0, durationSec: 2.2, camera: { ...PISO.group, move: { type: 'push-in', amount: 0.1 } } },
+    { id: 'i-congelado', after: 's0', offset: 0.15, durationSec: 40, camera: PISO.group }
+  ],
+  actions: [
+    { id: 'humo', type: 'effect', effect: 'smoke', prop: 'olla', at: 0, durationSec: 30, intensity: 1.2 },
+    { id: 'lucia-brinda', type: 'hold', actor: 'lucia', at: 0.4, hand: 'right', pose: 'raised', durationSec: 0.8 },
+    { id: 'oscar-rinde', type: 'play', actor: 'oscar', with: 'o0', clip: 'shrug', durationSec: 1.3 },
+    { id: 'dani-cara', type: 'play', actor: 'dani', with: 'v0', offset: 0.4, clip: 'facepalm', durationSec: 1.6 },
+    { id: 'congela', type: 'effect', effect: 'freeze', after: 's0', offset: 0.35, durationSec: 1, until: 'fin-vo' },
+    { id: 'fin-vo', type: 'lookAt', actor: 'dani', after: 'n5', offset: 0.6, target: 'susana', durationSec: 0.4 }
+  ],
+  dialogue: [
+    L('l0', 'lucia', 'dani', '¡Sorpresa! He traído champán.', 'joy', { at: 0.5 }),
+    L('m0', 'marga', 'oscar', '¿Óscar? ¿Qué haces tú aquí?', 'surprise'),
+    L('o0', 'oscar', 'marga', 'Yo... pasaba por el dormitorio.', 'fear'),
+    L('v0', 'susana', 'dani', 'Dani... ¿esta era la cena tranquila?', 'surprise', { intensity: 0.8 }),
+    L('s0', 'dani', 'susana', 'Puedo explicarlo.', 'fear'),
+    VO('n1', 'Ese de ahí soy yo. El que suda.'),
+    VO('n2', 'La primera vez que invité a Susana a cenar, pensé que lo difícil iba a ser cocinar.'),
+    VO('n3', 'A las diez de la noche tenía el arroz carbonizado, a mi mejor amigo saliendo de mi dormitorio, a mi exnovia con champán... y a la exmujer de mi mejor amigo con una tarta.'),
+    VO('n4', 'Mi abuela tenía razón: el risotto no se abandona nunca. Lo que no me explicó es qué se hace con los ex.'),
+    VO('n5', 'Para entenderlo, hay que volver tres horas atrás.', { pauseAfter: 0.4 })
+  ],
+  sound: [AMB_PISO, STING({ with: 'congela', offset: 0.05 })]
+});
+
 // ---- ESC. 1 — TEASER: Apuestas (bar, antes de abrir)
 scene('sc-001', 'Apuestas', 'El Sirena antes de abrir: Marga y Susana apuestan sobre la cita y sobre el ex de Marga.', 'sirena', {
   actors: [
@@ -113,13 +155,13 @@ scene('sc-001', 'Apuestas', 'El Sirena antes de abrir: Marga y Susana apuestan s
     L('m4', 'marga', 'susana', 'Las recetas de abuela son como los fantasmas: todo el mundo dice que tiene una y nadie las ha visto funcionar.', 'smirk'),
     L('v4', 'susana', 'marga', 'Marga, por una vez, alégrate por mí.', 'sad', { intensity: 0.6 }),
     L('m5', 'marga', 'susana', 'Me alegro. Y te apuesto veinte euros a que a las diez estás aquí comiendo cacahuetes.', 'smile'),
-    L('v5', 'susana', 'marga', 'Hecho. Y otros veinte a que tú esta noche no aguantas sin hablar de tu ex.', 'smirk', { intensity: 1.2 }),
+    L('v5', 'susana', 'marga', 'Hecho. ¿Y tú? ¿Vas a aguantar toda la noche sin nombrar a tu ex?', 'smile'),
     L('m6', 'marga', 'susana', '¿De quién? ¿Del fisioterapeuta que me dejó por un congreso en Benidorm? Ni me acuerdo de él.', 'angry'),
     L('v6', 'susana', 'marga', 'Acabas de decir dónde era el congreso.', 'smirk'),
     L('m7', 'marga', 'susana', 'Benidorm es... cultura general.', 'nervous'),
-    L('s7', 'susana', 'marga', 'Veinte euros, Marga. Y todavía no hemos abierto.', 'smirk', { intensity: 1.2, pauseAfter: 0.3 })
+    L('s7', 'susana', 'marga', 'Veinte euros, Marga.', 'smile', { pauseAfter: 0.6 })
   ],
-  sound: [AMB_BAR, BUTTON('s7')]
+  sound: [AMB_BAR, { id: 'tema', kind: 'music', sound: 'sirena-tema', at: 0, durationSec: 9, gainDb: -4, fadeIn: 0.05, fadeOut: 3, duck: true }, BUTTON('s7')]
 });
 
 // ---- ESC. 2 — La técnica del espejo (piso, 20:00)
@@ -141,11 +183,14 @@ scene('sc-002', 'La técnica del espejo', 'Dani cocina el risotto de su abuela; 
   actions: [
     { id: 'remueve-1', type: 'play', actor: 'dani', at: 0.3, clip: 'point', target: 'olla', durationSec: 1.6 },
     { id: 'mira-olla', type: 'lookAt', actor: 'dani', at: 0.2, target: 'olla', durationSec: 2.6 },
-    { id: 'abre', type: 'propJoint', prop: 'puerta', joint: 'leaf', at: 1.6, toDeg: 95, durationSec: 0.8, sound: 'door-creak' },
+    { id: 'abre', type: 'propJoint', prop: 'puerta', joint: 'leaf', after: 'n2', offset: -0.6, toDeg: 95, durationSec: 0.8, sound: 'door-creak' },
     { id: 'oscar-entra', type: 'walk', actor: 'oscar', with: 'abre', offset: 0.3, to: [-0.45, 0, -2.2], faceTo: 'dani' },
     { id: 'cierra', type: 'propJoint', prop: 'puerta', joint: 'leaf', with: 'oscar-entra', offset: 1.8, toDeg: 0, durationSec: 0.8, sound: 'click' },
     { id: 'da-colonia', type: 'give', actor: 'oscar', after: 'o3', offset: -1.6, prop: 'colonia', to: 'dani', durationSec: 1.4 },
     { id: 'dani-lee', type: 'hold', actor: 'dani', after: 'da-colonia', hand: 'right', pose: 'show', durationSec: 0.6 },
+    { id: 'rociada', type: 'effect', effect: 'smoke', prop: 'colonia', after: 'dani-lee', offset: 0.1, durationSec: 1.6, intensity: 0.7, sound: 'whoosh' },
+    { id: 'dani-tose', type: 'play', actor: 'dani', with: 'rociada', offset: 0.25, clip: 'facepalm', durationSec: 1.6 },
+    { id: 'dani-aparta', type: 'play', actor: 'dani', with: 'rociada', offset: 1.2, clip: 'headshake', durationSec: 1.0 },
     { id: 'dani-mira-frasco', type: 'lookAt', actor: 'dani', with: 'dani-lee', target: 'colonia', mode: 'head', durationSec: 2.2 },
     { id: 'deja-colonia', type: 'place', actor: 'dani', after: 'd3', offset: 0.1, prop: 'colonia', on: ON_ISLA(-1.2, -1.5), hand: 'right', durationSec: 0.9 },
     { id: 'remueve-2', type: 'play', actor: 'dani', with: 'd4', offset: 0.6, clip: 'point', target: 'olla', durationSec: 1.4 },
@@ -154,6 +199,8 @@ scene('sc-002', 'La técnica del espejo', 'Dani cocina el risotto de su abuela; 
     { id: 'dani-senala', type: 'play', actor: 'dani', with: 'd14', clip: 'point', target: 'puerta', durationSec: 1.5 }
   ],
   dialogue: [
+    VO('n1', 'Tres horas antes, todo estaba bajo control. Tenía una lista, un sofrito y la receta de mi abuela.', { at: 0.4 }),
+    VO('n2', 'Y entonces llegó Óscar. Casi todas las malas ideas de mi vida han llegado por esa puerta.'),
     L('o1', 'oscar', 'dani', '¡Ha llegado la caballería! ¿Dónde está el enfermo de amor?', 'joy', { with: 'abre', offset: 0.5 }),
     L('d1', 'dani', 'oscar', 'Óscar, te di la llave para emergencias.', 'nervous'),
     L('o2', 'oscar', 'dani', 'Esto es una emergencia. Tienes una cita a las nueve y hueles a cebolla.', 'smirk'),
@@ -326,6 +373,7 @@ scene('sc-005', 'Crujiente', 'Óscar se esconde en el dormitorio; llega Susana; 
     { id: 'i-timbre', with: 'timbre', offset: 0.2, durationSec: 2.4, camera: { ...PISO.group, move: { type: 'push-in', amount: 0.15 } } }
   ],
   actions: [
+    { id: 'humea', type: 'effect', effect: 'smoke', prop: 'olla', at: 0, durationSec: 40, intensity: 0.5 },
     { id: 'empuja', type: 'play', actor: 'dani', with: 'd0', clip: 'point', target: 'puerta-cuarto', durationSec: 1.5 },
     { id: 'oscar-huye', type: 'walk', actor: 'oscar', with: 'o0', offset: 0.8, to: [-4.6, 0, 0.6], gait: 'walk-brisk' },
     { id: 'dani-a-puerta', type: 'walk', actor: 'dani', after: 'oscar-huye', offset: -1.6, to: [2.9, 0, 1.0], faceTo: 'puerta' },
@@ -351,11 +399,11 @@ scene('sc-005', 'Crujiente', 'Óscar se esconde en el dormitorio; llega Susana; 
     L('d0b', 'dani', 'oscar', '¡Y no toques nada!', 'angry', { with: 'dani-a-puerta', offset: 0.5 }),
     L('o0b', 'oscar', undefined, '¡Si aquí solo hay una cama y un flexo!', 'worried', { direction: 'desde el dormitorio' }),
     L('d0c', 'dani', undefined, 'Pues no toques el flexo.', 'nervous', { direction: 'en voz baja' }),
-    L('v1', 'susana', 'dani', 'Huele a... ¿Qué es eso? ¿Incendio o perfume?', 'smirk', { with: 'susana-entra', offset: 1.2 }),
+    L('v1', 'susana', 'dani', 'Huele a... ¿Qué es eso? ¿Incendio o perfume?', 'surprise', { with: 'susana-entra', offset: 1.2, gesture: 'dismiss' }),
     L('d1', 'dani', 'susana', 'Las dos cosas. Es una colonia que se llama Tormenta salvaje.', 'nervous'),
     L('v2', 'susana', 'dani', '¿Te la has puesto tú?', 'laugh'),
     L('d2', 'dani', 'susana', 'Me la han puesto. Es una historia larga.', 'nervous'),
-    L('v3', 'susana', 'dani', 'Me gustan las historias largas. Mientras no sean del tiempo.', 'smirk'),
+    L('v3', 'susana', 'dani', 'Me gustan las historias largas.', 'smile'),
     L('d3', 'dani', 'susana', 'Hoy no hablo del tiempo. Tengo una lista nueva.', 'joy'),
     L('v4', 'susana', 'dani', 'Cómo no.', 'smirk'),
     L('d4', 'dani', 'susana', 'Punto uno: cocinar algo de mi abuela. Punto dos: no quemarlo.', 'determined'),
@@ -365,14 +413,14 @@ scene('sc-005', 'Crujiente', 'Óscar se esconde en el dormitorio; llega Susana; 
     L('d6', 'dani', 'susana', 'Exacto. Siéntate, por favor.', 'joy'),
     L('s6b', 'susana', 'dani', '¿Y tú dónde te sientas?', 'smirk', { with: 'dani-rodea', offset: 0.3 }),
     L('d6b', 'dani', 'susana', 'Enfrente. Lo he medido: un metro cuarenta. Ni muy cerca ni muy lejos.', 'nervous'),
-    L('s6c', 'susana', 'dani', 'Qué romántico. Con cinta métrica.', 'laugh'),
+    L('s6c', 'susana', 'dani', '¿Has medido la mesa?', 'surprise', { intensity: 0.7 }),
     L('v7', 'susana', 'dani', 'Pues... está crujiente.', 'thinking', { after: 'dani-se-sienta', offset: 0.6 }),
     L('d7', 'dani', 'susana', 'El risotto crujiente es tendencia en Milán.', 'nervous'),
     L('v8', 'susana', 'dani', 'Dani. Está quemado.', 'laugh'),
     L('d8', 'dani', 'susana', 'Está muy quemado. Lo siento. Quería demostrarte que no soy solo el de la lámpara.', 'sad'),
     L('v9', 'susana', 'dani', 'A mí me gustaba el de la lámpara.', 'smile', { direction: 'en voz baja' }),
     L('d9', 'dani', 'susana', '¿En serio?', 'surprise'),
-    L('v10', 'susana', 'dani', 'El de la lámpara me hacía reír. Este de la colonia me hace llorar un poco, pero es por los ojos.', 'smirk'),
+    L('v10', 'susana', 'dani', 'El de la lámpara me hacía reír. Este... me tiene un poco nerviosa. Y yo no me pongo nerviosa.', 'worried', { intensity: 0.8 }),
     L('o1', 'oscar', undefined, '¡Achís!', 'surprise', { direction: 'gritando' }),
     L('v11', 'susana', 'dani', '¿Hay alguien en tu dormitorio?', 'surprise'),
     L('d10', 'dani', 'susana', 'No. Es el vecino. Las paredes son muy finas.', 'fear'),
@@ -387,7 +435,7 @@ scene('sc-005', 'Crujiente', 'Óscar se esconde en el dormitorio; llega Susana; 
     L('d14', 'dani', 'susana', 'Espero que no.', 'fear', { pauseAfter: 0.3 })
   ],
   sound: [AMB_PISO,
-    { id: 'balada', kind: 'music', sound: 'pasion-vol3', with: 'pasion', durationSec: 11, gainDb: -15, fadeIn: 0.3, fadeOut: 1.5, duck: true },
+    { id: 'balada', kind: 'music', sound: 'pasion-vol3', with: 'pasion', durationSec: 11, gainDb: -8, fadeIn: 0.3, fadeOut: 1.5, duck: true },
     { id: 'ding', kind: 'sfx', sound: 'doorbell', with: 'timbre', gainDb: -6 },
     STING({ with: 'timbre', offset: 0.6 })]
 });
@@ -458,11 +506,11 @@ scene('sc-006', 'Todos los ex', 'Lucía irrumpe con champán; Óscar sale del do
     L('l1', 'lucia', 'dani', '¡Dani! ¡Sorpresa! Pasaba por aquí con unos planos y una botella de champán.', 'joy', { with: 'lucia-entra', offset: 0.9 }),
     L('d1', 'dani', 'lucia', 'Lucía. Estoy... cenando.', 'fear'),
     L('l2', 'lucia', 'susana', 'Ah, hola. ¿Tú no eres la del bar?', 'smirk'),
-    L('v1', 'susana', 'lucia', 'Y tú la del yate.', 'smirk', { intensity: 1.3 }),
+    L('v1', 'susana', 'lucia', 'Hola, Lucía.', 'neutral'),
     L('l3', 'lucia', 'dani', '¡Me encanta! Dani, cariño, he venido por trabajo. Mi tienda. Tú y yo. Como en los viejos tiempos.', 'laugh'),
     L('d2', 'dani', 'lucia', 'En los viejos tiempos me dejaste por un DJ.', 'sad'),
     L('l4', 'lucia', 'dani', 'Y he aprendido mucho. Por ejemplo, que la música electrónica no se baila agarrados.', 'thinking'),
-    L('v2', 'susana', 'lucia', 'Qué profundo.', 'smirk'),
+    L('v2', 'susana', 'lucia', 'Vale.', 'thinking'),
     L('l5', 'lucia', 'susana', 'Lo sé. Tengo medio millón de seguidores que lo confirman.', 'smirk'),
     L('o1', 'oscar', undefined, '¡Achís! Vale, vale, me rindo. Hola a todos. Soy el vecino.', 'nervous', { with: 'oscar-sale', offset: 0.4 }),
     L('v3', 'susana', 'oscar', 'El de las paredes finas.', 'smirk'),
@@ -497,7 +545,7 @@ scene('sc-006', 'Todos los ex', 'Lucía irrumpe con champán; Óscar sale del do
     L('o9', 'oscar', 'marga', 'Te la devuelvo mañana. Palabra.', 'smile', { with: 'oscar-tras', offset: 0.3 }),
     L('m8', 'marga', 'oscar', 'Mañana estará vacía. Te conozco, Óscar.', 'smirk'),
     L('d6', 'dani', 'susana', '¿Y la tarta?', 'surprise', { with: 'marga-tras', offset: 0.9 }),
-    L('v8', 'susana', 'dani', 'La tarta se queda. Las testigos se van.', 'smirk', { pauseAfter: 0.3 })
+    L('v8', 'susana', 'dani', 'La tarta se queda, ¿no?', 'smile', { pauseAfter: 0.6 })
   ],
   sound: [AMB_PISO, BUTTON('v8')]
 });
@@ -542,9 +590,9 @@ scene('sc-007', 'Punto tres', 'Solos en la cocina con la tarta de Marga, Susana 
     L('v9', 'susana', 'dani', 'Por Dios, no. La cena no.', 'laugh'),
     L('v10', 'susana', 'dani', 'La próxima vez cocino yo.', 'smile'),
     L('d9', 'dani', 'susana', '¿Tú sabes cocinar?', 'surprise'),
-    L('v11', 'susana', 'dani', 'No. Pero sé abrirle la puerta al repartidor sin que se cuele ninguna ex.', 'smirk', { pauseAfter: 0.3 })
+    L('v11', 'susana', 'dani', 'No. Pero pido muy bien a domicilio.', 'smile', { pauseAfter: 0.6 })
   ],
-  sound: [AMB_PISO, { id: 'romance', kind: 'music', sound: 'sirena-romance', with: 'd3', offset: -0.5, durationSec: 30, gainDb: -17, fadeIn: 2, fadeOut: 3, duck: true }]
+  sound: [AMB_PISO, { id: 'romance', kind: 'music', sound: 'sirena-romance', with: 'd3', offset: -0.5, durationSec: 30, gainDb: -10, fadeIn: 2, fadeOut: 3, duck: true }]
 });
 
 // ---- ESC. 8 — ETIQUETA: Veinte euros (bar, 01:55)
@@ -593,7 +641,8 @@ scene('sc-008', 'Veinte euros', 'A las dos menos cinco, Óscar vuelve al Sirena 
     L('m8', 'marga', 'oscar', 'Cuarenta a que no.', 'smirk'),
     L('v3', 'susana', 'marga', 'Que nadie me pregunte cuál es el punto cuatro.', 'smirk'),
     L('d2', 'dani', 'susana', 'Mañana va a hacer mucho calor.', 'smirk', { intensity: 1.3 }),
-    L('v4', 'susana', 'dani', 'Eso no estaba en la lista.', 'laugh', { pauseAfter: 0.3 })
+    L('v4', 'susana', 'dani', 'Eso no estaba en la lista.', 'laugh', { pauseAfter: 0.3 }),
+    VO('n1', 'Nunca supe cuál era el punto cuatro. Pero esa... es otra cena.', { pauseAfter: 0.8 })
   ],
   sound: [AMB_BAR, BUTTON('v4')]
 });
@@ -627,13 +676,13 @@ w('story.json', {
   ]
 });
 
-const ACTS = { 'sc-001': 'TEASER', 'sc-002': 'ACTO 1 — PLANTEAMIENTO', 'sc-004': 'ACTO 2 — NUDO', 'sc-006': 'ACTO 3 — DESENLACE', 'sc-008': 'ETIQUETA' };
+const ACTS = { 'sc-000': 'APERTURA', 'sc-001': 'TEASER', 'sc-002': 'ACTO 1 — PLANTEAMIENTO', 'sc-004': 'ACTO 2 — NUDO', 'sc-006': 'ACTO 3 — DESENLACE', 'sc-008': 'ETIQUETA' };
 const PLACE = { sirena: 'INT. BAR SIRENA', 'piso-dani': 'INT. PISO DE DANI' };
 let g = `# «Tormenta salvaje» — guion (ep. 2)\n\n*Generado desde los archivos de escena: lo que se lee es exactamente lo que se rueda.*\n\n**Logline.** Dani se empeña en cocinar el risotto de su abuela para su primera cita con Susana; entre su mejor amigo escondido, una colonia de gasolinera y la ex que aparece con champán, la cena se quema… y es lo mejor que les podía pasar.\n\n**Siembras y pagos**\n- Las apuestas de Marga (cacahuetes a las diez / hablar del ex) → se pagan en la etiqueta; Marga habla de su ex en el teaser y en el clímax.\n- «El risotto no se abandona nunca» → se abandona por la llamada de Lucía y se quema.\n- La colonia *Tormenta salvaje* → hace llorar a Susana «por los ojos»; Marga la reconoce («de gasolinera»); se la regaló ella; vuelve vacía.\n- «Noches de pasión, volumen tres» (la uno y la dos, quemadas con Marga) → suena sola en la cita; «se quemaron, como el risotto».\n- «El de la lámpara» (ep. 1) → «a mí me gustaba el de la lámpara»; «al de la lámpara se le ha encendido la bombilla».\n- Las listas de Dani → Lucía: «escribe los planes y no los hace»; Susana escribe el punto tres: «Repetir».\n- «Mañana va a hacer calor» (ep. 1) → remate final.\n\n---\n`;
 for (const [id, sc] of Object.entries(scenes)) {
   if (ACTS[id]) g += `\n## ${ACTS[id]}\n`;
   g += `\n### ${id.toUpperCase()} — ${PLACE[sc.environmentId]} — «${sc.name}»\n\n*${sc.synopsis}*\n\n`;
-  for (const l of sc.dialogue) g += `**${NAMES[l.actor]}**${l.direction ? ` *(${l.direction})*` : ''}: ${l.text}\n`;
+  for (const l of sc.dialogue) g += `**${NAMES[l.actor]}${l.voiceOver ? ' (V. O.)' : ''}**${l.direction && !l.voiceOver ? ` *(${l.direction})*` : ''}: ${l.voiceOver ? `*${l.text}*` : l.text}\n`;
 }
 w('guion.md', g);
 console.log('ok', Object.values(scenes).reduce((n, s) => n + s.dialogue.length, 0), 'líneas');

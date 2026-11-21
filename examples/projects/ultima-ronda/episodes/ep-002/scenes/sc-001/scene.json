@@ -196,9 +196,8 @@
       "id": "v5",
       "actor": "susana",
       "to": "marga",
-      "text": "Hecho. Y otros veinte a que tú esta noche no aguantas sin hablar de tu ex.",
-      "emotion": "smirk",
-      "intensity": 1.2
+      "text": "Hecho. ¿Y tú? ¿Vas a aguantar toda la noche sin nombrar a tu ex?",
+      "emotion": "smile"
     },
     {
       "id": "m6",
@@ -225,10 +224,9 @@
       "id": "s7",
       "actor": "susana",
       "to": "marga",
-      "text": "Veinte euros, Marga. Y todavía no hemos abierto.",
-      "emotion": "smirk",
-      "intensity": 1.2,
-      "pauseAfter": 0.3
+      "text": "Veinte euros, Marga.",
+      "emotion": "smile",
+      "pauseAfter": 0.6
     }
   ],
   "sound": [
@@ -242,13 +240,24 @@
       "fadeOut": 0.3
     },
     {
+      "id": "tema",
+      "kind": "music",
+      "sound": "sirena-tema",
+      "at": 0,
+      "durationSec": 9,
+      "gainDb": -4,
+      "fadeIn": 0.05,
+      "fadeOut": 3,
+      "duck": true
+    },
+    {
       "id": "remate",
       "kind": "music",
       "sound": "sirena-remate",
       "after": "s7",
       "offset": 0.05,
       "durationSec": 1.8,
-      "gainDb": -9,
+      "gainDb": -2,
       "duck": false
     }
   ]

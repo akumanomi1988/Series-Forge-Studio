@@ -13,23 +13,23 @@
   "score": {
     "theme": {
       "music": "sirena-tema",
-      "gainDb": -12,
+      "gainDb": -4,
       "durationSec": 8,
       "fadeOut": 3
     },
     "underscore": {
       "music": "sirena-cama",
-      "gainDb": -21
+      "gainDb": -14
     },
     "bumpers": {
       "music": "sirena-cortinilla",
-      "gainDb": -12,
+      "gainDb": -4,
       "durationSec": 4.2,
       "leadSec": 1.1
     },
     "ending": {
       "music": "sirena-tema",
-      "gainDb": -12,
+      "gainDb": -4,
       "durationSec": 7,
       "fadeOut": 2
     },

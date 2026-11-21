@@ -441,7 +441,7 @@
       "after": "o10",
       "offset": 0.05,
       "durationSec": 1.8,
-      "gainDb": -9,
+      "gainDb": -2,
       "duck": false
     }
   ]

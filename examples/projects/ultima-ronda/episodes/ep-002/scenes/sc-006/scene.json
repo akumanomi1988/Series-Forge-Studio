@@ -637,9 +637,8 @@
       "id": "v1",
       "actor": "susana",
       "to": "lucia",
-      "text": "Y tú la del yate.",
-      "emotion": "smirk",
-      "intensity": 1.3
+      "text": "Hola, Lucía.",
+      "emotion": "neutral"
     },
     {
       "id": "l3",
@@ -666,8 +665,8 @@
       "id": "v2",
       "actor": "susana",
       "to": "lucia",
-      "text": "Qué profundo.",
-      "emotion": "smirk"
+      "text": "Vale.",
+      "emotion": "thinking"
     },
     {
       "id": "l5",
@@ -927,9 +926,9 @@
       "id": "v8",
       "actor": "susana",
       "to": "dani",
-      "text": "La tarta se queda. Las testigos se van.",
-      "emotion": "smirk",
-      "pauseAfter": 0.3
+      "text": "La tarta se queda, ¿no?",
+      "emotion": "smile",
+      "pauseAfter": 0.6
     }
   ],
   "sound": [
@@ -949,7 +948,7 @@
       "after": "v8",
       "offset": 0.05,
       "durationSec": 1.8,
-      "gainDb": -9,
+      "gainDb": -2,
       "duck": false
     }
   ]

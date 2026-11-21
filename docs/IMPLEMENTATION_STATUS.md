@@ -31,6 +31,17 @@ Comedia romántica para adultos en un bar de cócteles: Susana (dueña, vestido 
 
 Cinco personajes (Susana, Dani y los nuevos Marga, Óscar y Lucía), dos decorados (bar Sirena y piso de Dani), teaser, tres actos y etiqueta, tramas A/B/C, 212 líneas. Guion generado desde los archivos de escena (`episodes/ep-002/guion.md`). `npm run studio -- produce ultima-ronda ep-002` → **1920×1080, 24 fps, 10 min 30 s (15 120 fotogramas), 196 planos, 234 rótulos**; render 32 min en la GTX 660 Ti. Validación **superada**: diálogo −16,0 LUFS, mezcla −16,2 LUFS, pico −0,6 dBTP, **ningún solape de voces**, **racord sin errores** entre escenas continuas, ningún hueco sin diálogo > 2,7 s (diálogo en el 88 % del metraje), lip-sync global −20 ms, paridad editor/exportación PSNR ≥ 42,3 dB. Comprobado además con un barrido automático de todos los planos (ninguna cámara dentro de un personaje ni pegada al sujeto) y fotogramas del MP4.
 
+## Respuesta a la crítica del capítulo 2 (21-11-2026)
+
+- **Música inaudible (causa real)**: la cama sonaba ~18 dB por debajo de las voces y se atenuaba 9 dB más bajo el diálogo (88 % del tiempo); tema y cortinillas, 8–10 dB por debajo. Nuevos valores por defecto (tema/cortinillas/final −4 dB, cama −14 dB) y atenuación bajo voz de −6 dB.
+- **Estilo `soft`** (`project.json` `renderStyle`): materiales físicos mates, sombras VSM suaves, oclusión ambiental en pantalla (16 muestras sobre la profundidad del propio fotograma), tono ACES, sin contornos. «Última ronda» lo usa.
+- **Proporciones** más estilizadas (cabeza ~1/7 de la altura, orejas y narices menores), falda de vuelo desde la cintura con fajín (`fit: skater`), falda ajustada (`fitted`), tacones (`heels`).
+- **Cámara**: los planos de grupo y abiertos suben el encuadre (y abren algo el objetivo) hasta que ninguna cabeza queda cortada.
+- **Actuación**: repertorio por personaje (`acting`): posturas mientras escucha en cada silencio de 3 s o más, gestos propios al hablar, energía; planos de reacción tras líneas fuertes (máx. uno cada 12 s) con un respiro extra antes de la respuesta.
+- **Narrador** (`voiceOver`) y **congelado** (`effect: freeze`). El capítulo 2 abre ahora con el desastre en su punto álgido, congelado, y Dani contándolo en pasado; narraciones breves al empezar la escena 2 y al cerrar el capítulo.
+- **Guion**: Susana pierde la mayoría de sus remates (es la «normal» que descubre sus contradicciones); gags visuales de la colonia (rociada, tos) y del risotto que humea toda la cena. El capítulo dura ahora 12:17: **falta recortar** hacia los 9–10 min que propone la crítica.
+- Verificado con imágenes fijas y una muestra renderizada de la apertura y la escena 1; el capítulo completo **no** se ha renderizado.
+
 ## Colisiones, escenarios, cuerpos y línea toon (21-11-2026)
 
 - **Navegación** (`src/engine/layout.ts`): A* sobre rejilla de 10 cm con muebles (huella por generador o por piezas), personas y paredes; las paredes solo se cruzan por los huecos de puerta. Rutas simplificadas por línea de visión y con esquinas redondeadas; el personaje gira mientras anda. `sit` elige el lado libre de la silla; una escena que empieza con alguien sentado lo coloca ya en su sitio. QA `blocking.noCollisions`: 0 avisos en el capítulo 2 tras corregir los datos.

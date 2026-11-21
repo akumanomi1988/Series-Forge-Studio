@@ -1,0 +1,307 @@
+{
+  "schemaVersion": 2,
+  "id": "sc-000",
+  "name": "Tres horas después",
+  "synopsis": "El desastre en su punto álgido: la ex con champán, el amigo escondido, la exmujer con la tarta. Imagen congelada; Dani lo cuenta.",
+  "environmentId": "piso-dani",
+  "durationSec": "auto",
+  "tailSec": 0.6,
+  "autoLook": true,
+  "autoActing": 1,
+  "coverage": "auto",
+  "actors": [
+    {
+      "id": "dani",
+      "characterId": "dani",
+      "position": [
+        2.35,
+        0,
+        0.85
+      ],
+      "yawDeg": 60,
+      "expression": "fear",
+      "idle": "idle"
+    },
+    {
+      "id": "susana",
+      "characterId": "susana",
+      "position": [
+        1.25,
+        0,
+        0.95
+      ],
+      "yawDeg": 80,
+      "expression": "surprise",
+      "idle": "idle-relaxed"
+    },
+    {
+      "id": "lucia",
+      "characterId": "lucia",
+      "position": [
+        2.25,
+        0,
+        1.75
+      ],
+      "yawDeg": -150,
+      "expression": "joy",
+      "idle": "idle-relaxed"
+    },
+    {
+      "id": "marga",
+      "characterId": "marga",
+      "position": [
+        3.1,
+        0,
+        0.55
+      ],
+      "yawDeg": -95,
+      "expression": "surprise",
+      "idle": "idle"
+    },
+    {
+      "id": "oscar",
+      "characterId": "oscar",
+      "position": [
+        -0.2,
+        0,
+        1.25
+      ],
+      "yawDeg": 85,
+      "expression": "fear",
+      "idle": "idle-relaxed"
+    }
+  ],
+  "props": [
+    {
+      "id": "champan",
+      "propId": "botella-vino",
+      "heldBy": {
+        "actor": "lucia",
+        "hand": "right"
+      }
+    },
+    {
+      "id": "tarta",
+      "propId": "caja-tarta",
+      "heldBy": {
+        "actor": "marga",
+        "hand": "left"
+      }
+    },
+    {
+      "id": "olla",
+      "propId": "olla",
+      "position": [
+        -2.25,
+        0.91,
+        -1.6
+      ]
+    }
+  ],
+  "shots": [
+    {
+      "id": "i-caos",
+      "at": 0,
+      "durationSec": 2.2,
+      "camera": {
+        "type": "static",
+        "position": [
+          0.9,
+          1.75,
+          4.2
+        ],
+        "target": [
+          1.2,
+          1.15,
+          0.6
+        ],
+        "fov": 44,
+        "move": {
+          "type": "push-in",
+          "amount": 0.1
+        }
+      }
+    },
+    {
+      "id": "i-congelado",
+      "after": "s0",
+      "offset": 0.15,
+      "durationSec": 40,
+      "camera": {
+        "type": "static",
+        "position": [
+          0.9,
+          1.75,
+          4.2
+        ],
+        "target": [
+          1.2,
+          1.15,
+          0.6
+        ],
+        "fov": 44
+      }
+    }
+  ],
+  "actions": [
+    {
+      "id": "humo",
+      "type": "effect",
+      "effect": "smoke",
+      "prop": "olla",
+      "at": 0,
+      "durationSec": 30,
+      "intensity": 1.2
+    },
+    {
+      "id": "lucia-brinda",
+      "type": "hold",
+      "actor": "lucia",
+      "at": 0.4,
+      "hand": "right",
+      "pose": "raised",
+      "durationSec": 0.8
+    },
+    {
+      "id": "oscar-rinde",
+      "type": "play",
+      "actor": "oscar",
+      "with": "o0",
+      "clip": "shrug",
+      "durationSec": 1.3
+    },
+    {
+      "id": "dani-cara",
+      "type": "play",
+      "actor": "dani",
+      "with": "v0",
+      "offset": 0.4,
+      "clip": "facepalm",
+      "durationSec": 1.6
+    },
+    {
+      "id": "congela",
+      "type": "effect",
+      "effect": "freeze",
+      "after": "s0",
+      "offset": 0.35,
+      "durationSec": 1,
+      "until": "fin-vo"
+    },
+    {
+      "id": "fin-vo",
+      "type": "lookAt",
+      "actor": "dani",
+      "after": "n5",
+      "offset": 0.6,
+      "target": "susana",
+      "durationSec": 0.4
+    }
+  ],
+  "dialogue": [
+    {
+      "id": "l0",
+      "actor": "lucia",
+      "to": "dani",
+      "text": "¡Sorpresa! He traído champán.",
+      "emotion": "joy",
+      "at": 0.5
+    },
+    {
+      "id": "m0",
+      "actor": "marga",
+      "to": "oscar",
+      "text": "¿Óscar? ¿Qué haces tú aquí?",
+      "emotion": "surprise"
+    },
+    {
+      "id": "o0",
+      "actor": "oscar",
+      "to": "marga",
+      "text": "Yo... pasaba por el dormitorio.",
+      "emotion": "fear"
+    },
+    {
+      "id": "v0",
+      "actor": "susana",
+      "to": "dani",
+      "text": "Dani... ¿esta era la cena tranquila?",
+      "emotion": "surprise",
+      "intensity": 0.8
+    },
+    {
+      "id": "s0",
+      "actor": "dani",
+      "to": "susana",
+      "text": "Puedo explicarlo.",
+      "emotion": "fear"
+    },
+    {
+      "id": "n1",
+      "actor": "dani",
+      "voiceOver": true,
+      "text": "Ese de ahí soy yo. El que suda.",
+      "emotion": "smile",
+      "intensity": 0.7,
+      "direction": "narrador, en pasado, tono íntimo y con humor"
+    },
+    {
+      "id": "n2",
+      "actor": "dani",
+      "voiceOver": true,
+      "text": "La primera vez que invité a Susana a cenar, pensé que lo difícil iba a ser cocinar.",
+      "emotion": "smile",
+      "intensity": 0.7,
+      "direction": "narrador, en pasado, tono íntimo y con humor"
+    },
+    {
+      "id": "n3",
+      "actor": "dani",
+      "voiceOver": true,
+      "text": "A las diez de la noche tenía el arroz carbonizado, a mi mejor amigo saliendo de mi dormitorio, a mi exnovia con champán... y a la exmujer de mi mejor amigo con una tarta.",
+      "emotion": "smile",
+      "intensity": 0.7,
+      "direction": "narrador, en pasado, tono íntimo y con humor"
+    },
+    {
+      "id": "n4",
+      "actor": "dani",
+      "voiceOver": true,
+      "text": "Mi abuela tenía razón: el risotto no se abandona nunca. Lo que no me explicó es qué se hace con los ex.",
+      "emotion": "smile",
+      "intensity": 0.7,
+      "direction": "narrador, en pasado, tono íntimo y con humor"
+    },
+    {
+      "id": "n5",
+      "actor": "dani",
+      "voiceOver": true,
+      "text": "Para entenderlo, hay que volver tres horas atrás.",
+      "emotion": "smile",
+      "intensity": 0.7,
+      "direction": "narrador, en pasado, tono íntimo y con humor",
+      "pauseAfter": 0.4
+    }
+  ],
+  "sound": [
+    {
+      "id": "ambiente",
+      "kind": "ambience",
+      "sound": "room-tone",
+      "at": 0,
+      "gainDb": -29,
+      "fadeIn": 0.3,
+      "fadeOut": 0.3
+    },
+    {
+      "id": "tension",
+      "kind": "music",
+      "sound": "sirena-alarma",
+      "with": "congela",
+      "offset": 0.05,
+      "durationSec": 2.6,
+      "gainDb": -4,
+      "duck": false
+    }
+  ]
+}

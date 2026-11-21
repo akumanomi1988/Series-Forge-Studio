@@ -33,7 +33,8 @@ Herencia de animaciones y expresiones: `library/humanoid/` → `<proyecto>/anima
 | `face` | `eyeSize`, `eyeSpacing`, `eyeHeight`, `irisColor`, `eyeShape` (round/almond/narrow), `browThickness`, `browColor`, `noseShape` (button/round/pointy/long/wide), `noseSize`, `mouthWidth`, `lipColor`, `earSize`, `blush` |
 | `hair` | `style` (short, spiky, bob, ponytail, bun, long, curly, mohawk, bald, buzz, sidepart), `color`, `volume`, `shine` 0–1 (banda de brillo) |
 | `beard` | `style` (none, stubble, full, goatee, mustache, chinstrap), `color` |
-| `outfit` | `top.type` (tshirt, longsleeve, jacket, hoodie, vest, overalls, labcoat, tanktop, dress) + `color`/`secondaryColor` + `neckline` (crew, v, scoop, plunge, off-shoulder; el escote se dibuja por píxel con borde limpio y sombra de escote si `bust` ≥ 0,3) + `fabric` (matte, satin, silk, leather, sequin; sin brillo en personajes); `bottom.type` (pants, shorts, skirt) + `color` + `fabric`; `shoes.type` (sneakers, boots, shoes, sandals) + `color`/`soleColor`; `gloves.color` |
+| `acting` | personalidad de actuación para la dirección automática: `listen` (posturas que mantiene mientras escucha, p. ej. `cross-arms`, `hands-on-hips`, `nervous`), `talk` (gestos al hablar), `energy` 0–2 (amplitud) |
+| `outfit` | `top.type` (tshirt, longsleeve, jacket, hoodie, vest, overalls, labcoat, tanktop, dress) + `color`/`secondaryColor` + `neckline` (crew, v, scoop, plunge, off-shoulder; el escote se dibuja por píxel con borde limpio y sombra de escote si `bust` ≥ 0,3) + `fabric` (matte, satin, silk, leather, sequin; sin brillo en personajes); `bottom.type` (pants, shorts, skirt) + `color` + `fabric` + `fit` (fitted, aline, skater: la falda de vuelo nace en la cintura) + `waistband` (color del fajín); `shoes.type` (sneakers, boots, shoes, sandals, heels) + `color`/`soleColor`; `gloves.color` |
 | `accessories[]` | `type` (goggles, glasses, toolbelt, cap, beanie, headset, scarf, badge, apron, watch, earrings, bandana, backpack), `color`, `secondaryColor`, `position` |
 | `parts[]` | primitivas extra (`box/sphere/capsule/cylinder/cone/torus/roundedBox`) pegadas a un hueso (`bone`) o a `headGroup` |
 | `outlineWidth` | grosor del contorno toon (m) |
@@ -104,6 +105,8 @@ Generadores: `parts, robot, workbench, chair, stool, door, shelf, toolbox, crate
 
 ## Escenario
 
+**Estilo de render** (`project.json` → `"renderStyle": "toon" | "soft"`): `toon` = bandas de color y tinta; `soft` = 3D estilizado (sombreado físico mate, sombras suaves, oclusión ambiental, tono fílmico, sin contornos).
+
 `environment.json`: `kind` (`room`|`exterior`), `size` [ancho, alto, fondo], `floor` (`color`, `pattern`: tiles/planks/concrete/grass/asphalt/plain), `walls` (`color`, `trimColor`, `sides`, `panel`), `openings[]` (ventanas/puertas por pared con `offset`, `width`, `height`, `sill`, `glow` y `beyond`: lo que se ve y se pisa al otro lado de una puerta, `{ "kind": "corridor"|"street"|"room"|"dark", "depth", "width", "wallColor", "floorColor", "lightColor", "lightIntensity" }`; por defecto, pasillo). Ojo: `offset` en la pared derecha crece hacia −z. Un objeto `door` colocado en una pared abre su propio hueco aunque no esté declarado. La parte delantera abierta tiene una «cuarta pared» que solo se ve desde dentro., `lights[]` (`key/fill/rim/point/spot`, `position`, `target`, `color`, `intensity`, `castShadow`, `flicker`), `ambient`, `fog`, `props[]` (objetos fijos del decorado con `id` propio, utilizables por las escenas), `decor[]` (poster, pipe, shelf-boxes, vent, sign, clock, pegboard). Las paredes son sólidas para la cámara y para los personajes: cada `walk` calcula una ruta (A* en rejilla de 10 cm) que rodea muebles y personas y cruza las paredes solo por las puertas; `sit` se acerca por el lado libre de la silla. La QA `blocking.noCollisions` avisa si un cuerpo atraviesa un mueble o una pared.
 
 ## Escena (`episodes/<ep>/scenes/sc-NNN/scene.json`)
@@ -116,6 +119,8 @@ Generadores: `parts, robot, workbench, chair, stool, door, shelf, toolbox, crate
 ```
 
 **Racord** (`"continuous": true`): la escena sigue a la anterior sin salto de tiempo; al compilar se compara dónde terminó cada personaje (posición, orientación, sentado o de pie, objetos en la mano) con cómo empieza esta escena, y cualquier diferencia es un error de QA (`continuity.racord`). Quien entra o sale de la habitación entre escenas no cuenta.
+
+**Narrador**: una línea con `"voiceOver": true` es narración en off; `actor` puede ser el id de un personaje que no está en el decorado (usa su voz). No mueve labios ni miradas ni genera planos; sus subtítulos van en cursiva (`<i>` en el SRT) y el guion la marca como «(V. O.)».
 
 **Voces**: dos diálogos nunca se solapan. Si un tiempo forzado (`at`, `with`…) haría empezar una frase antes de que acabe la anterior, el director la retrasa hasta 0,12 s después; la QA comprueba que no haya solapes (`dialogue.noOverlap`).
 
@@ -132,7 +137,7 @@ Acciones (`type`):
 | `pickUp` / `drop` / `place` / `give` / `hold` | `prop`, `hand`; `hold.pose`: front/behind/raised/show/side; `place.on`; `give.to`. `drop` simula caída con rebotes y genera foley de impacto. |
 | `sit` / `stand` | `prop` con anclaje `seat` |
 | `propJoint` | `prop`, `joint`, `toDeg`, `fromDeg`, `durationSec`, `sound` (abrir puertas, cabeza del robot…) |
-| `effect` | `effect`: sparks/smoke/flicker/glow/off; `prop`+`part` o `position`; `sound`. `off` apaga un aparato (sus luces y el brillo de la parte indicada, p. ej. `screen`) mientras dura; sin `prop` ni `part` es un **apagón** del decorado (luces del escenario y ambiente; las luces prácticas como velas siguen encendidas). No alarga la escena. `until: "<id>"` termina el efecto cuando empieza esa línea o acción |
+| `effect` | `effect`: sparks/smoke/flicker/glow/off/freeze (`freeze` congela la imagen —poses, objetos y cámara— mientras el sonido sigue, con la imagen algo desaturada; ideal para el narrador); `prop`+`part` o `position`; `sound`. `off` apaga un aparato (sus luces y el brillo de la parte indicada, p. ej. `screen`) mientras dura; sin `prop` ni `part` es un **apagón** del decorado (luces del escenario y ambiente; las luces prácticas como velas siguen encendidas). No alarga la escena. `until: "<id>"` termina el efecto cuando empieza esa línea o acción |
 
 Diálogo: `{ "id", "actor", "text", "to", "emotion", "intensity", "direction", "gesture", "pauseAfter", "rate", "pitchSemitones", "knowledge": [hechos que debe conocer], "reveals": [hechos que revela] }`. `emotion` acepta ids o sinónimos españoles (enfado, alegría, ironía…). `direction` con «susurrando/en voz baja» o «gritando» modifica la prosodia. `[pausa 0.8]` dentro del texto inserta un silencio intencionado (no aparece en subtítulos); el resto de silencios internos de la voz se acortan a ≤ 0,36 s (0,5 s con «...»). Con `autoLook` el que escucha mira al que habla. Con `autoActing` (0 apagado, 1 normal, 1,5 teatral) el que habla gesticula según el texto y la emoción («no…» niega, «sí/vale» asiente, preguntas con encogimiento o palmas, enfado, nervios, risa, «mira/toma» presenta, frases largas con manos) y el que escucha asiente en frases largas; nunca pisa un `gesture`, un `play`, un paseo ni a quien está sentado (solo brazos y cabeza).
 

@@ -367,6 +367,16 @@
       "text": "Eso no estaba en la lista.",
       "emotion": "laugh",
       "pauseAfter": 0.3
+    },
+    {
+      "id": "n1",
+      "actor": "dani",
+      "voiceOver": true,
+      "text": "Nunca supe cuál era el punto cuatro. Pero esa... es otra cena.",
+      "emotion": "smile",
+      "intensity": 0.7,
+      "direction": "narrador, en pasado, tono íntimo y con humor",
+      "pauseAfter": 0.8
     }
   ],
   "sound": [
@@ -386,7 +396,7 @@
       "after": "v4",
       "offset": 0.05,
       "durationSec": 1.8,
-      "gainDb": -9,
+      "gainDb": -2,
       "duck": false
     }
   ]

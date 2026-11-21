@@ -457,7 +457,7 @@
       "with": "d16",
       "offset": -0.3,
       "durationSec": 14,
-      "gainDb": -17,
+      "gainDb": -10,
       "fadeIn": 1.5,
       "fadeOut": 2.5,
       "duck": true
@@ -476,7 +476,7 @@
       "after": "v19",
       "offset": 0.05,
       "durationSec": 1.8,
-      "gainDb": -9,
+      "gainDb": -2,
       "duck": false
     }
   ]

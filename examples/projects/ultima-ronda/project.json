@@ -6,5 +6,6 @@
   "language": "es-ES",
   "fps": 24,
   "voiceProvider": "kokoro",
-  "description": "Serie de animación para público adulto: un bar de cócteles que cierra a las dos, su dueña y el cliente que siempre llega a las doce menos cinco. Coqueteo, dobles sentidos y nada explícito."
+  "description": "Serie de animación para público adulto: un bar de cócteles que cierra a las dos, su dueña y el cliente que siempre llega a las doce menos cinco. Coqueteo, dobles sentidos y nada explícito.",
+  "renderStyle": "soft"
 }

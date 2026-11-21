@@ -428,7 +428,7 @@
       "with": "l3",
       "offset": 1.2,
       "durationSec": 2.6,
-      "gainDb": -11,
+      "gainDb": -4,
       "duck": false
     }
   ]

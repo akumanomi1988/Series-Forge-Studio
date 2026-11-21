@@ -15,6 +15,23 @@
 
 ---
 
+## APERTURA
+
+### SC-000 — INT. PISO DE DANI — «Tres horas después»
+
+*El desastre en su punto álgido: la ex con champán, el amigo escondido, la exmujer con la tarta. Imagen congelada; Dani lo cuenta.*
+
+**LUCÍA**: ¡Sorpresa! He traído champán.
+**MARGA**: ¿Óscar? ¿Qué haces tú aquí?
+**ÓSCAR**: Yo... pasaba por el dormitorio.
+**SUSANA**: Dani... ¿esta era la cena tranquila?
+**DANI**: Puedo explicarlo.
+**DANI (V. O.)**: *Ese de ahí soy yo. El que suda.*
+**DANI (V. O.)**: *La primera vez que invité a Susana a cenar, pensé que lo difícil iba a ser cocinar.*
+**DANI (V. O.)**: *A las diez de la noche tenía el arroz carbonizado, a mi mejor amigo saliendo de mi dormitorio, a mi exnovia con champán... y a la exmujer de mi mejor amigo con una tarta.*
+**DANI (V. O.)**: *Mi abuela tenía razón: el risotto no se abandona nunca. Lo que no me explicó es qué se hace con los ex.*
+**DANI (V. O.)**: *Para entenderlo, hay que volver tres horas atrás.*
+
 ## TEASER
 
 ### SC-001 — INT. BAR SIRENA — «Apuestas»
@@ -30,11 +47,11 @@
 **MARGA**: Las recetas de abuela son como los fantasmas: todo el mundo dice que tiene una y nadie las ha visto funcionar.
 **SUSANA**: Marga, por una vez, alégrate por mí.
 **MARGA**: Me alegro. Y te apuesto veinte euros a que a las diez estás aquí comiendo cacahuetes.
-**SUSANA**: Hecho. Y otros veinte a que tú esta noche no aguantas sin hablar de tu ex.
+**SUSANA**: Hecho. ¿Y tú? ¿Vas a aguantar toda la noche sin nombrar a tu ex?
 **MARGA**: ¿De quién? ¿Del fisioterapeuta que me dejó por un congreso en Benidorm? Ni me acuerdo de él.
 **SUSANA**: Acabas de decir dónde era el congreso.
 **MARGA**: Benidorm es... cultura general.
-**SUSANA**: Veinte euros, Marga. Y todavía no hemos abierto.
+**SUSANA**: Veinte euros, Marga.
 
 ## ACTO 1 — PLANTEAMIENTO
 
@@ -42,6 +59,8 @@
 
 *Dani cocina el risotto de su abuela; Óscar llega con colonia, una lista de reproducción y malos consejos.*
 
+**DANI (V. O.)**: *Tres horas antes, todo estaba bajo control. Tenía una lista, un sofrito y la receta de mi abuela.*
+**DANI (V. O.)**: *Y entonces llegó Óscar. Casi todas las malas ideas de mi vida han llegado por esa puerta.*
 **ÓSCAR**: ¡Ha llegado la caballería! ¿Dónde está el enfermo de amor?
 **DANI**: Óscar, te di la llave para emergencias.
 **ÓSCAR**: Esto es una emergencia. Tienes una cita a las nueve y hueles a cebolla.
@@ -142,7 +161,7 @@
 **DANI**: Las dos cosas. Es una colonia que se llama Tormenta salvaje.
 **SUSANA**: ¿Te la has puesto tú?
 **DANI**: Me la han puesto. Es una historia larga.
-**SUSANA**: Me gustan las historias largas. Mientras no sean del tiempo.
+**SUSANA**: Me gustan las historias largas.
 **DANI**: Hoy no hablo del tiempo. Tengo una lista nueva.
 **SUSANA**: Cómo no.
 **DANI**: Punto uno: cocinar algo de mi abuela. Punto dos: no quemarlo.
@@ -152,14 +171,14 @@
 **DANI**: Exacto. Siéntate, por favor.
 **SUSANA**: ¿Y tú dónde te sientas?
 **DANI**: Enfrente. Lo he medido: un metro cuarenta. Ni muy cerca ni muy lejos.
-**SUSANA**: Qué romántico. Con cinta métrica.
+**SUSANA**: ¿Has medido la mesa?
 **SUSANA**: Pues... está crujiente.
 **DANI**: El risotto crujiente es tendencia en Milán.
 **SUSANA**: Dani. Está quemado.
 **DANI**: Está muy quemado. Lo siento. Quería demostrarte que no soy solo el de la lámpara.
 **SUSANA** *(en voz baja)*: A mí me gustaba el de la lámpara.
 **DANI**: ¿En serio?
-**SUSANA**: El de la lámpara me hacía reír. Este de la colonia me hace llorar un poco, pero es por los ojos.
+**SUSANA**: El de la lámpara me hacía reír. Este... me tiene un poco nerviosa. Y yo no me pongo nerviosa.
 **ÓSCAR** *(gritando)*: ¡Achís!
 **SUSANA**: ¿Hay alguien en tu dormitorio?
 **DANI**: No. Es el vecino. Las paredes son muy finas.
@@ -184,11 +203,11 @@
 **LUCÍA**: ¡Dani! ¡Sorpresa! Pasaba por aquí con unos planos y una botella de champán.
 **DANI**: Lucía. Estoy... cenando.
 **LUCÍA**: Ah, hola. ¿Tú no eres la del bar?
-**SUSANA**: Y tú la del yate.
+**SUSANA**: Hola, Lucía.
 **LUCÍA**: ¡Me encanta! Dani, cariño, he venido por trabajo. Mi tienda. Tú y yo. Como en los viejos tiempos.
 **DANI**: En los viejos tiempos me dejaste por un DJ.
 **LUCÍA**: Y he aprendido mucho. Por ejemplo, que la música electrónica no se baila agarrados.
-**SUSANA**: Qué profundo.
+**SUSANA**: Vale.
 **LUCÍA**: Lo sé. Tengo medio millón de seguidores que lo confirman.
 **ÓSCAR**: ¡Achís! Vale, vale, me rindo. Hola a todos. Soy el vecino.
 **SUSANA**: El de las paredes finas.
@@ -223,7 +242,7 @@
 **ÓSCAR**: Te la devuelvo mañana. Palabra.
 **MARGA**: Mañana estará vacía. Te conozco, Óscar.
 **DANI**: ¿Y la tarta?
-**SUSANA**: La tarta se queda. Las testigos se van.
+**SUSANA**: La tarta se queda, ¿no?
 
 ### SC-007 — INT. PISO DE DANI — «Punto tres»
 
@@ -248,7 +267,7 @@
 **SUSANA**: Por Dios, no. La cena no.
 **SUSANA**: La próxima vez cocino yo.
 **DANI**: ¿Tú sabes cocinar?
-**SUSANA**: No. Pero sé abrirle la puerta al repartidor sin que se cuele ninguna ex.
+**SUSANA**: No. Pero pido muy bien a domicilio.
 
 ## ETIQUETA
 
@@ -276,3 +295,4 @@
 **SUSANA**: Que nadie me pregunte cuál es el punto cuatro.
 **DANI**: Mañana va a hacer mucho calor.
 **SUSANA**: Eso no estaba en la lista.
+**DANI (V. O.)**: *Nunca supe cuál era el punto cuatro. Pero esa... es otra cena.*

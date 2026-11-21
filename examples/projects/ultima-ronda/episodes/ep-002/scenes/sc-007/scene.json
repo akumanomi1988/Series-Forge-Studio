@@ -285,9 +285,9 @@
       "id": "v11",
       "actor": "susana",
       "to": "dani",
-      "text": "No. Pero sé abrirle la puerta al repartidor sin que se cuele ninguna ex.",
-      "emotion": "smirk",
-      "pauseAfter": 0.3
+      "text": "No. Pero pido muy bien a domicilio.",
+      "emotion": "smile",
+      "pauseAfter": 0.6
     }
   ],
   "sound": [
@@ -307,7 +307,7 @@
       "with": "d3",
       "offset": -0.5,
       "durationSec": 30,
-      "gainDb": -17,
+      "gainDb": -10,
       "fadeIn": 2,
       "fadeOut": 3,
       "duck": true

@@ -3,7 +3,7 @@
   "generator": "humanoid-toon",
   "body": {
     "height": 1.76,
-    "headScale": 1.04,
+    "headScale": 0.832,
     "headWidth": 1.05,
     "jaw": 0.75,
     "shoulderWidth": 0.5,
@@ -34,10 +34,10 @@
     "browThickness": 1.5,
     "browColor": "#141414",
     "noseShape": "wide",
-    "noseSize": 1.05,
+    "noseSize": 0.892,
     "mouthWidth": 1.12,
     "lipColor": "#7a3a32",
-    "earSize": 1,
+    "earSize": 0.55,
     "freckles": false,
     "blush": 0
   },
@@ -76,5 +76,17 @@
     }
   ],
   "parts": [],
-  "outlineWidth": 0.007
+  "outlineWidth": 0.007,
+  "acting": {
+    "listen": [
+      "hands-on-hips",
+      "cross-arms"
+    ],
+    "talk": [
+      "point",
+      "explain",
+      "present"
+    ],
+    "energy": 1.35
+  }
 }

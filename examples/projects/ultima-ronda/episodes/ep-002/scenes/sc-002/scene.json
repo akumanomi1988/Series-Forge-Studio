@@ -151,7 +151,8 @@
       "type": "propJoint",
       "prop": "puerta",
       "joint": "leaf",
-      "at": 1.6,
+      "after": "n2",
+      "offset": -0.6,
       "toDeg": 95,
       "durationSec": 0.8,
       "sound": "door-creak"
@@ -198,6 +199,35 @@
       "hand": "right",
       "pose": "show",
       "durationSec": 0.6
+    },
+    {
+      "id": "rociada",
+      "type": "effect",
+      "effect": "smoke",
+      "prop": "colonia",
+      "after": "dani-lee",
+      "offset": 0.1,
+      "durationSec": 1.6,
+      "intensity": 0.7,
+      "sound": "whoosh"
+    },
+    {
+      "id": "dani-tose",
+      "type": "play",
+      "actor": "dani",
+      "with": "rociada",
+      "offset": 0.25,
+      "clip": "facepalm",
+      "durationSec": 1.6
+    },
+    {
+      "id": "dani-aparta",
+      "type": "play",
+      "actor": "dani",
+      "with": "rociada",
+      "offset": 1.2,
+      "clip": "headshake",
+      "durationSec": 1
     },
     {
       "id": "dani-mira-frasco",
@@ -261,6 +291,25 @@
     }
   ],
   "dialogue": [
+    {
+      "id": "n1",
+      "actor": "dani",
+      "voiceOver": true,
+      "text": "Tres horas antes, todo estaba bajo control. Tenía una lista, un sofrito y la receta de mi abuela.",
+      "emotion": "smile",
+      "intensity": 0.7,
+      "direction": "narrador, en pasado, tono íntimo y con humor",
+      "at": 0.4
+    },
+    {
+      "id": "n2",
+      "actor": "dani",
+      "voiceOver": true,
+      "text": "Y entonces llegó Óscar. Casi todas las malas ideas de mi vida han llegado por esa puerta.",
+      "emotion": "smile",
+      "intensity": 0.7,
+      "direction": "narrador, en pasado, tono íntimo y con humor"
+    },
     {
       "id": "o1",
       "actor": "oscar",
@@ -483,7 +532,7 @@
       "after": "d14",
       "offset": 0.05,
       "durationSec": 1.8,
-      "gainDb": -9,
+      "gainDb": -2,
       "duck": false
     }
   ]

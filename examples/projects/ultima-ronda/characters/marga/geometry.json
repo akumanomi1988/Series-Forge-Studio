@@ -3,13 +3,13 @@
   "generator": "humanoid-toon",
   "body": {
     "height": 1.63,
-    "headScale": 1.02,
+    "headScale": 0.816,
     "headWidth": 1.02,
     "jaw": 0.4,
     "shoulderWidth": 0.4,
     "hipWidth": 0.39,
     "torsoScale": 1,
-    "legScale": 0.96,
+    "legScale": 1.0,
     "armScale": 1,
     "armThickness": 0.05,
     "legThickness": 0.078,
@@ -34,11 +34,11 @@
     "eyeShape": "almond",
     "browThickness": 1.1,
     "browColor": "#7a2a18",
-    "noseShape": "round",
-    "noseSize": 0.95,
+    "noseShape": "pointy",
+    "noseSize": 0.807,
     "mouthWidth": 1.08,
     "lipColor": "#9c2f3c",
-    "earSize": 0.9,
+    "earSize": 0.55,
     "freckles": true,
     "blush": 0.35
   },
@@ -65,7 +65,7 @@
       "fabric": "matte"
     },
     "shoes": {
-      "type": "shoes",
+      "type": "heels",
       "color": "#2a1a12"
     }
   },
@@ -80,5 +80,16 @@
     }
   ],
   "parts": [],
-  "outlineWidth": 0.007
+  "outlineWidth": 0.007,
+  "acting": {
+    "listen": [
+      "cross-arms",
+      "hands-on-hips"
+    ],
+    "talk": [
+      "dismiss",
+      "point"
+    ],
+    "energy": 0.9
+  }
 }

@@ -3,13 +3,13 @@
   "generator": "humanoid-toon",
   "body": {
     "height": 1.72,
-    "headScale": 0.96,
+    "headScale": 0.768,
     "headWidth": 0.92,
     "jaw": 0.25,
     "shoulderWidth": 0.37,
     "hipWidth": 0.37,
     "torsoScale": 1,
-    "legScale": 1.06,
+    "legScale": 1.1,
     "armScale": 1,
     "armThickness": 0.044,
     "legThickness": 0.07,
@@ -35,10 +35,10 @@
     "browThickness": 0.85,
     "browColor": "#2a1712",
     "noseShape": "button",
-    "noseSize": 0.8,
+    "noseSize": 0.68,
     "mouthWidth": 1.02,
     "lipColor": "#b3123a",
-    "earSize": 0.85,
+    "earSize": 0.55,
     "freckles": false,
     "blush": 0.3
   },
@@ -61,11 +61,12 @@
     "bottom": {
       "type": "skirt",
       "color": "#a8102c",
-      "fabric": "satin"
+      "fabric": "satin",
+      "fit": "skater"
     },
     "shoes": {
-      "type": "shoes",
-      "color": "#141014"
+      "type": "heels",
+      "color": "#b3122f"
     }
   },
   "accessories": [
@@ -75,5 +76,15 @@
     }
   ],
   "parts": [],
-  "outlineWidth": 0.007
+  "outlineWidth": 0.007,
+  "acting": {
+    "listen": [
+      "hands-on-hips"
+    ],
+    "talk": [
+      "present",
+      "explain"
+    ],
+    "energy": 0.9
+  }
 }
